@@ -13,23 +13,11 @@
   <!-- cordova.js is served from localhost to ensure the correct version -->
   <script src="http://localhost/cordova.js"></script>
   <script src="/components/steroids-js/steroids.js"></script>
+
   <script>
-    //Pollute the global namespace with the setupEvent (thanks to Phonegap architecture)
-    window.setupEvent = new Event('setup');
-
-    var onSetup = function(){
-      require(['AuthController', 'HomeController'], function(Auth, Home){
-        if(Parse.User.current()){
-          (new Home.Index()).show();
-        }else{
-          (new Auth.Index()).show();
-        }
-      });
-    }
-
-    // Listen for the event.
-    window.addEventListener('setup', onSetup, false);
+    window.controllerPath = 'http://localhost/controllers/<%= yield.controller %>.js';
   </script>
+  <%= yield.view %>
 </head>
 <body>
   <script src="/components/requirejs/require.js" data-main="http://localhost/javascripts/application"></script>

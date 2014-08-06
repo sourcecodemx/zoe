@@ -1,0 +1,29 @@
+//Override ionic variables
+// Colors
+// -------------------------------
+$stable:                          #33465d !default;
+$positive:                        #00a5db !default;
+$energized:                       #57be29 !default;
+$dark:                            #2d3d52 !default;
+
+//Buttons
+$button-stable-bg:                $stable !default;
+$button-stable-text:              #fff !default;
+$button-stable-border:            #fff !default;
+$button-stable-active-bg:         darken($stable, 15%) !default;
+$button-stable-active-border:     #fff !default;
+
+$button-positive-bg:              $positive !default;
+$button-positive-text:            #fff !default;
+$button-positive-border:          #fff !default;
+$button-positive-active-bg:       darken($positive, 15%) !default;
+$button-positive-active-border:   #fff !default;
+
+$base-background-color:           #000 !default;
+$base-color:                      #fff !default;
+
+
+//ionicons variables
+$ionicons-font-path: 'http://localhost/stylesheets/ionic/fonts' !default;
+
+//App variables

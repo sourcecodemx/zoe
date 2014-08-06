@@ -1,16 +1,19 @@
 {
-  "name": "mySteroidsProject",
+  "name": "ZoeWater",
   "version": "0.0.1",
-  "description": "My awesome AppGyver Steroids project.",
+  "description": "Zoe Water Mobile Application.",
   "repository": "N/A",
-  "readme":"N/A",
+  "readme": "N/A",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "devDependencies": {
-    "grunt-steroids": "0.x"
+    "grunt-steroids": "0.x",
+    "grunt-jade": "~0.5.0",
+    "grunt-contrib-jshint": "~0.6.3",
+    "jshint-stylish": "~0.1.3"
   },
   "license": "none",
   "engines": {

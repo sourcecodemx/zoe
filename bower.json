@@ -1,8 +1,7 @@
 {
   "name": "zoe",
   "version": "0.0.1",
-  "authors": [
-  ],
+  "authors": [],
   "ignore": [
     "**/.*",
     "node_modules",
@@ -12,6 +11,14 @@
     "tests"
   ],
   "dependencies": {
-    "steroids-js": "3.1.x"
+    "steroids-js": "3.1.x",
+    "backbone": "~1.1.2",
+    "requirejs": "~2.1.14",
+    "hammerjs": "~1.1.*",
+    "jquery-hammerjs": "~1.1.*",
+    "zepto": "~1.1.4",
+    "lodash": "~2.4.1",
+    "parse-1.2.19.min": "http://www.parsecdn.com/js/parse-1.2.19.min.js",
+    "aspect.js": "*"
   }
 }

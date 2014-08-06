@@ -1,0 +1,45 @@
+@import 'variables';
+@import 'ionic/variables';
+@import 'ionic/ionic';
+@import 'ionic/ionicons/ionicons-variables';
+@import 'ionic/ionicons/ionicons';
+
+html,
+body,
+.ionic-body {
+	min-height: 100%;
+}
+
+body {
+	position: absolute;
+}
+
+.ionic-body {
+	background-color: $stable;
+}
+
+#index-page,
+#login-page,
+#signup-page,
+#weight-config-page {
+	background-image: url(/images/background-1.png);
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+//Misc classes
+.img-res {
+	max-width: 100%;
+}
+
+.padding-large {
+	padding: $content-padding*2;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.center-block {
+	margin: 0 auto;
+}

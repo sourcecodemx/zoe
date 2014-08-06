@@ -29,20 +29,22 @@ steroids.config.location = "http://localhost/index.html"
 # steroids.config.tabBar.backgroundImage = ""
 
 # ## Preloads
-# steroids.config.preloads = [
-#   {
-#     id: "google"
-#     location: "http://www.google.com"
-#   }
-# ]
+steroids.config.preloads = [
+	{
+		id: 'signup'
+		location: 'http://localhost/views/Auth/new.html'
+	},
+	{
+		id: 'login'
+		location: 'http://localhost/views/Auth/login.html'
+	},
+	{
+		id: 'tos'
+		location: 'http://localhost/views/Auth/tos.html'
+	}
+]
 
 # ## Drawers
-# steroids.config.drawers =
-#   left:
-#     id: "leftDrawer"
-#     location: "http://localhost/leftDrawer.html"
-#     showOnAppLoad: true
-#     widthOfDrawerInPixels: 200
 #   right:
 #     id: "rightDrawer"
 #     location: "http://localhost/rightDrawer.html"
@@ -57,9 +59,9 @@ steroids.config.location = "http://localhost/index.html"
 #     widthOfLayerInPixels: 0
 
 # ## Initial View
-# steroids.config.initialView =
-#   id: "initialView"
-#   location: "http://localhost/initialView.html"
+steroids.config.initialView =
+    id: "index"
+    location: "http://localhost/index.html"
 
 # ## Navigation Bar
 steroids.config.navigationBar.tintColor = "#2d3d52"
@@ -76,8 +78,8 @@ steroids.config.navigationBar.buttonTintColor = "#ffffff"
 steroids.config.loadingScreen.tintColor = "#262626"
 
 # ## iOS Status Bar
-steroids.config.statusBar.enabled = true
-steroids.config.statusBar.style = "default"
+steroids.config.statusBar.enabled = false
+steroids.config.statusBar.style = "light"
 
 # ## File Watcher
 # steroids.config.watch.exclude = ["www/my_excluded_file.js", "www/my_excluded_dir"]
