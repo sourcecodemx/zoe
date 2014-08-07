@@ -28,7 +28,8 @@ module.exports = function(grunt) {
 					'!www/javascripts/console.log.android.js',
 					'!www/javascripts/console.log.js',
 					'!www/javascripts/onerror.android.js',
-					'!www/javascripts/onerror.js'
+					'!www/javascripts/onerror.js',
+					'!www/javascripts/zoe.js'
 				]
 			}
 		});

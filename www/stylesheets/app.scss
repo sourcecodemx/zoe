@@ -3,6 +3,7 @@
 @import 'ionic/ionic';
 @import 'ionic/ionicons/ionicons-variables';
 @import 'ionic/ionicons/ionicons';
+@import 'menu';
 
 html,
 body,
@@ -21,17 +22,24 @@ body {
 #index-page,
 #login-page,
 #signup-page,
-#weight-config-page {
+#weight-config-page,
+#signup-password-page {
 	background-image: url(/images/background-1.png);
 	background-repeat: no-repeat;
 	background-size: cover;
 }
 
-//Misc classes
-.img-res {
-	max-width: 100%;
+#headerBrand {
+	height: 100%;
+	border: 0;
+
+	img {
+		height: 85%;
+		margin-top: 5px;
+	}
 }
 
+//Misc classes
 .padding-large {
 	padding: $content-padding*2;
 }
@@ -42,4 +50,40 @@ body {
 
 .center-block {
 	margin: 0 auto;
+}
+
+//Spinner
+#spinner-overlay {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.4);
+	z-index: $z-index-backdrop;
+}
+
+#spinner {
+	position: fixed;
+	top: 50%;
+	bottom: 0;
+	height: 100px;
+	background: rgba(0,0,0,0.7);
+	//line-height: 100px;
+	left:50%;
+	width:100px;
+	margin-left:-50px;
+	margin-top:-50px;
+	text-align: center;
+	font-weight: bold;
+	text-transform: capitalize;
+	border-radius: $border-radius-large;
+	padding-top: 1em;
+	z-index: $z-index-backdrop + 1;
+
+	.icon {
+		font-size: 3em;
+	}
 }

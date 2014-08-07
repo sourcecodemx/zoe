@@ -1,15 +1,20 @@
-/* global define, steroids */
+/* global define, steroids, TimelineLite */
 define(
 	'setup',
 	[
 		'underscore',
+		'jquery',
 		'backbone',
 		'parse',
 		'config',
+		'gsap',
+		'timeline',
+		'timelineCSS',
+		'jquerygsap',
 		'hammerjs',
 		'jqueryhammer'
 	],
-	function(_, Backbone, Parse, config){
+	function(_, $, Backbone, Parse, config){
 		'use strict';
 
 		// Set the views' default backround
@@ -17,6 +22,9 @@ define(
 
 		//Initialize Parse
 		Parse.initialize(config.PARSE.ID, config.PARSE.JSKEY);
+
+		//Create main timeline
+		window.Timeline = new TimelineLite();
 
 		/** 
 		* Add close method to Backbone.View's prototype
@@ -98,13 +106,15 @@ define(
 					show();
 				} else {
 					this.overlay = $('<div id="spinner-overlay"></div>');
-					this.spinner = $('<div id="spinner"></div>');
+					this.spinner = $('<div id="spinner"><i class="icon ion-ios7-reloading"></i><div class="label"></div></div>');
 					$body.append(this.overlay);
 					$body.append(this.spinner);
 				}
 
-				if ((_.isString(label) && this.spinner) && (this.spinner.html() !== label)) {
-					this.spinner.html(label);
+				var $label = this.spinner.find('.label');
+
+				if ((_.isString(label) && $label.length) && ($label.html() !== label)) {
+					$label.html(label);
 				}
 
 				if (_.isFunction(onSuccess)) {

@@ -1,4 +1,4 @@
-/* globals define, steroids */
+/* globals define, steroids, Parse, _, Zoe */
 define(function(require){
 	'use strict';
 
@@ -55,22 +55,134 @@ define(function(require){
 		template: require('http://localhost/javascripts/templates/signup.js'),
 		events: {
 			'click #tos': 'tos',
-			'click .back-button': 'back'
+			'click .back-button': 'back',
+			'submit form': 'submit'
 		},
 		initialize: function(){
 			Controller.prototype.initialize.call(this, arguments);
 
 			this.tosView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/tos.html', id: 'tos'});
+			this.signupPasswordView = new steroids.views.WebView({location: 'http://localhost/views/Auth/new_password.html', id: 'signupPassword'});
 
 			return this.render();
 		},
 		onRender: function(){
-			console.log('signup controller render complete');
+			this.dom = {
+				username: this.$el.find('#username'),
+				email: this.$el.find('#email')
+			};
 		},
 		tos: function(){
 			setTimeout(function(){
 				steroids.modal.show(this.tosView);
 			}.bind(this), 1);
+		},
+		submit: function(e){
+			try{
+				if(e && e.preventDefault){
+					e.preventDefault();
+				}
+
+				var data = {username: this.dom.username.val(), email: this.dom.email.val()};
+
+				//Save items for the next step, will last for 10 minutes
+				Zoe.storage.setItem('signup_prefill', data, ((new Date())*1) + 10*60*1000);
+				//Take user to the next screen (password setup)
+				setTimeout(function(){
+					steroids.layers.push({
+						view: this.signupPasswordView,
+						navigationBar: false
+					});
+				}.bind(this), 1);
+			}catch(e){
+				
+			}
+		}
+	});
+
+	var Signup2 = Signup.extend({
+		id: 'signup-password-page',
+		template: require('http://localhost/javascripts/templates/signup_password.js'),
+		onRender: function(){
+			this.dom = {
+				password: this.$el.find('#password'),
+				passwordConfirmation: this.$el.find('#passwordConfirmation')
+			};
+		},
+		submit: function(e){
+			try{
+				if(e && e.preventDefault){
+					e.preventDefault();
+				}
+
+				var prefilledData = Zoe.storage.getItem('signup_prefill');
+				var password = this.dom.password.val();
+				var confirmation = this.dom.passwordConfirmation.val();
+				var user, cx;
+
+				this.$el.find(':focus').trigger('blur');
+
+				if(!_.isEmpty(prefilledData) && !_.isEmpty(password) && !_.isEmpty(confirmation) && (password === confirmation)){
+					//Add password to the object
+					prefilledData.password = password;
+					
+					//Context passed to timeout function
+					cx = {s:this.onSuccess.bind(this), e: this.onError.bind(this), data: prefilledData};
+
+					//Let's use a timeout to prevent the loading dialog to be cut off
+					setTimeout(function(){
+						window.showLoading('Guardando...');
+						
+						//start creating user
+						user = new Parse.User();
+						user.set(this.data);
+
+						//Atempt saving the user
+						user.signUp(
+							null,
+							{
+								success: this.s,
+								error: this.e
+							}
+						);
+					}.bind(cx), 800);
+				}else{
+					if(_.isEmpty(prefilledData)){
+
+						throw new Error('NO_PREFILLED_DATA');
+
+					}else if(_.isEmpty(password)||_.isEmpty(confirmation)){
+
+						throw new Error('INVALIDA_DATA');
+
+					}else if(password !== confirmation){
+
+						throw new Error('UNMATCHING_DATA');
+
+					}
+				}
+			}catch(e){
+				console.log(e.message);
+			}finally{
+
+			}
+		},
+		onSuccess: function(){
+			//Remove prefilled data
+			Zoe.storage.removeItem('prefilled_data');
+
+			setTimeout(function(){
+				window.hideLoading();
+				//Go back to the first screen
+				steroids.layers.popAll();
+			}, 200);
+		},
+		onError: function(model, error){
+			window.hideLoading();
+
+			setTimeout(function(){
+				navigator.notification.alert(this.message, $.noop, 'Ups!');
+			}.bind(error), 1);
 		}
 	});
 
@@ -78,7 +190,8 @@ define(function(require){
 		id: 'login-page',
 		template: require('http://localhost/javascripts/templates/login.js'),
 		events: {
-			'click .back-button': 'back'
+			'click .back-button': 'back',
+			'submit form': 'submit'
 		},
 		initialize: function(){
 			Controller.prototype.initialize.call(this, arguments);
@@ -86,7 +199,61 @@ define(function(require){
 			return this.render();
 		},
 		onRender: function(){
-			console.log('login controller render complete');
+			this.dom = {
+				username: this.$el.find('#username'),
+				password: this.$el.find('#password')
+			};
+		},
+		submit: function(e){
+			try{
+				if(e && e.preventDefault){
+					e.preventDefault();
+				}
+
+				var u = this.dom.username.val();
+				var p = this.dom.password.val();
+				var cx;
+
+				this.$el.find(':focus').trigger('blur');
+
+				if(!_.isEmpty(u) && !_.isEmpty(p)){
+
+					cx = {s: this.onSuccess.bind(this), e: this.onError.bind(this), u: u, p: p};
+
+					setTimeout(function(){
+
+						window.showLoading('Validando...');
+
+						Parse.User.logIn(
+							this.u, this.p,
+							{
+								success: this.s,
+								error: this.e
+							}
+						);
+					}.bind(cx), 800);
+				}
+			}catch(e){
+				console.log(e, e.message, e.stack);
+			}
+		},
+		onSuccess: function(){
+			//Broadcast login message
+			window.postMessage({message: 'login'});
+
+			setTimeout(function(){
+				//Go back to the top most view
+				steroids.layers.popAll();
+				//Hide loading indicator
+				window.hideLoading();
+			}, 500);
+		},
+		onError: function(model, error){
+			window.hideLoading();
+
+			setTimeout(function(){
+				navigator.notification.alert(this.message, $.noop, 'Ups!');
+			}.bind(error), 1);
 		}
 	});
 
@@ -111,7 +278,10 @@ define(function(require){
 
 	return {
 		Index: Index,
-		Signup: Signup,
+		signup: {
+			Credentials: Signup,
+			Password: Signup2
+		},
 		Login: Login,
 		TOS: TOS
 	};

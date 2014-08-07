@@ -3,8 +3,8 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['AuthController'], function(Auth){
-      (new Auth.signup.Credentials()).show();
+    require(['SettingsController'], function(Settings){
+      (new Settings.Index()).show();
     });
   }
 

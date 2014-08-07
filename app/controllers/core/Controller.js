@@ -62,7 +62,7 @@ define(function(require){
 		},
 		
 		back: function(){
-			steroids.layers.pop();
+			setTimeout(function(){steroids.layers.pop();}, 1);
 		}
 
 	});
