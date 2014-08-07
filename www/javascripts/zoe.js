@@ -69,7 +69,7 @@ var Zoe = (function(){
     */
     removeItem: function(key){
       if(key){
-        return localstorage.removeItem(key);
+        return localStorage.removeItem(key);
       }
     },
     /**
