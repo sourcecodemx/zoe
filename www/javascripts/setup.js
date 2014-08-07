@@ -19,6 +19,7 @@ define(
 
 		// Set the views' default backround
 		steroids.view.setBackgroundColor('#33465d');
+		//steroids.view.setBackgroundImage('http://localhost/images/background-1.png');
 
 		//Initialize Parse
 		Parse.initialize(config.PARSE.ID, config.PARSE.JSKEY);

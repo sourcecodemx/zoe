@@ -6,14 +6,14 @@ define(function(require){
 	var template = require('http://localhost/javascripts/templates/home.js');
 
 	var Index = Controller.extend({
-		id: 'home',
+		id: 'home-page',
 		template: template,
 		events: {
 			'click .toggle-menu': 'toggleMenu',
 			'click #settingsButton': 'settings'
 		},
 		initialize: function(){
-			Controller.prototype.initialize.call(this, arguments);
+			Controller.prototype.initialize.apply(this, arguments);
 
 			this.settingsView = new steroids.views.WebView({
 				location: 'http://localhost/views/Settings/index.html',
@@ -30,11 +30,9 @@ define(function(require){
 			};
 		},
 		toggleMenu: function(){
-
-			console.log('menu');
 			var pos = this.dom.menu.position().top;
 			var el = this.dom.menu;
-			console.log(pos, 'position');
+
 			if(pos < 0){
 				Timeline.fromTo(el, 0.5, {css: {top: '-100%', 'z-index': 9}}, {css: {top: 0, 'z-index': 11}});
 			}else{
@@ -48,6 +46,10 @@ define(function(require){
 					navigationBar: false
 				});
 			}.bind(this), 1);
+		},
+		onClose: function(){
+			this.settingsView.unload();
+			this.settingsView = null;
 		}
 	});
 

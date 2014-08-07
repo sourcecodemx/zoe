@@ -13,7 +13,7 @@ define(function(require){
 			'click #signin':         'signin'
 		},
 		initialize: function(){
-			Controller.prototype.initialize.call(this, arguments);
+			Controller.prototype.initialize.apply(this, arguments);
 
 			this.signupView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/new.html', id: 'signup'});
 			this.loginView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/login.html', id: 'login'});
@@ -47,6 +47,10 @@ define(function(require){
 				}.bind(this),
 				1
 			);
+		},
+		onClose: function(){
+			this.signupView = null;
+			this.loginView = null;
 		}
 	});
 
@@ -59,17 +63,20 @@ define(function(require){
 			'submit form': 'submit'
 		},
 		initialize: function(){
-			Controller.prototype.initialize.call(this, arguments);
+			Controller.prototype.initialize.apply(this, arguments);
 
 			this.tosView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/tos.html', id: 'tos'});
 			this.signupPasswordView = new steroids.views.WebView({location: 'http://localhost/views/Auth/new_password.html', id: 'signupPassword'});
+
+			window.addEventListener('message', this.onMessage.bind(this));
 
 			return this.render();
 		},
 		onRender: function(){
 			this.dom = {
 				username: this.$el.find('#username'),
-				email: this.$el.find('#email')
+				email: this.$el.find('#email'),
+				form: this.$el.find('form')
 			};
 		},
 		tos: function(){
@@ -97,6 +104,18 @@ define(function(require){
 			}catch(e){
 				
 			}
+		},
+		onMessage: function(event){
+			switch(event.data.message){
+			case 'signup':
+				this.reset();
+				break;
+			}
+		},
+		reset: function(){
+			if(this.dom.form){
+				this.dom.form.trigger('reset');
+			}
 		}
 	});
 
@@ -106,7 +125,8 @@ define(function(require){
 		onRender: function(){
 			this.dom = {
 				password: this.$el.find('#password'),
-				passwordConfirmation: this.$el.find('#passwordConfirmation')
+				passwordConfirmation: this.$el.find('#passwordConfirmation'),
+				form: this.$el.find('form')
 			};
 		},
 		submit: function(e){
@@ -171,11 +191,28 @@ define(function(require){
 			//Remove prefilled data
 			Zoe.storage.removeItem('prefilled_data');
 
+			window.postMessage({
+				message: 'signup',
+				token: Parse.User.current()._sessionToken
+			});
+
+			//Create weight view
+			this.weightView = new steroids.views.WebView({
+				location: 'http://localhost/views/Settings/weight.html',
+				id: 'weightView'
+			});
+			//Preload weight view
+			this.weightView.preload();
+
 			setTimeout(function(){
+				//Push weight view
+				steroids.layers.push({
+					view: this.weightView,
+					navigationBar: false
+				});
+				//Hide loading indicator
 				window.hideLoading();
-				//Go back to the first screen
-				steroids.layers.popAll();
-			}, 200);
+			}.bind(this), 500);
 		},
 		onError: function(model, error){
 			window.hideLoading();
@@ -183,6 +220,23 @@ define(function(require){
 			setTimeout(function(){
 				navigator.notification.alert(this.message, $.noop, 'Ups!');
 			}.bind(error), 1);
+		},
+		onMessage: function(event){
+			switch(event.data.message){
+			case 'signup':
+				this.reset();
+				break;
+			case 'signup_weight':
+				if(this.weightView){
+					this.weightView.unload();
+				}
+				break;
+			}
+		},
+		reset: function(){
+			if(this.dom.form){
+				this.dom.form.trigger('reset');
+			}
 		}
 	});
 
@@ -194,14 +248,17 @@ define(function(require){
 			'submit form': 'submit'
 		},
 		initialize: function(){
-			Controller.prototype.initialize.call(this, arguments);
+			Controller.prototype.initialize.apply(this, arguments);
+
+			window.addEventListener('message', this.onMessage.bind(this));
 
 			return this.render();
 		},
 		onRender: function(){
 			this.dom = {
 				username: this.$el.find('#username'),
-				password: this.$el.find('#password')
+				password: this.$el.find('#password'),
+				form: this.$el.find('form')
 			};
 		},
 		submit: function(e){
@@ -239,7 +296,12 @@ define(function(require){
 		},
 		onSuccess: function(){
 			//Broadcast login message
-			window.postMessage({message: 'login'});
+			window.postMessage({
+				message: 'login',
+				token: Parse.User.current()._sessionToken
+			});
+			//Reset form
+			this.reset();
 
 			setTimeout(function(){
 				//Go back to the top most view
@@ -254,6 +316,18 @@ define(function(require){
 			setTimeout(function(){
 				navigator.notification.alert(this.message, $.noop, 'Ups!');
 			}.bind(error), 1);
+		},
+		onMessage: function(event){
+			switch(event.data.message){
+			case 'login':
+				
+				break;
+			}
+		},
+		reset: function(){
+			if(this.dom.form){
+				this.dom.form.trigger('reset');
+			}
 		}
 	});
 
@@ -264,7 +338,7 @@ define(function(require){
 			'click .hide-modal': 'hideModal'
 		},
 		initialize: function(){
-			Controller.prototype.initialize.call(this, arguments);
+			Controller.prototype.initialize.apply(this, arguments);
 
 			return this.render();
 		},
