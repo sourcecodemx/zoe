@@ -3,8 +3,8 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['SettingsController'], function(Settings){
-      (new Settings.Weight()).show();
+    require(['SettingsController'], function(C){
+      (new C.Weight()).show();
     });
   }
 

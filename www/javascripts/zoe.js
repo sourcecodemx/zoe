@@ -19,8 +19,8 @@ var Zoe = (function(){
     getItem: function(key){
       var item, exp;
       try{
-        item = JSON.parse(localStorage.getItem(key)) || {};
-        if('timestamp' in item ){
+        item = JSON.parse(localStorage.getItem(key)) || null;
+        if(item && item.timestamp){
           exp = new Date().getTime();
           item = exp < item.timestamp ? item : null;
         }

@@ -1,0 +1,14 @@
+#gallery-page,
+#gallery-image-page {
+	img {
+		text-shadow: 0 0 2px transparentize(black, 0.3);
+	}
+
+	#like {
+		font-size: 5em;
+		
+		.ion-ios7-heart{
+			color: red;
+		}
+	}
+}

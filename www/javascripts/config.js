@@ -6,6 +6,11 @@ define('config', function(){
 		PARSE: {
 			ID: 'Li087ST1O7bYBGKxhFQhWwlKnPRy4jJ2575mz7C3',
 			JSKEY: 'ex5SBIHB9bNN9ELyx1ZRFoqiWVfrl5SIukRct2zt'
+		},
+		FB: {
+			DEFAULT_PERMISSION: ['public_info'],
+			APP_ID: '733603660030225',
+			APP_NAME: 'Zoe Water Dev'
 		}
 	};
 });

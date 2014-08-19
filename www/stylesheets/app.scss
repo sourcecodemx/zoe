@@ -4,6 +4,16 @@
 @import 'ionic/ionicons/ionicons-variables';
 @import 'ionic/ionicons/ionicons';
 @import 'menu';
+@import 'font-face';
+
+//views
+@import 'views/home';
+@import 'views/settings';
+@import 'views/stats';
+@import 'views/gallery';
+@import 'views/blog';
+@import 'views/premier';
+@import 'views/store';
 
 html,
 body,
@@ -17,6 +27,22 @@ body {
 
 .ionic-body {
 	background-color: $stable;
+
+	.page-content {
+		position: absolute;
+		top:0;
+		left:0;
+		right:0;
+		bottom:0;
+		padding-bottom:30px;
+		overflow-x: hidden;
+		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
+	}
+}
+
+.modal-open .ionic-body {
+	-webkit-filter: blur(2px);
 }
 
 #index-page,

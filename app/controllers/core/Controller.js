@@ -13,7 +13,10 @@ define(function(require){
 		title: 'Default title',
 		description: 'Default Description',
 		events: {
-			//Add default events
+			'click #leftButton': 'onLeftButton',
+			'click #title': 'onTitle',
+			'click #rightButton': 'onRightButton',
+			'submit form': 'submit'
 		},
 		mobile: true,
 		initialize: function(){
@@ -63,6 +66,17 @@ define(function(require){
 		
 		back: function(){
 			setTimeout(function(){steroids.layers.pop();}, 1);
+		},
+		onLeftButton: function(){
+			this.back();
+		},
+		onRightButton: function(){},
+		onTitle: function(){},
+		submit: function(){},
+		reset: function(){
+			if(this.dom.form){
+				this.dom.form.trigger('reset');
+			}
 		}
 
 	});

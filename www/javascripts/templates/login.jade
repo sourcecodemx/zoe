@@ -1,20 +1,21 @@
 .bar.bar-header.bar-dark
-	button.button.icon.button-clear.ion-chevron-left.back-button
+	button.button.icon.button-clear.ion-ios7-arrow-left.back-button#leftButton
 	.h1.title Ingresa a tu cuenta
 
-.content.has-header
-	form.row
-		.col
-			.padding
-				.list
-					label.item.item-input
-						input#username(type='text', placeholder="Usuario", autocomplete="off", autocapitalize="off")
-						
-				.list
-					label.item.item-input
-						input#password(type='password', placeholder="Contraseña")
+.scroll-content.has-header
+	.page-content
+		form.row
+			.col
+				.padding
+					.list
+						label.item.item-input
+							input#username(type='text', placeholder="Usuario", autocomplete="off", autocapitalize="off")
+							
+					.list
+						label.item.item-input
+							input#password(type='password', placeholder="Contraseña")
 
-				.text-center
-					button(type='submit').button.button-outline.button-light Siguiente
-				.text-center
-					a#forgot ¿Olvidaste tu usuario o contraseña?
+					.text-center
+						button(type='submit').button.button-outline.button-light Siguiente
+					.text-center
+						a#forgot ¿Olvidaste tu usuario o contraseña?

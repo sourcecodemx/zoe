@@ -1,0 +1,14 @@
+<script>
+  //Pollute the global namespace with the setupEvent (thanks to Phonegap architecture)
+  window.setupEvent = new Event('setup');
+
+  var onSetup = function(){
+    require(['AuthController'], function(Auth){
+    	window.controller = new Auth.signup.Weight().show(); 
+      //(new Auth.signup.Weight()).show();
+    });
+  }
+
+  // Listen for the event.
+  window.addEventListener('setup', onSetup, false);
+</script>

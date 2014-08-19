@@ -4,6 +4,8 @@ require.config({
 		//Core libraries
 		aspect:      'http://localhost/components/aspect.js/src/aspect',
 		backbone:    'http://localhost/components/backbone/backbone',
+		//fb:          '//connect.facebook.net/en_US/all',
+		fb:          'http://localhost/components/openfb/index',
 		functional:  'http://localhost/components/aspect.js/src/functional',
 		gsap:        'http://localhost/components/gsap/src/minified/TweenLite.min',
 		hammerjs:    'http://localhost/components/hammerjs/hammer.min',
@@ -18,12 +20,19 @@ require.config({
 		templates:   'http://localhost/javascripts/templates',
 		jade:        'http://localhost/javascripts/templates/jade',
 		setup:       'http://localhost/javascripts/setup',
+		mixins:      'http://localhost/javascripts/mixins',
 
 		//MVC
 		//TODO: Setup modules for MVC blocks
 		AuthController :    'http://localhost/controllers/Auth',
 		HomeController :    'http://localhost/controllers/Home',
-		SettingsController: 'http://localhost/controllers/Settings'
+		SettingsController: 'http://localhost/controllers/Settings',
+		GalleryController:  'http://localhost/controllers/Gallery',
+		BlogController:     'http://localhost/controllers/Blog',
+		PremierController:  'http://localhost/controllers/Premier',
+		PosController:      'http://localhost/controllers/Pos',
+		StoreController:    'http://localhost/controllers/Store',
+		StatsController:    'http://localhost/controllers/Stats'
 	},
 	shim: {
 		aspect: {
@@ -46,9 +55,12 @@ require.config({
 		underscore: {
 			exports: '_'
 		},
+		mixins: {
+			deps: ['underscore']
+		},
 		parse: {
 			exports: 'Parse',
-			deps: ['backbone']
+			deps: ['backbone', 'fb']
 		},
 		setup: {
 			deps: ['parse']

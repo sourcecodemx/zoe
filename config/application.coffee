@@ -76,7 +76,7 @@ steroids.config.navigationBar.buttonTintColor = "#ffffff"
 # steroids.config.navigationBar.borderSize = 2
 
 # steroids.config.navigationBar.landscape.backgroundImage = ""
-# steroids.config.navigationBar.portrait.backgroundImage = ""
+steroids.config.navigationBar.portrait.backgroundImage = "http://localhost/images/navigation_background.jpg"
 
 # ## Android Loading Screen
 steroids.config.loadingScreen.tintColor = "#262626"

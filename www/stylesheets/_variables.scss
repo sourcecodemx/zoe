@@ -19,9 +19,28 @@ $button-positive-border:          #fff !default;
 $button-positive-active-bg:       darken($positive, 15%) !default;
 $button-positive-active-border:   #fff !default;
 
-$base-background-color:           #000 !default;
+$button-default-border:           #fff !default;
+$button-dark-border:              $button-default-border !default;
+$button-energized-border:         $button-default-border !default;
+
+//Bar
+$bar-dark-border:                 transparent !default;
+
+$base-background-color:           $stable !default;
 $base-color:                      #fff !default;
 
+//Tabs
+$tabs-dark-border:                $bar-dark-border !default;
+
+//Modal
+$modal-bg-color:                  transparent !default;
+
+//Cards
+$card-border-color:               transparent !default;
+$card-border-radius:              4px !default;
+
+//Font
+$font-family-sans-serif:          robotolight, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif !default;
 
 //ionicons variables
 $ionicons-font-path: 'http://localhost/stylesheets/ionic/fonts' !default;

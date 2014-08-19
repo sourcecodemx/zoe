@@ -5,8 +5,10 @@ define(
 		'underscore',
 		'jquery',
 		'backbone',
+		//'fb',
 		'parse',
 		'config',
+		'mixins',
 		'gsap',
 		'timeline',
 		'timelineCSS',
@@ -23,6 +25,13 @@ define(
 
 		//Initialize Parse
 		Parse.initialize(config.PARSE.ID, config.PARSE.JSKEY);
+		/*Parse.FacebookUtils.init({
+			appId      : config.FB.APP_ID, // Facebook App ID
+			//channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File
+			cookie     : true, // enable cookies to allow Parse to access the session
+			xfbml      : true  // parse XFBML
+		});*/
+		//FB.init({appId: config.FB.APP_ID});
 
 		//Create main timeline
 		window.Timeline = new TimelineLite();
@@ -96,18 +105,19 @@ define(
 		window.showLoading = function (label, onSuccess, onError) {
 			try {
 				var $body = $('body');
+				var height = $(window).height();
 				var show = function () {
 					this.spinner.show();
 					this.overlay.show();
 				}.bind(this);
 
-				$('body').addClass('loading');
+				$('body').addClass('loading modal-open');
 
 				if (this.spinner) {
 					show();
 				} else {
-					this.overlay = $('<div id="spinner-overlay"></div>');
-					this.spinner = $('<div id="spinner"><i class="icon ion-ios7-reloading"></i><div class="label"></div></div>');
+					this.overlay = $('<div id="spinner-overlay" style="height: ' + height + 'px;"></div>');
+					this.spinner = $('<div id="spinner" style="top: ' + (height/2) + 'px;"><i class="icon ion-ios7-reloading"></i><div class="label"></div></div>');
 					$body.append(this.overlay);
 					$body.append(this.spinner);
 				}
@@ -137,7 +147,7 @@ define(
 		*/
 		window.hideLoading = function () {
 			try{
-				$('body').removeClass('loading');
+				$('body').removeClass('loading modal-open');
 
 				if (this.spinner) {
 					this.spinner.hide();

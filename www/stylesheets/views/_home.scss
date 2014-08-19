@@ -1,0 +1,42 @@
+#home-page {
+
+	#stats {
+		background: url('http://localhost/images/stats.png') no-repeat center;
+		background-size: contain;
+		width: $font-size-base * 2;
+		height: $font-size-base * 2;
+		padding: $padding-small-vertical;
+		margin: $padding-small-vertical 0;
+	}
+
+	#goalArea {
+		position: relative;
+		margin: $padding-large-vertical 0;
+		
+		#track {
+			position: absolute;
+			width: 180px;
+			height: 180px;
+			top: 20px;
+			left: 0;
+			right: 0;
+			margin: 0 auto;
+			background: url('http://localhost/images/trackButton.png') no-repeat;
+			background-size: cover;
+			border-radius: 90px;
+			box-shadow: 0 10px 20px transparentize(black, 0.7);
+		}
+
+		canvas {
+			background:lightgray;
+			border-radius: 110px;
+			box-shadow: 0 20px 20px transparentize(black, 0.7);
+		}
+	}
+
+	& + #modal {
+		#bottles {
+			margin-bottom: $padding-large-vertical * 6;
+		}
+	}
+}

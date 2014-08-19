@@ -1,32 +1,26 @@
 .bar.bar-header.bar-dark
-	button.button.icon.button-clear.ion-ios7-arrow-down.back-button.toggle-menu
+	button.button.icon.button-clear.ion-ios7-arrow-down#leftButton
 	.h1.title
-		button.button-cleat.button#headerBrand.toggle-menu(type='button')
+		button.button-clear.button#headerBrand(type='button')
 			img(src='http://localhost/images/zoe.png')
-	button.button.icon.button-clear.ion-ios7-gear-outline.back-button#settingsButton
+	button.button.icon.button-clear.ion-ios7-gear-outline.back-button#rightButton
 
-#menu
-	ul.text-center
-		li
-			button.button-clear.button(type='button') Consumo Diario
-		li
-			button.button-clear.button(type='button') ?Que es Zoe Water?
-		li
-			button.button-clear.button(type='button') Comparte tu Foto
-		li
-			button.button-clear.button(type='button') Blog Alcalino
-		li
-			button.button-clear.button(type='button') Zoe Water Premier
-		li
-			button.button-clear.button(type='button') Puntos de Venta
-		li
-			button.button-clear.button(type='button') Tienda en Linea
+include ./menu.jade
 
-.content.has-header
-	.padding-top
-		.h4.text-center Hola Jorge!
-		.h4.text-center Tu meta del dia son 2 litros
+.scroll-content.has-header
+	.page-content
+		.padding-top#homeGreeting
+			.h4.text-center ¡Hola #{data.username}!
+			.h4.text-center Tu meta del dia son #{data.goal}
 
-	.text-center
-		button.button.button-dark.rounded
-			i.icon.ion-ios7-pulse-strong
+		.text-center
+			button.button.button-clear#stats
+
+		.text-center#goalArea
+			canvas#progress(width=220, height=220)
+			#track(type='button')
+
+		.text-center.h3#percentage 35%
+
+		.text-center
+			button.button.button-energized#share Compartir

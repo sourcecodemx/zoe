@@ -1,0 +1,15 @@
+#premier-page {
+	background: rgb(1, 1, 1) url('http://localhost/images/premier_back.jpg') no-repeat;
+	background-position-y: $padding-large-vertical * 7;
+	background-size: 50%;
+	background-position-x: 100%;
+
+	#premierLogo {
+		margin-top: $padding-large-vertical * 3;
+	}
+
+	#benefits {
+		margin: $padding-large-vertical * 2 0;
+		line-height: 2em;
+	}
+}

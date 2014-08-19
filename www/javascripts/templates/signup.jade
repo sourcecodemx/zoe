@@ -1,21 +1,22 @@
 .bar.bar-header.bar-dark
-	button.button.icon.button-clear.ion-chevron-left.back-button
+	button.button.icon.button-clear.ion-ios7-arrow-left.back-button#leftButton
 	.h1.title 1. Crear tu cuenta
 
-.content.has-header
-	form.row
-		.col
-			.padding
-				.list
-					label.item.item-input
-						input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off")
-						
-				.list
-					label.item.item-input
-						input#email(type='email', placeholder="Correo electronico")
+.scroll-content.has-header
+	.page-content
+		form.row
+			.col
+				.padding
+					.list
+						label.item.item-input
+							input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off")
+							
+					.list
+						label.item.item-input
+							input#email(type='email', placeholder="Correo electronico")
 
-				.text-center
-					button(type='submit').button.button-outline.button-light Siguiente
-				.text-center
-					| Al crear tu cuenta confirmas que has leido y 
-					a#tos Aceptas los terminos de uso
+					.text-center
+						button(type='submit').button.button-outline.button-light Siguiente
+					.text-center
+						| Al crear tu cuenta confirmas que has leido y 
+						a#tos Aceptas los terminos de uso

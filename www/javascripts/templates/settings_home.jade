@@ -1,34 +1,34 @@
 .bar.bar-header.bar-dark
-	button.button.icon.button-clear.ion-chevron-left.back-button
-	.h1.title Configuracion
+	button.button.icon.button-clear.ion-ios7-arrow-left.back-button#leftButton
+	.h1.title#title Configuracion
 
-.content.has-header
-	br
-	.list
-		a.item.item-icon-right.item-dark#updateName
-			| Cambiar Nombre
-			i.ion-ios7-arrow-right.icon
+.scroll-content.has-header
+	.page-content
+		br
+		.list.list-inset
+			a.item.item-icon-right.item-dark#updateName(data-view='name')
+				| Cambiar Nombre
+				i.ion-ios7-arrow-right.icon
 
-		a.item.item-icon-right.item-dark#updateEmail
-			| Cambiar Correo
-			i.ion-ios7-arrow-right.icon
+			a.item.item-icon-right.item-dark#updateEmail(data-view='email')
+				| Cambiar Correo
+				i.ion-ios7-arrow-right.icon
 
-		a.item.item-icon-right.item-dark#updatePassword
-			| Cambiar Contrasena
-			i.ion-ios7-arrow-right.icon
+			a.item.item-icon-right.item-dark#updatePassword(data-view='password')
+				| Cambiar Contraseña
+				i.ion-ios7-arrow-right.icon
 
-		a.item.item-icon-right.item-dark#updateWeight
-			| Cambiar Peso
-			i.ion-ios7-arrow-right.icon
+			a.item.item-icon-right.item-dark#updateWeight(data-view='weight')
+				| Cambiar Peso
+				i.ion-ios7-arrow-right.icon
 
-	br
+			a.item.item-icon-right.item-assertive#signout Cerrar Sesión
 
-	.text-center
-		button.button.button-assertive#signout Cerrar Sesion
+		.text-center
+			img#settingsBottle(src='http://localhost/images/bottle.png')
 
-	img
-	.text-center
-		button.button.button-clear#tos Ver terminos de uso
+		.text-center
+			button.button.button-clear#tos(data-view='tos') Ver terminos de uso
 
 
-	p.text-center Welcome to the Source/Code
+		p.text-center Welcome to the Source/Code

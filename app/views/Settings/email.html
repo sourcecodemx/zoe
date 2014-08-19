@@ -1,0 +1,12 @@
+<script>
+  window.setupEvent = new Event('setup');
+
+  var onSetup = function(){
+    require(['SettingsController'], function(C){
+      (new C.Email()).show();
+    });
+  }
+
+  // Listen for the event.
+  window.addEventListener('setup', onSetup, false);
+</script>

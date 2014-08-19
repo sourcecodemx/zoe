@@ -9,12 +9,13 @@ Currently, loading.html is supported by iOS only.
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Loading...</title>
+  <title>Cargando...</title>
 
   <link rel="stylesheet" href="vendor/ionic/css/ionic.css" />
   <style>
   body, html {
     height:100%;
+    background: #33465d;
   }
   .loading-box {
     height:100%;
@@ -25,11 +26,16 @@ Currently, loading.html is supported by iOS only.
   }
   .ion-loading-c {
     font-size:50px;
+    color: white;
   }
   </style>
 </head>
 
 <body class="loading-box content">
-  <i class="ion-loading-c"></i>
+  <div class='loading-container'>
+    <div class='loading'>
+    Loading...
+    </div>
+  </div>
 </body>
 </html>

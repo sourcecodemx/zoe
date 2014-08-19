@@ -1,0 +1,13 @@
+<script>
+  //Pollute the global namespace with the setupEvent (thanks to Phonegap architecture)
+  window.setupEvent = new Event('setup');
+
+  var onSetup = function(){
+    require(['GalleryController'], function(C){
+      (new C.Index()).show();
+    });
+  }
+
+  // Listen for the event.
+  window.addEventListener('setup', onSetup, false);
+</script>

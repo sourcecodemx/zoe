@@ -1,0 +1,13 @@
+#stats-page {
+	background: url('http://localhost/images/stats_back.jpg') no-repeat center top;
+	background-position-y: $padding-large-vertical * 5;
+	background-size: cover;
+	background-color: white;
+
+	#history {
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+		padding: 0;
+	}
+}
