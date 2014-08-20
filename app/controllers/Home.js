@@ -50,6 +50,11 @@ define(function(require){
 			this._drawMultiRadiantCircle(150, 150, 120, this.progressColors);
 		},
 		onRightButton: function(){
+			//Hide menu (if visible)
+			if(this.dom.menu && this.dom.menu.position().top === 0){
+				this.toggleMenu();
+			}
+
 			setTimeout(function(){
 				steroids.layers.push({
 					view: this.views.settings,

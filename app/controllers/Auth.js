@@ -1,10 +1,13 @@
-/* globals define, steroids, Parse, _, Zoe, facebookConnectPlugin */
+/* globals define, steroids, Parse, _, Zoe, openFB, CryptoJS */
 define(function(require){
 	'use strict';
 
 	var Controller      = require('http://localhost/controllers/core/Controller.js');
 	var Modal           = require('http://localhost/controllers/core/Modal.js');
 	var config          = require('config');
+
+	//Require crypto library
+	require('http://localhost/components/cryptojslib/rollups/sha3.js');
 
 	/**
 	* Index Controller
@@ -27,21 +30,99 @@ define(function(require){
 
 			this.signupView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/new.html', id: 'signup'});
 			this.loginView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/login.html', id: 'login'});
+			this.weightView = new steroids.views.WebView({location: 'http://localhost/views/Auth/weight.html',id: 'signupWeightView'});
+			
+			this.weightView.preload();
+
+			window.addEventListener('message', this.onMessage.bind(this));
 
 			return this.render();
 		},
 		facebook: function(){
-			facebookConnectPlugin.login(
-				config.FB.DEFAULT_PERMISSION,
-				this.onFBSignup.bind(this),
-				this.onFBError.bind(this)
+			window.showLoading('Autenticando...');
+			openFB.login(this.onFBResponse.bind(this), {scope: config.FB.SCOPE});
+		},
+		onFBResponse: function(response){
+			if(response.status === 'connected') {
+				window.showLoading('Sincronizando...');
+				openFB.api({
+					path: '/me',
+					success: this.onMe.bind(this),
+					error: this.onFBError.bind(this)
+				});
+			} else {
+				setTimeout(function(){
+					navigator.notification.alert(this.message, $.noop, 'Ups!');
+				}.bind(response), 1);
+			}
+		},
+		onFBError: function(response){
+			window.hideLoading();
+			console.log('onfberror', response);
+		},
+		onMe: function(response){
+			var data = {
+				email: response.email,
+				username: response.id,
+				password: CryptoJS.SHA3(response.id).toString(),
+				firstName: response.first_name || '',
+				lastName: response.last_name || '',
+				fullName: response.name || '',
+				gender: response.gender || ''
+			};
+
+			//start creating user
+			var user = new Parse.User();
+			user.set(data);
+
+			//Atempt saving the user
+			user.signUp(
+				null,
+				{
+					success: this.onSuccess.bind(this),
+					error: this.onError.bind(this)
+				}
 			);
 		},
-		onFBSignup: function(){
-			console.log('fbsignup', arguments);
+		onSuccess: function(){
+			setTimeout(function(){
+				//Push weight view
+				steroids.layers.push({
+					view: this.weightView,
+					navigationBar: false
+				});
+				//Hide loading indicator
+				window.hideLoading();
+
+				window.postMessage({message: 'fbauth'});
+			}.bind(this), 1);
 		},
-		onFBError: function(e){
-			console.log('fberror', e, typeof e);
+		onLogin: function(){
+			window.hideLoading();
+			window.postMessage({message: 'fbauth'});
+		},
+		onError: function(model, error){
+			window.hideLoading();
+			//If username already exists
+			if(error.code === 202){
+				Parse.User.logIn(
+					model.get('username'), model.get('password'),{
+						success: this.onLogin.bind(this),
+						error: this.onLoginError.bind(this)
+					}
+				);
+			}else{
+				setTimeout(function(){
+					navigator.notification.alert(this.message, $.noop, 'Ups!');
+				}.bind(error), 1);
+			}
+		},
+		onLoginError: function(model, error){
+			window.hideLoading();
+
+			setTimeout(function(){
+				navigator.notification.alert(this.message, $.noop, 'Ups!');
+			}.bind(error), 1);
 		},
 		signup: function(){
 			setTimeout(
@@ -68,6 +149,16 @@ define(function(require){
 		onClose: function(){
 			this.signupView = null;
 			this.loginView = null;
+			this.weightView = null;
+		},
+		onMessage: function(event){
+			switch(event.data.message){
+			case 'signup_weight':
+				if(this.weightView){
+					this.weightView.unload();
+				}
+				break;
+			}
 		}
 	});
 
@@ -263,7 +354,11 @@ define(function(require){
 	var SignupWeight = Controller.extend({
 		id: 'signup-weight-page',
 		template: require('http://localhost/javascripts/templates/signup_weight.js'),
-		initialize: function(){
+		initialize: function(options){
+			if(!options || !options.model || !options.model instanceof Parse.User){
+				throw new Error('Settings.Weight require a User model');
+			}
+
 			Controller.prototype.initialize.apply(this, arguments);
 
 			this.render();
@@ -294,7 +389,7 @@ define(function(require){
 				}
 			}catch(e){
 				window.hideLoading();
-				console.log(e);
+				console.log(e, e.stack);
 			}
 		},
 		onSuccess: function(){

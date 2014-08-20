@@ -1,13 +1,13 @@
-/* global define, steroids, TimelineLite */
+/* global define, steroids, TimelineLite, openFB */
 define(
 	'setup',
 	[
 		'underscore',
 		'jquery',
 		'backbone',
-		//'fb',
 		'parse',
 		'config',
+		'fb',
 		'mixins',
 		'gsap',
 		'timeline',
@@ -25,13 +25,8 @@ define(
 
 		//Initialize Parse
 		Parse.initialize(config.PARSE.ID, config.PARSE.JSKEY);
-		/*Parse.FacebookUtils.init({
-			appId      : config.FB.APP_ID, // Facebook App ID
-			//channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File
-			cookie     : true, // enable cookies to allow Parse to access the session
-			xfbml      : true  // parse XFBML
-		});*/
-		//FB.init({appId: config.FB.APP_ID});
+
+		openFB.init({appId: config.FB.APP_ID});
 
 		//Create main timeline
 		window.Timeline = new TimelineLite();
@@ -107,8 +102,8 @@ define(
 				var $body = $('body');
 				var height = $(window).height();
 				var show = function () {
-					this.spinner.show();
-					this.overlay.show();
+					this.spinner.fadeIn();
+					this.overlay.fadeIn();
 				}.bind(this);
 
 				$('body').addClass('loading modal-open');
@@ -150,10 +145,10 @@ define(
 				$('body').removeClass('loading modal-open');
 
 				if (this.spinner) {
-					this.spinner.hide();
+					this.spinner.fadeOut();
 				}
 				if (this.overlay) {
-					this.overlay.hide();
+					this.overlay.fadeOut();
 				}
 			}catch(e){
 				console.log('An error occurred while trying to hide the spinner', e, e.stack, e.message);
@@ -168,5 +163,16 @@ define(
 				}
 			}
 		});
+
+		var onMessage = function(event){
+			var data = event.data || {};
+
+			switch(data.message){
+			case 'logout':
+				Parse.User.logOut();
+				break;
+			}
+		};
+		window.addEventListener('message', onMessage);
 	}
 );

@@ -77,6 +77,17 @@ define(function(require){
 			if(this.dom.form){
 				this.dom.form.trigger('reset');
 			}
+		},
+		messageListener: function(){
+			window.addEventListener('message', this.onMessage.bind(this));
+		},
+		onMessage: function(event){
+			var data = event.data;
+			switch(data.message){
+			case 'reload':
+				this.render();
+				break;
+			}
 		}
 
 	});

@@ -10,7 +10,8 @@ define(function(require){
 			'click #headerBrand': 'onLeftButton',
 			'click #rightButton': 'onRightButton',
 			'click #menu button[root]': 'showRootView',
-			'click #home': 'home'
+			'swipedown #menu': 'onLeftButton',
+			'click #home': 'home',
 		},
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);

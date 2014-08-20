@@ -13,8 +13,7 @@
 
   <!-- cordova.js is served from localhost to ensure the correct version -->
   <script src="http://localhost/cordova.js"></script>
-  <script src="http://localhost/cdv-plugin-fb-connect.js"></script>
-  <script src="http://localhost/facebook-js-sdk.js"></script>
+  <script src="http://localhost/MapKit.js"></script>
 
   <script src="http://localhost/javascripts/zoe.js"></script>
   <script src="/components/steroids-js/steroids.js"></script>
@@ -47,39 +46,43 @@
         //Listen for messages
         var onMessage = function(event){
           var data = event.data;
-          //Did we authenticate?
-          this.authed = data.message === 'login' || data.message === 'signup';
-          this.message = data.message;
-
-          if(this.authed && data.token){
+          var reload = function(){
+            //Destroy current view
+            this.view.destroy();
+            this.view = null;
+            //Create home view
+            this.view = window.view = this.fn();
+            //Hide loading
+            window.hideLoading();
+          }.bind(this);
+          
+          switch(data.message){
+          case 'login':
+          case 'signup':
             window.showLoading('Sincronizando...');
-            //Login with passed token
+
             Parse.User.become(data.token, {
               success: function(){
-                //Destroy current view
-                this.view.destroy();
-                this.view = null;
-                //Create home view
-                this.view = this.fn();
-                //Hide loading
-                window.hideLoading();
-              }.bind(this),
+                window.postMessage({message:'reload'});
+              },
               error: function(){
                 window.hideLoading();
 
                 setTimeout(function(){
-                  navigator.notification.alert('Error al iniciar sesion', $.noop, 'Error');
+                navigator.notification.alert('Error al iniciar sesion', $.noop, 'Error');
                 }, 1);
               }
             });
-          }else if(data.message === 'logout'){
+            break;
+          case 'fbauth':
+          case 'reload':
+            reload();
+            break;
+          case 'logout':
             //Logout
             Parse.User.logOut();
-            //Clear view instance
-            this.view.destroy();
-            this.view = null;
-            //Create new view
-            this.view = this.fn();
+            reload();
+            break;
           }
         }.bind({view: view, fn: initialize});
 
@@ -96,5 +99,6 @@
 <body>
   <script src="/components/requirejs/require.js" data-main="http://localhost/javascripts/application"></script>
   <!--script src="http://192.168.0.13:31173/target/target-script-min.js#anonymous"></script-->
+  <script src="http://192.168.1.72:8089/target/target-script-min.js#anonymous"></script>
 </body>
 </html>

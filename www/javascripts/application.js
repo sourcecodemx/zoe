@@ -32,7 +32,8 @@ require.config({
 		PremierController:  'http://localhost/controllers/Premier',
 		PosController:      'http://localhost/controllers/Pos',
 		StoreController:    'http://localhost/controllers/Store',
-		StatsController:    'http://localhost/controllers/Stats'
+		StatsController:    'http://localhost/controllers/Stats',
+		AboutController:    'http://localhost/controllers/Stats'
 	},
 	shim: {
 		aspect: {

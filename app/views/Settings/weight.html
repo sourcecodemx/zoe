@@ -4,7 +4,7 @@
 
   var onSetup = function(){
     require(['SettingsController'], function(C){
-      (new C.Weight()).show();
+      (new C.Weight({model: Parse.User.current()})).show();
     });
   }
 

@@ -4,7 +4,7 @@
 
   var onSetup = function(){
     require(['AuthController'], function(Auth){
-    	window.controller = new Auth.signup.Weight().show(); 
+    	window.controller = new Auth.signup.Weight({model: Parse.User.current()}).show(); 
       //(new Auth.signup.Weight()).show();
     });
   }

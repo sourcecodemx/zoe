@@ -4,7 +4,7 @@
 
   var onSetup = function(){
     require(['SettingsController'], function(C){
-      (new C.Index()).show();
+      (new C.Index({model: Parse.User.current()})).show();
     });
   }
 

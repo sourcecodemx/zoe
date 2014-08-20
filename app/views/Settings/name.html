@@ -3,7 +3,7 @@
 
   var onSetup = function(){
     require(['SettingsController'], function(C){
-      (new C.Name()).show();
+      (new C.Name({model: Parse.User.current()})).show();
     });
   }
 

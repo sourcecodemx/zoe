@@ -1,4 +1,4 @@
-/* globals define, steroids, _ */
+/* globals define, steroids, _, Parse */
 define(function(require){
 	'use strict';
 
@@ -99,17 +99,22 @@ define(function(require){
 	var EditWeight = Auth.signup.Weight.extend({
 		id: 'settings-weight-page',
 		template: require('http://localhost/javascripts/templates/settings_weight.js'),
-		onSuccess: function(){
-			window.hideLoading();
-		},
-		onError: function(){
-			window.hideLoading();
-			console.log(arguments, 'error');
+		initialize: function(options){
+			if(!options || !options.model || !options.model instanceof Parse.User){
+				throw new Error('Settings.Weight require a User model');
+			}
+
+			Controller.prototype.initialize.apply(this, arguments);
+
+			this.render();
 		},
 		back: function(){
 			setTimeout(function(){
 				steroids.layers.pop();
 			}, 1);
+		},
+		onSuccess: function(){
+			window.hideLoading();
 		}
 	});
 

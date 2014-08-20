@@ -14,6 +14,7 @@
 @import 'views/blog';
 @import 'views/premier';
 @import 'views/store';
+@import 'views/pos';
 
 html,
 body,
@@ -89,6 +90,7 @@ body {
 	height: 100%;
 	background: rgba(0,0,0,0.4);
 	z-index: $z-index-backdrop;
+	display: none;
 }
 
 #spinner {
@@ -108,6 +110,7 @@ body {
 	border-radius: $border-radius-large;
 	padding-top: 1em;
 	z-index: $z-index-backdrop + 1;
+	display: none;
 
 	.icon {
 		font-size: 3em;

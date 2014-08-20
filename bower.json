@@ -22,6 +22,8 @@
     "jquery": "~2.1.1",
     "gsap": "~1.13.1",
     "animate.css": "~3.2.0",
-    "openfb": "https://raw.githubusercontent.com/ccoenraets/OpenFB/master/openfb.js"
+    "openfb": "https://raw.githubusercontent.com/ccoenraets/OpenFB/master/openfb.js",
+    "mapbox.js": "~2.0.1",
+    "cryptojslib": "~3.1.2"
   }
 }
