@@ -15,4 +15,12 @@
 	#gallery {
 		display: none;
 	}
+
+	& + #modal {
+		#image img{
+			@include box-shadow(0,0,10px, transparentize($dark, 0.3));
+			@extend .full-image;
+			@extend .rounded;
+		}
+	}
 }

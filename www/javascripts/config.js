@@ -1,4 +1,4 @@
-/* globals define */
+/* globals define, Camera */
 define('config', function(){
 	'use strict';
 
@@ -20,6 +20,16 @@ define('config', function(){
 		GOOGLE: {
 			MAPS: {
 				API_KEY: 'AIzaSyDrn-K18_6y9j9Vc-HzEO0jpzURmDwdaNg'
+			}
+		},
+		CAMERA: {
+			DEFAULT: {
+				quality: 80,
+				allowEdit: true,
+				encodingType: Camera.EncodingType.JPEG,
+				destinationType: Camera.DestinationType.DATA_URL,
+				targetWidth: 600,
+				targetHeight: 600
 			}
 		}
 	};

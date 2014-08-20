@@ -33,7 +33,7 @@ require.config({
 		PosController:      'http://localhost/controllers/Pos',
 		StoreController:    'http://localhost/controllers/Store',
 		StatsController:    'http://localhost/controllers/Stats',
-		AboutController:    'http://localhost/controllers/Stats'
+		AboutController:    'http://localhost/controllers/About'
 	},
 	shim: {
 		aspect: {

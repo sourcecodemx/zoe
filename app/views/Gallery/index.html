@@ -4,7 +4,8 @@
 
   var onSetup = function(){
     require(['GalleryController'], function(C){
-      (new C.Index()).show();
+    	window.controller = new C.Index().show();
+      //(new C.Index()).show();
     });
   }
 
