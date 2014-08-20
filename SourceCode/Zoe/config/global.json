@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "Zoe iOS": {
+            "applicationId": "Li087ST1O7bYBGKxhFQhWwlKnPRy4jJ2575mz7C3", 
+            "masterKey": "lIPddNeKUyJLNgh971cAmY3boTYZm7urvJJ8URNL"
+        }, 
+        "_default": {
+            "link": "Zoe iOS"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.19"
+    }
+}
