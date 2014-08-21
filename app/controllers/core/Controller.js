@@ -82,6 +82,7 @@ define(function(require){
 			window.addEventListener('message', this.onMessage.bind(this));
 		},
 		onMessage: function(event){
+			console.log('controller on message');
 			var data = event.data;
 			switch(data.message){
 			case 'reload':

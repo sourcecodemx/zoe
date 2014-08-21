@@ -29,13 +29,16 @@ body {
 .ionic-body {
 	background-color: $stable;
 
+	.bar.bar-header {
+		@include box-shadow(0 0 2px transparentize(black, 0.5));
+	}
+	
 	.page-content {
 		position: absolute;
 		top:0;
 		left:0;
 		right:0;
 		bottom:0;
-		padding-bottom:30px;
 		overflow-x: hidden;
 		overflow-y: scroll;
 		-webkit-overflow-scrolling: touch;
@@ -115,4 +118,8 @@ body {
 	.icon {
 		font-size: 3em;
 	}
+}
+
+.spinner-open {
+	@extend .modal-open;
 }

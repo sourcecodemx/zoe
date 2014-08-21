@@ -354,11 +354,7 @@ define(function(require){
 	var SignupWeight = Controller.extend({
 		id: 'signup-weight-page',
 		template: require('http://localhost/javascripts/templates/signup_weight.js'),
-		initialize: function(options){
-			if(!options || !options.model || !options.model instanceof Parse.User){
-				throw new Error('Settings.Weight require a User model');
-			}
-
+		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
 			this.render();

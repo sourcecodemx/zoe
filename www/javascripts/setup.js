@@ -106,15 +106,16 @@ define(
 					this.overlay.fadeIn();
 				}.bind(this);
 
-				$('body').addClass('loading modal-open');
+				$('body').addClass('loading spinner-open');
 
 				if (this.spinner) {
 					show();
 				} else {
-					this.overlay = $('<div id="spinner-overlay" style="height: ' + height + 'px;"></div>');
-					this.spinner = $('<div id="spinner" style="top: ' + (height/2) + 'px;"><i class="icon ion-ios7-reloading"></i><div class="label"></div></div>');
+					this.overlay = $('<div id="spinner-overlay" style="height: ' + height + 'px;display:none;"></div>');
+					this.spinner = $('<div id="spinner" style="top: ' + (height/2) + 'px;display:none;"><i class="icon ion-ios7-reloading"></i><div class="label"></div></div>');
 					$body.append(this.overlay);
 					$body.append(this.spinner);
+					show();
 				}
 
 				var $label = this.spinner.find('.label');
@@ -142,7 +143,7 @@ define(
 		*/
 		window.hideLoading = function () {
 			try{
-				$('body').removeClass('loading modal-open');
+				$('body').removeClass('loading spinner-open');
 
 				if (this.spinner) {
 					this.spinner.fadeOut();

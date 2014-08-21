@@ -3,12 +3,27 @@ define(['backbone', 'aspect'], function(Backbone, aspect){
 	'use strict';
 	
 	return Backbone.View.extend({
-		appendTo: 'body',//Update to create subControllers
+		appendTo: 'body',
+		append: 'appendTo',
+		showFx: 'show',//What do you want to do to show it? show, fadeIn
+		hideFx: 'hide',//What do you want to do to hide it? hide, fadeOut
 		initialize: function(options){
 
 			if(options){
 				if(options.appendTo){
 					this.appendTo = options.appendTo;
+				}
+
+				if(options.showFx){
+					this.showFx = options.showFx;
+				}
+
+				if(options.hideFx){
+					this.hideFx = options.hideFx;
+				}
+
+				if(options.prepend){
+					this.append = 'prependTo';
 				}
 			}
 
@@ -21,8 +36,7 @@ define(['backbone', 'aspect'], function(Backbone, aspect){
 		render: function(){},//Implement yours
 		hide: function(){
 			try{
-				this.$el.hide();
-				this._detach();
+				this.$el[this.hideFx]().done(this._detach());
 			}catch(e){
 				console.log('An error occurred while hiding the view', e, e.message, e.stack);
 			}
@@ -34,7 +48,7 @@ define(['backbone', 'aspect'], function(Backbone, aspect){
 				if(!this.isAttached()){
 					this._append();
 				}
-				this.$el.show();
+				this.$el[this.showFx]();
 			}catch(e){
 				console.log('An error occurred while showing the view', e, e.message, e.stack);
 			}
@@ -47,7 +61,7 @@ define(['backbone', 'aspect'], function(Backbone, aspect){
 
 		_append: function(){
 			try{
-				this.$el.appendTo(this.appendTo);
+				this.$el[this.append](this.appendTo);
 				//TODO: don't remove the loading label here, do it in the controller(s)
 				if(this.$el.parent().hasClass('loading')){
 					this.$el.parent().removeClass('loading');
