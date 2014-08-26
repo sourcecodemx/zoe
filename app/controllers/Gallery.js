@@ -43,6 +43,23 @@ define(function(require){
 			//Open picture view
 			Backbone.on('gallery:show:image', this.showPicture, this);
 
+			var leftButton = new steroids.buttons.NavigationBarButton();
+			leftButton.imagePath = '/images/menu.png';
+			leftButton.onTap = this.onLeftButton.bind(this);
+			
+			var rightButton = new steroids.buttons.NavigationBarButton();
+			rightButton.imagePath = '/images/refresh.png';
+			rightButton.onTap = this.onRightButton.bind(this);
+
+			steroids.view.navigationBar.update({
+				title: 'Gallery',
+				buttons: {
+					left: [leftButton],
+					right: [rightButton]
+				}
+			});
+			steroids.view.navigationBar.show();
+
 			return this.render();
 		},
 		onRender: function(){
@@ -53,6 +70,13 @@ define(function(require){
 			//Pics container
 			this.dom.pics = this.$el.find('#pics');
 			//Load pictures from server
+			this.collection.fetch();
+		},
+		onRightButton: function(){
+			console.log('collection fetch');
+			window.showLoading('Cargando imagenes...');
+
+			this.removeAll();
 			this.collection.fetch();
 		},
 		addAll: function(){
@@ -98,7 +122,6 @@ define(function(require){
 			console.log(error, error.code, 'fetch error');
 		},
 		showPicture: function(data){
-			console.log(data, {id: data.id, image: data.image.url, likes: data.likes || 0}, 'about to post message');
 			//Let the view know it can load the image
 			window.postMessage({
 				message: 'gallery:show:image',
@@ -112,15 +135,7 @@ define(function(require){
 			//Push view
 			setTimeout(function(){
 				steroids.layers.push({
-					view: this.views.pic,
-					navigationBar: false
-				}, {
-					onSuccess: function(){
-						console.log('success', arguments);
-					},
-					onFailure: function(){
-						console.log('failure', arguments);
-					}
+					view: this.views.pic
 				});
 			}.bind(this), 1);
 		},
@@ -216,6 +231,17 @@ define(function(require){
 				image: this.$el.find('#image')
 			};
 		},
+		onLayerWillChange: function(event){
+			if(event && event.target && (event.target.webview.id === 'galleryImageView')){
+				var backButton = this.constructor.backButton();
+				
+				steroids.view.navigationBar.update({
+					title: 'Foto',
+					backButton: backButton
+				});
+				steroids.view.navigationBar.show();
+			}
+		},
 		like: function(){
 			this.dom.likeIcon.toggleClass('ion-ios7-heart-outline ion-ios7-heart');
 		},
@@ -308,6 +334,7 @@ define(function(require){
 			window.hideLoading();
 		},
 		onSave: function(file){
+			console.log('on save');
 			var user = Parse.User.current();
 			var images = user.relation('images');
 			//Add image to relation;
@@ -316,6 +343,7 @@ define(function(require){
 			user
 				.save()
 				.then(function(){
+					console.log('user save');
 					return file.fetch();
 				}.bind({file: file}))
 				.then(function(file){

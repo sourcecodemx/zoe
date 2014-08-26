@@ -1,4 +1,4 @@
-/* globals define, steroids, Parse, _, Zoe, openFB, CryptoJS */
+/* globals define, steroids, Parse, _, Zoe, CryptoJS, facebookConnectPlugin */
 define(function(require){
 	'use strict';
 
@@ -20,6 +20,8 @@ define(function(require){
 	var Index = Controller.extend({
 		id: 'index-page',
 		template: require('http://localhost/javascripts/templates/index.js'),
+		hideFx: 'fadeOut',
+		showFb: 'fadeIn',
 		events: {
 			'click #facebookSignup': 'facebook',
 			'click #mailSignup':     'signup',
@@ -40,27 +42,32 @@ define(function(require){
 		},
 		facebook: function(){
 			window.showLoading('Autenticando...');
-			openFB.login(this.onFBResponse.bind(this), {scope: config.FB.SCOPE});
-		},
-		onFBResponse: function(response){
-			if(response.status === 'connected') {
-				window.showLoading('Sincronizando...');
-				openFB.api({
-					path: '/me',
-					success: this.onMe.bind(this),
-					error: this.onFBError.bind(this)
-				});
-			} else {
-				setTimeout(function(){
-					navigator.notification.alert(this.message, $.noop, 'Ups!');
-				}.bind(response), 1);
-			}
+
+			var me = function(){
+				facebookConnectPlugin.api(
+					'/me',
+					config.FB.DEFAULT_PERMISSION,
+					this.onMe.bind(this),
+					this.onFBError.bind(this)
+				);
+			}.bind(this);
+
+			facebookConnectPlugin.login(
+				config.FB.DEFAULT_PERMISSION,
+				me,
+				this.onFBError
+			);
 		},
 		onFBError: function(response){
 			window.hideLoading();
-			console.log('onfberror', response);
+			steroids.logger.log(JSON.stringify(response));
+			setTimeout(function(){
+				navigator.notification.alert('No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.', $.noop, 'Ups!');
+			}, 1);
 		},
 		onMe: function(response){
+			window.showLoading('Sincronizando...');
+			steroids.logger.log(JSON.stringify(response));
 			var data = {
 				email: response.email,
 				username: response.id,
@@ -68,7 +75,8 @@ define(function(require){
 				firstName: response.first_name || '',
 				lastName: response.last_name || '',
 				fullName: response.name || '',
-				gender: response.gender || ''
+				gender: response.gender || '',
+				facebook: true
 			};
 
 			//start creating user
@@ -97,14 +105,9 @@ define(function(require){
 				window.postMessage({message: 'fbauth'});
 			}.bind(this), 1);
 		},
-		onLogin: function(){
-			window.hideLoading();
-			window.postMessage({message: 'fbauth'});
-		},
 		onError: function(model, error){
-			window.hideLoading();
 			//If username already exists
-			if(error.code === 202){
+			if(error.code === Parse.Error.USERNAME_TAKEN){
 				Parse.User.logIn(
 					model.get('username'), model.get('password'),{
 						success: this.onLogin.bind(this),
@@ -112,14 +115,18 @@ define(function(require){
 					}
 				);
 			}else{
+				window.hideLoading();
 				setTimeout(function(){
 					navigator.notification.alert(this.message, $.noop, 'Ups!');
 				}.bind(error), 1);
 			}
 		},
+		onLogin: function(){
+			window.hideLoading();
+			window.postMessage({message: 'fbauth'});
+		},
 		onLoginError: function(model, error){
 			window.hideLoading();
-
 			setTimeout(function(){
 				navigator.notification.alert(this.message, $.noop, 'Ups!');
 			}.bind(error), 1);
@@ -330,6 +337,17 @@ define(function(require){
 		onError: function(model, error){
 			window.hideLoading();
 
+			var message = error.message;
+
+			switch(error.code){
+			case Parse.Error.USERNAME_TAKEN:
+				message = 'Ese usuario ya existe.';
+				break;
+			case Parse.Error.EMAIL_TAKEN:
+				message = 'Esa direccion de correo electronico ya esta en uso.';
+				break;
+			
+			}
 			setTimeout(function(){
 				navigator.notification.alert(this.message, $.noop, 'Ups!');
 			}.bind(error), 1);

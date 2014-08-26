@@ -9,6 +9,8 @@ define(function(require){
 	var Index = Controller.extend({
 		id: 'home-page',
 		template: template,
+		hideFx: 'fadeOut',
+		showFb: 'fadeIn',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'click #track': 'track',
@@ -37,6 +39,25 @@ define(function(require){
 			this.canvas = null;
 			this.progressColors = ['#54BB2F', '#0093C2'];
 
+			var leftButton = new steroids.buttons.NavigationBarButton();
+			leftButton.imagePath = '/images/menu.png';
+			leftButton.onTap = this.onLeftButton.bind(this);
+			leftButton.imageAsOriginal = false;
+			
+			var rightButton = new steroids.buttons.NavigationBarButton();
+			rightButton.imagePath = '/images/settings.png';
+			rightButton.onTap = this.onRightButton.bind(this);
+			rightButton.imageAsOriginal = false;
+
+			steroids.view.navigationBar.update({
+				titleImagePath: '/images/zoe.png',
+				buttons: {
+					left: [leftButton],
+					right: [rightButton]
+				}
+			});
+			steroids.view.navigationBar.show();
+
 			return this.render();
 		},
 		onRender: function(){
@@ -57,8 +78,7 @@ define(function(require){
 
 			setTimeout(function(){
 				steroids.layers.push({
-					view: this.views.settings,
-					navigationBar: false
+					view: this.views.settings
 				});
 			}.bind(this), 1);
 		},
@@ -78,7 +98,10 @@ define(function(require){
 			console.log('share');
 		},
 		stats: function(){
-			steroids.modal.show({view: this.views.stats});
+			steroids.modal.show({
+				view: this.views.stats,
+				navigationBar: true
+			});
 		},
 		_drawMultiRadiantCircle: function(/*xc, yc, r, radientColors*/) {
 			/*var ctx = this.canvas;

@@ -3,8 +3,8 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['StoreController'], function(C){
-      (new C.Index()).show();
+    require(['PremierController'], function(C){
+      (new C.Information()).show();
     });
   }
 

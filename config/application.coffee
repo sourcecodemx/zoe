@@ -68,21 +68,21 @@ steroids.config.initialView =
     location: "http://localhost/index.html"
 
 # ## Navigation Bar
-steroids.config.navigationBar.tintColor = "#2d3d52"
+steroids.config.navigationBar.tintColor = "#222242"
 steroids.config.navigationBar.titleColor = "#ffffff"
 steroids.config.navigationBar.buttonTintColor = "#ffffff"
 
-# steroids.config.navigationBar.borderColor = "#000000"
-# steroids.config.navigationBar.borderSize = 2
+steroids.config.navigationBar.borderColor = "#222242"
+steroids.config.navigationBar.borderSize = 0
 
 # steroids.config.navigationBar.landscape.backgroundImage = ""
-steroids.config.navigationBar.portrait.backgroundImage = "http://localhost/images/navigation_background.jpg"
+#steroids.config.navigationBar.portrait.backgroundImage = "http://localhost/images/portrait-navbar@2x.png"
 
 # ## Android Loading Screen
 steroids.config.loadingScreen.tintColor = "#262626"
 
 # ## iOS Status Bar
-steroids.config.statusBar.enabled = false
+steroids.config.statusBar.enabled = true
 steroids.config.statusBar.style = "light"
 
 # ## File Watcher

@@ -26,12 +26,32 @@ define(function(require){
             //Aspect
 			aspect.add(this, 'show', this.onBeforeShow.bind(this));
 			aspect.add(this, 'hide', this.onBeforeHide.bind(this));
+
+			steroids.layers.on('willchange', this.onLayerWillChange.bind(this));
+			steroids.layers.on('didchange', this.onLayerChange.bind(this));
 		},
 
 		onBeforeShow: function(){
 			Backbone.trigger('domchange:title', this.title, this.description);
 		},
 		onBeforeHide: function(){},
+
+		onLayerChange: function(event){
+			if(event && event.target){
+				console.log('layer changed target', event.target.webview.id);
+			}
+			if(event && event.source){
+				console.log('layer changed source', event.source.webview.id);
+			}
+		},
+		onLayerWillChange: function(event){
+			if(event && event.target){
+				console.log('layer will change target', event.target.webview.id);
+			}
+			if(event && event.source){
+				console.log('layer will change source', event.source.webview.id);
+			}
+		},
 
 		//Override whenever it makes sense
 		render: function(){
@@ -91,6 +111,15 @@ define(function(require){
 			}
 		}
 
+	}, {
+		backButton: function(){
+			if(!this._backButton){
+				this._backButton = new steroids.buttons.NavigationBarButton();
+				this._backButton.title = '';
+			}
+
+			return this._backButton;
+		}
 	});
 
 	return Controller;

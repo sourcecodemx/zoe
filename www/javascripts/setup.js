@@ -1,4 +1,4 @@
-/* global define, steroids, TimelineLite, openFB */
+/* global define, steroids, TimelineLite */
 define(
 	'setup',
 	[
@@ -7,14 +7,14 @@ define(
 		'backbone',
 		'parse',
 		'config',
-		'fb',
+		//'fb',
 		'mixins',
 		'gsap',
 		'timeline',
 		'timelineCSS',
 		'jquerygsap',
-		'hammerjs',
-		'jqueryhammer'
+		//'hammerjs',
+		//'jqueryhammer'
 	],
 	function(_, $, Backbone, Parse, config){
 		'use strict';
@@ -26,7 +26,7 @@ define(
 		//Initialize Parse
 		Parse.initialize(config.PARSE.ID, config.PARSE.JSKEY);
 
-		openFB.init({appId: config.FB.APP_ID});
+		//openFB.init({appId: config.FB.APP_ID});
 
 		//Create main timeline
 		window.Timeline = new TimelineLite();

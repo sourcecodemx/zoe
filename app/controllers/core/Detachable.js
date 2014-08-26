@@ -36,7 +36,7 @@ define(['backbone', 'aspect'], function(Backbone, aspect){
 		render: function(){},//Implement yours
 		hide: function(){
 			try{
-				this.$el[this.hideFx]().done(this._detach());
+				this.$el[this.hideFx](this._detach.bind(this));
 			}catch(e){
 				console.log('An error occurred while hiding the view', e, e.message, e.stack);
 			}

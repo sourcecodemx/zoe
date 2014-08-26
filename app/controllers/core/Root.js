@@ -12,17 +12,36 @@ define(function(require){
 			'click #menu button[root]': 'showRootView',
 			'swipedown #menu': 'onLeftButton',
 			'click #home': 'home',
+			'click #store': 'store',
 		},
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 			
 			//Hide menu after showing root views
-			aspect.add(this, ['showRootView', 'home'], this.hideMenu.bind(this), 'after');
+			aspect.add(this, ['showRootView', 'home', 'store'], this.hideMenu.bind(this), 'after');
 
 			//Create home WebView if we're not in it already
 			if(!$('body #index-page').length){
-				this.views['home'] = new steroids.views.WebView({location: 'http://localhost/index.html', id: 'index'});
+				this.views.home = new steroids.views.WebView({location: 'http://localhost/index.html', id: 'index'});
 			}
+
+			// Set navigation bar appearance to rainbow, with background images
+			/*
+			steroids.view.navigationBar.setAppearance({
+				tintColor: '#2D3D52', // superceded by background image
+				titleTextColor: '#FFFFFFFFF',
+				buttonTintColor: '#2D3D52',
+				portraitBackgroundImage: steroids.app.path + '/images/portrait-navbar@2x.png'
+			},
+			{
+				onSuccess: function() {
+					alert("Taste the rainbow!")
+				},
+				onFailure: function() {
+					alert("Failed set navigation bar appearance.")
+				}
+			});
+			*/
 		},
 		onRender: function(){
 			this.dom = {
@@ -81,7 +100,7 @@ define(function(require){
 								//Save load status for other pages to check it
 								Zoe.storage.setItem(this.id + '-preloaded', true);
 								//Replace the thing
-								setTimeout(this.replace.bind({view: this.views[this.id]}), 1);
+								_.delay(this.replace.bind({view: this.views[this.id]}), 1000);
 							}.bind({views: this.views, id: page, replace: replace}),
 							onFailure: function(){
 								window.hideLoading();
@@ -116,6 +135,43 @@ define(function(require){
 		home: function(){
 			steroids.layers.replace({view: this.views.home});
 		},
+		store: function(){
+			var preloaded = Zoe.storage.getItem('store-preloaded') ? true : false;
+			if(preloaded || !this.views.store){
+				this.views.store = new steroids.views.WebView({location: 'http://zoewater.com.mx/movil', id: 'storeView'});
+			}
+
+			if(!preloaded){
+				window.showLoading('Cargando...');
+				this.views.store.preload({},{
+					onSuccess: function(){
+						window.hideLoading();
+						Zoe.storage.setItem('store-preloaded', true);
+						_.delay(function(){
+							steroids.layers.push({
+								view: this.view
+							});
+						}.bind({view: this.views.store}), 1);
+					}.bind(this),
+					onFailure: function(){
+						window.hideLoading();
+						_.delay(function(){
+							navigator.notification.alert(
+                                'Ha ocurrido un error al cargar la tienda, por favor intente de nuevo', 
+                                $.noop, 
+                                'Ups!'
+                            );
+						}, 1);
+					}
+				});
+			}else{
+				_.delay(function(){
+					steroids.layers.push({
+						view: this.view
+					});
+				}.bind({view: this.views.store}), 1);
+			}
+		},
 		toggleMenu: function(){
 			var pos = this.dom.menu.position().top;
 			var el = this.dom.menu;
@@ -127,7 +183,7 @@ define(function(require){
 			}
 		},
 		hideMenu: function(){
-			this.dom.menu.css({top: '-100%', 'z-index': 9});
+			Timeline.fromTo(this.dom.menu, 0.5, {css: {top: 0, 'z-index': 9}}, {css: {top: '-100%', 'z-index': 9}});
 		}
 	});
 });

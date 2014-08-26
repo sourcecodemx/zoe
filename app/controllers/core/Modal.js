@@ -8,6 +8,10 @@ define(function(require){
 		events: {
 			'click #leftButton': 'onLeftButton',
 			'click #rightButton': 'onRightButton',
+			'submit': 'submit'
+		},
+		initialize: function(){
+			Controller.prototype.initialize.apply(this, arguments);
 		},
 		onShow: function(){
 			steroids.view.removeLoading();
@@ -16,7 +20,6 @@ define(function(require){
 			setTimeout(function(){
 				steroids.modal.hide();
 			}, 1);
-		},
-		onRightButton: function(){}
+		}
 	});
 });

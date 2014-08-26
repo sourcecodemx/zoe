@@ -1,4 +1,4 @@
-/* globals define, _, Backbone */
+/* globals define, _, Backbone, steroids */
 define(function(require){
 	'use strict';
 
@@ -25,6 +25,23 @@ define(function(require){
 			this.listenTo(this.collection, 'request', this.showLoading.bind(this));
 			this.listenTo(this.collection, 'reset', this.addAll.bind(this));
 			this.listenTo(this.collection, 'error', this.onError.bind(this));
+
+			var leftButton = new steroids.buttons.NavigationBarButton();
+			leftButton.imagePath = '/images/menu.png';
+			leftButton.onTap = this.onLeftButton.bind(this);
+			
+			var rightButton = new steroids.buttons.NavigationBarButton();
+			rightButton.imagePath = '/images/refresh.png';
+			rightButton.onTap = this.onRightButton.bind(this);
+
+			steroids.view.navigationBar.update({
+				title: 'Blog',
+				buttons: {
+					left: [leftButton],
+					right: [rightButton]
+				}
+			});
+			steroids.view.navigationBar.show();
 
 			this.collection.fetch();
 

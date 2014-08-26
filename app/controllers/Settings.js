@@ -37,14 +37,16 @@ define(function(require){
 
 			return this.render();
 		},
-		onShow: function(){
-			var backButton = new steroids.buttons.NavigationBarButton({title: ''});
-			steroids.view.navigationBar.update({
-				overrideBackButton: false,
-				backButton: backButton,
-				title: 'Configuracion'
-			});
-			steroids.view.navigationBar.show();
+		onLayerWillChange: function(event){
+			if(event && event.target && (event.target.webview.id === 'settingsView')){
+				var backButton = this.constructor.backButton();
+				
+				steroids.view.navigationBar.update({
+					title: 'Configuracion',
+					backButton: backButton
+				});
+				steroids.view.navigationBar.show();
+			}
 		},
 		showView: function(e){
 			try{
@@ -56,8 +58,7 @@ define(function(require){
 				if(view && this.views[view]){
 					setTimeout(function(){
 						steroids.layers.push({
-							view: this.views[view],
-							navigationBar: false
+							view: this.views[view]
 						});
 					}.bind(this), 1);
 				}else{
@@ -106,6 +107,8 @@ define(function(require){
 
 			Controller.prototype.initialize.apply(this, arguments);
 
+			steroids.navigationBar.show('Cambiar Peso');
+
 			this.render();
 		},
 		back: function(){
@@ -127,6 +130,8 @@ define(function(require){
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
+			steroids.navigationBar.show('Cambiar Nombre');
+
 			this.render();
 		}
 	});
@@ -140,6 +145,8 @@ define(function(require){
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
+			steroids.navigationBar.show('Cambiar Correo');
+
 			this.render();
 		}
 	});
@@ -152,6 +159,8 @@ define(function(require){
 		},
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
+
+			steroids.navigationBar.show('Cambiar Contrasena');
 
 			this.render();
 		}

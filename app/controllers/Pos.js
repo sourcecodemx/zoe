@@ -1,4 +1,4 @@
-/* globals define, _, L */
+/* globals define, _, L, steroids */
 define(function(require){
 	'use strict';
 
@@ -18,6 +18,23 @@ define(function(require){
 		})(),
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
+
+			var leftButton = new steroids.buttons.NavigationBarButton();
+			leftButton.imagePath = '/images/menu.png';
+			leftButton.onTap = this.onLeftButton.bind(this);
+			
+			var rightButton = new steroids.buttons.NavigationBarButton();
+			rightButton.imagePath = '/images/pointer.png';
+			rightButton.onTap = this.onRightButton.bind(this);
+
+			steroids.view.navigationBar.update({
+				title: 'Puntos de Venta',
+				buttons: {
+					left: [leftButton],
+					right: [rightButton]
+				}
+			});
+			steroids.view.navigationBar.show();
 
 			return this.render();
 		},

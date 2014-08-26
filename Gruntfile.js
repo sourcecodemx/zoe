@@ -58,6 +58,63 @@ module.exports = function(grunt) {
 		return grunt.task.run('jade');
 	});
 
+	grunt.registerTask('steroids-uglify', 'Compress Javascript files', function(){
+		grunt.extendConfig({
+			uglify: {
+				options: {
+					compress: {
+						drop_console: true
+					}
+				},
+				dist: {
+					files: {
+						expand: true,
+						cwd: 'dist/',
+						src: [
+							'**/**.js'
+						],
+						dest: 'dist'
+					}
+				}
+			}
+		});
+
+		return grunt.task.run('uglify');
+	});
+
+	grunt.registerTask('steroids-copy-www', 'Copy files from www/ to dist/ (except for .scss and .coffee)', function() {
+		grunt.extendConfig({
+			copy: {
+				www: {
+					expand: true,
+					cwd: 'www/',
+					src: [
+						'*.*',
+						'images/**/*.*',
+						'javascripts/**/*.js',
+						'stylesheets/**/*.*',
+						'!stylesheets/**/*.scss',
+						//Define components to copy
+						'components/aspect.js/src/*.js',
+						'components/backbone/backbone.js',
+						'components/cryptojslib/rollups/sha3.js',
+						'components/gsap/src/minified/**/*.*',
+						'components/jquery/dist/jquery.min.js',
+						'components/lodash/dist/lodash.min.js',
+						'components/mapbox.js/images/*',
+						'components/mapbox.js/mapbox.css',
+						'components/mapbox.js/mapbox.js',
+						'components/parse-1.2.19.min/index.js',
+						'components/requirejs/require.js',
+						'components/steroids-js/steroids.js'
+					],
+					dest: 'dist/'
+				}
+			}
+		});
+		return grunt.task.run('copy:www');
+	});
+
 	grunt.registerTask('default', ['steroids-jshint', 'steroids-make', 'steroids-compile-sass', 'steroids-jade']);
 
 };

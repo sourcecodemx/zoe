@@ -8,7 +8,7 @@ define('config', function(){
 			JSKEY: 'ex5SBIHB9bNN9ELyx1ZRFoqiWVfrl5SIukRct2zt'
 		},
 		FB: {
-			DEFAULT_PERMISSION: ['public_info'],
+			DEFAULT_PERMISSION: ['email'],
 			APP_ID: '733603660030225',
 			APP_NAME: 'Zoe Water Dev',
 			SCOPE: 'email,read_stream,publish_stream'

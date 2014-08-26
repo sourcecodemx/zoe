@@ -4,14 +4,10 @@ require.config({
 		//Core libraries
 		aspect:      'http://localhost/components/aspect.js/src/aspect',
 		backbone:    'http://localhost/components/backbone/backbone',
-		//fb:          '//connect.facebook.net/en_US/all',
-		fb:          'http://localhost/components/openfb/index',
 		functional:  'http://localhost/components/aspect.js/src/functional',
 		gsap:        'http://localhost/components/gsap/src/minified/TweenLite.min',
-		hammerjs:    'http://localhost/components/hammerjs/hammer.min',
 		jquery:      'http://localhost/components/jquery/dist/jquery.min',
 		jquerygsap:  'http://localhost/components/gsap/src/minified/jquery.gsap.min',
-		jqueryhammer:'http://localhost/components/jquery-hammerjs/jquery.hammer.min',
 		underscore:  'http://localhost/components/lodash/dist/lodash.min',
 		parse:       'http://localhost/components/parse-1.2.19.min/index',
 		timeline:    'http://localhost/components/gsap/src/minified/TimelineLite.min',
@@ -31,7 +27,6 @@ require.config({
 		BlogController:     'http://localhost/controllers/Blog',
 		PremierController:  'http://localhost/controllers/Premier',
 		PosController:      'http://localhost/controllers/Pos',
-		StoreController:    'http://localhost/controllers/Store',
 		StatsController:    'http://localhost/controllers/Stats',
 		AboutController:    'http://localhost/controllers/About'
 	},
@@ -50,9 +45,6 @@ require.config({
 		jquerygsap: {
 			deps: ['jquery', 'gsap']
 		},
-		jqueryhammer: {
-			deps: ['jquery', 'hammerjs']
-		},
 		underscore: {
 			exports: '_'
 		},
@@ -61,7 +53,7 @@ require.config({
 		},
 		parse: {
 			exports: 'Parse',
-			deps: ['backbone', 'fb']
+			deps: ['backbone']
 		},
 		setup: {
 			deps: ['parse']
