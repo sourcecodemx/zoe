@@ -2,8 +2,8 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['SettingsController'], function(C){
-      (new C.Email({model: Parse.User.current()})).show();
+    require(['Settings.Email'], function(C){
+      (new C()).show();
     });
   }
 

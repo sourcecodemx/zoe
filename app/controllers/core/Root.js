@@ -1,4 +1,4 @@
-/* globals define, Timeline, _, Zoe, aspect */
+/* globals define, _, Zoe, aspect */
 define(function(require){
 	'use strict';
 
@@ -13,6 +13,7 @@ define(function(require){
 			'swipedown #menu': 'onLeftButton',
 			'click #home': 'home',
 			'click #store': 'store',
+			'click button[child]': 'showView'
 		},
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
@@ -24,29 +25,9 @@ define(function(require){
 			if(!$('body #index-page').length){
 				this.views.home = new steroids.views.WebView({location: 'http://localhost/index.html', id: 'index'});
 			}
-
-			// Set navigation bar appearance to rainbow, with background images
-			/*
-			steroids.view.navigationBar.setAppearance({
-				tintColor: '#2D3D52', // superceded by background image
-				titleTextColor: '#FFFFFFFFF',
-				buttonTintColor: '#2D3D52',
-				portraitBackgroundImage: steroids.app.path + '/images/portrait-navbar@2x.png'
-			},
-			{
-				onSuccess: function() {
-					alert("Taste the rainbow!")
-				},
-				onFailure: function() {
-					alert("Failed set navigation bar appearance.")
-				}
-			});
-			*/
 		},
 		onRender: function(){
-			this.dom = {
-				menu: this.$el.find('#menu')
-			};
+			this.dom.menu = this.$el.find('#menu');
 		},
 		onShow: function(){
 			steroids.view.removeLoading();
@@ -173,17 +154,19 @@ define(function(require){
 			}
 		},
 		toggleMenu: function(){
-			var pos = this.dom.menu.position().top;
-			var el = this.dom.menu;
+			var $el = this.dom.menu;
+	        var pos = $el.position().top;
 
-			if(pos < 0){
-				Timeline.fromTo(el, 0.5, {css: {top: '-100%', 'z-index': 9}}, {css: {top: 0, 'z-index': 11}});
-			}else{
-				Timeline.fromTo(el, 0.5, {css: {top: 0, 'z-index': 9}}, {css: {top: '-100%', 'z-index': 9}});
-			}
+	        if(pos < 0){
+	          $el.animate({top: 0});
+	        }else{
+	          $el.animate({top: '-100%'});
+	        }
 		},
 		hideMenu: function(){
-			Timeline.fromTo(this.dom.menu, 0.5, {css: {top: 0, 'z-index': 9}}, {css: {top: '-100%', 'z-index': 9}});
+			if(this.dom.menu.position().top >=0){
+				this.toggleMenu();
+			}
 		}
 	});
 });

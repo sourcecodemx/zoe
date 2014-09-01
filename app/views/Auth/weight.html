@@ -3,8 +3,8 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['AuthController'], function(Auth){
-    	window.controller = new Auth.signup.Weight({model: Parse.User.current()}).show(); 
+    require(['Auth.Weight'], function(C){
+    	window.controller = new C({model: Parse.User.current()}).show(); 
       //(new Auth.signup.Weight()).show();
     });
   }

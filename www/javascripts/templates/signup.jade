@@ -13,6 +13,8 @@
 
 					.text-center
 						button(type='submit').button.button-outline.button-light Siguiente
+					br
 					.text-center
 						| Al crear tu cuenta confirmas que has leido y 
-						a#tos Aceptas los terminos de uso
+						a#tos(data-view='TOS/index', child, modal)
+							strong Aceptas los terminos de uso

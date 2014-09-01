@@ -1,19 +1,19 @@
-/* globals define, _, steroids, Camera, Parse, Backbone */
+/* globals define, _, steroids, Camera, Backbone, window */
 define(function(require){
 	'use strict';
 
 	var RootController = require('http://localhost/controllers/core/Root.js');
-	var Controller     = require('http://localhost/controllers/core/Controller.js');
 	var Detachable     = require('http://localhost/controllers/core/Detachable.js');
-	var template       = require('http://localhost/javascripts/templates/gallery.js');
 	var HTMLModal      = require('http://localhost/ui/Modal.js');
-	var File           = require('http://localhost/models/File.js');
-	var Images         = require('http://localhost/collections/Images.js');
+	var Images         = require('http://localhost/collections/ImagesSimple.js');
 	var config         = require('config');
 
+	window.config = config;
+	
 	var Index = RootController.extend({
 		id: 'gallery-page',
-		template: template,
+		template: require('http://localhost/javascripts/templates/gallery.js'),
+		title: 'Galeria',
 		events: (function () {
 			var events = _.extend({}, RootController.prototype.events, {
 				'click #take': 'takePicture',
@@ -24,6 +24,9 @@ define(function(require){
 		})(),
 		initialize: function(){
 			RootController.prototype.initialize.apply(this, arguments);
+
+			window.addEventListener('message', this.onMessage.bind(this));
+
 			//Initialize collection
 			this.collection = new Images();
 			this.images = {};
@@ -37,22 +40,24 @@ define(function(require){
 
 			//Listen for images collection
 			this.listenTo(this.collection, 'reset', this.addAll, this);
-			this.listenTo(this.collection, 'error', this.onError, this);
+			this.listenTo(this.collection, 'error', this.onContentError, this);
 			this.listenTo(this.collection, 'prepend', this.prependOne, this);
 
 			//Open picture view
-			Backbone.on('gallery:show:image', this.showPicture, this);
+			Backbone.on('gallery:image:show', this.showPicture, this);
 
 			var leftButton = new steroids.buttons.NavigationBarButton();
 			leftButton.imagePath = '/images/menu.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
+			leftButton.imageAsOriginal = false;
 			
 			var rightButton = new steroids.buttons.NavigationBarButton();
 			rightButton.imagePath = '/images/refresh.png';
 			rightButton.onTap = this.onRightButton.bind(this);
+			rightButton.imageAsOriginal = false;
 
 			steroids.view.navigationBar.update({
-				title: 'Gallery',
+				title: this.title,
 				buttons: {
 					left: [leftButton],
 					right: [rightButton]
@@ -65,35 +70,50 @@ define(function(require){
 		onRender: function(){
 			RootController.prototype.onRender.call(this);
 
-			window.showLoading('Cargando imagenes...');
+			window.showLoading('Cargando');
 
 			//Pics container
-			this.dom.pics = this.$el.find('#pics');
+			this.dom.content = this.$el.find('#pics');
 			//Load pictures from server
-			this.collection.fetch();
+			window.postMessage({message: 'gallery:fetch'});
 		},
 		onRightButton: function(){
-			console.log('collection fetch');
-			window.showLoading('Cargando imagenes...');
+			window.showLoading('Cargando');
 
 			this.removeAll();
-			this.collection.fetch();
+			window.postMessage({message: 'gallery:fetch'});
+		},
+		onLayerWillChange: function(event){
+			if(event && event.target && event.target.webview.id === 'galleryView'){
+				steroids.view.navigationBar.update({
+					title: this.title
+				});
+			}
 		},
 		addAll: function(){
-			this.collection.each(this.addOne.bind(this));
+			if(!this.dom.content.find('.pic').length){
+				this.dom.content.empty();
+			}
 
-			//Call show on all images
-			_.invoke(this.images, PicItem.prototype.show);
+			if(this.collection.length){
+				this.collection.each(this.addOne.bind(this));
+
+				//Call show on all images
+				_.invoke(this.images, PicItem.prototype.show);
+			}else{
+				this.onContentError({message: 'No hay imagenes en la galeria.'});
+			}
 
 			setTimeout(function(){
 				window.hideLoading();
 			}, 1000);
 		},
 		addOne: function(model){
+			console.log(model, 'model to add');
 			//Create image view
 			var view = new PicItem({
 				model: model,
-				appendTo: this.dom.pics
+				appendTo: this.dom.content
 			});
 			//Cache image reference
 			this.images[view.cid] = view;
@@ -101,9 +121,10 @@ define(function(require){
 			return this;
 		},
 		prependOne: function(model){
+			console.log(model, 'model to prepend');
 			var view = new PicItem({
 				model: model,
-				appendTo: this.dom.pics,
+				appendTo: this.dom.content,
 				prepend: true
 			}).show();
 
@@ -116,17 +137,12 @@ define(function(require){
 			});
 			this.images = {};
 		},
-		//addOne: function(){},
-		onError: function(model, error){
-			window.hideLoading();
-			console.log(error, error.code, 'fetch error');
-		},
 		showPicture: function(data){
 			//Let the view know it can load the image
 			window.postMessage({
-				message: 'gallery:show:image',
+				message: 'gallery:image:show',
 				picture: {
-					id: data.id,
+					id: data.objectId,
 					url: data.image.url,
 					thumbnail: data.thumbnail ? data.thumbnail.url : '',
 					likes: data.likes || 0
@@ -142,32 +158,47 @@ define(function(require){
 		takePicture: function(){
 			navigator.camera.getPicture(
 				this.onSuccess.bind(this),
-				this.onFail.bind(this),
+				this.onPictureError.bind(this),
 				config.CAMERA.DEFAULT
 			);
-			window.showLoading('Trabajando...');
+			window.showLoading('Trabajando');
 		},
 		grabPicture: function(){
 			navigator.camera.getPicture(
 				this.onSuccess.bind(this),
-				this.onFail.bind(this),
+				this.onPictureError.bind(this),
 				_.extend(
 					{},
 					config.CAMERA.DEFAULT,
 					{ sourceType : Camera.PictureSourceType.PHOTOLIBRARY }
 				)
 			);
-			window.showLoading('Trabajando...');
+			window.showLoading('Trabajando');
 		},
 		onSuccess: function(imageData) {
 			this.uploadModal.update(imageData).show();
 		},
-		onFail: function(message) {
-			window.hideLoading();
-			setTimeout(function(){
-				navigator.notification.alert('Error', $.noop, 'Ups!');
-			}, 1);
-			console.log('Failed because: ' + message);
+		onPictureError: function() {
+			//this.onError(null, {message: message});
+		},
+		onMessage: function(event){
+			var data = event.data;
+			switch(data.message){
+			case 'gallery:fetch:success':
+				this.collection.reset(data.images);
+				break;
+			case 'gallery:fetch:error':
+				if(this.dom.content.find('.pic').length){
+					this.onError(null, data.error);
+				}else{
+					this.onContentError(data.error);
+				}
+				break;
+			case 'gallery:image:upvote:success':
+			case 'gallery:image:downvote:success':
+				this.collection.get(data.image.objectId).set('likes', data.image.likes);
+				break;
+			}
 		}
 	});
 
@@ -181,14 +212,14 @@ define(function(require){
 			Detachable.prototype.initialize.apply(this, arguments);
 
 			if(!options || !options.model){
-				throw new Error('Error: Gallery.PickItem requires a Backbone Model');
+				throw new Error('Gallery.PickItem requires a Backbone Model');
 			}
 
 			this.render();
 		},
 		render: function(){
 			//If no thumbnail then go with the original image
-			var url = this.model.get('thumbnail') ? this.model.get('thumbnail').url() : this.model.get('image').url();
+			var url = this.model.get('thumbnail') ? this.model.get('thumbnail').url : this.model.get('image').url;
 			//Render & show
 			this.$el.append(this.template({image: {url: url}}));
 			this.$el.hide();
@@ -196,92 +227,14 @@ define(function(require){
 			return this.$el;
 		},
 		pic: function(){
-			Backbone.trigger('gallery:show:image', _.extend({}, this.model.toJSON(), {id: this.model.id}));
+			Backbone.trigger('gallery:image:show', this.model.toJSON());
 		},
 		onClose: function(){
 			this.model = null;
 		}
 	});
 
-	var PicView = Controller.extend({
-		id: 'gallery-image-page',
-		template: require('http://localhost/javascripts/templates/gallery_image.js'),
-		events: (function () {
-			var events = _.extend({}, Controller.prototype.events, {
-				'click #like': 'like',
-				'click .back-button': 'back',
-			});
-
-			return events;
-		})(),
-		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-			//Add message listener
-			this.messageListener();
-
-			this._createImage();
-
-			return this.render();
-		},
-		onRender: function(){
-			this.dom = {
-				likeButton: this.$el.find('#like'),
-				likeIcon: this.$el.find('#like i'),
-				likes: this.$el.find('#likes'),
-				image: this.$el.find('#image')
-			};
-		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'galleryImageView')){
-				var backButton = this.constructor.backButton();
-				
-				steroids.view.navigationBar.update({
-					title: 'Foto',
-					backButton: backButton
-				});
-				steroids.view.navigationBar.show();
-			}
-		},
-		like: function(){
-			this.dom.likeIcon.toggleClass('ion-ios7-heart-outline ion-ios7-heart');
-		},
-		onImageLoaded: function(){
-			this.dom.image.removeAttr('style');
-			this.dom.image.append($(this.image).hide().fadeIn());
-			this.dom.image.addClass('loaded');
-		},
-		onMessage: function(event){
-			Controller.prototype.onMessage.call(this, event);
-
-			var data = event.data;
-
-			switch(data.message){
-			case 'gallery:show:image':
-				try{
-					this.image.src = data.picture.url;
-					this.dom.likes.text(data.picture.likes);
-					this.dom.image.css({
-						backgroundImage: 'url(' + data.picture.thumbnail + ')'
-					});
-				}catch(e){
-					console.log(e, e.stack);
-				}
-				break;
-			}
-		},
-		back: function(){
-			Controller.prototype.back.call(this);
-			// GC image data
-			this.dom.image.empty();
-			this.dom.image.removeClass('loaded');
-			this.image = null;
-			this._createImage();
-		},
-		_createImage: function(){
-			this.image = new Image();
-			this.image.onload = this.onImageLoaded.bind(this);
-		}
-	});
+	
 
 	var UploadModal = HTMLModal.extend({
 		template: require('http://localhost/javascripts/templates/gallery_modal_upload.js'),
@@ -289,23 +242,24 @@ define(function(require){
 			'click #save': 'save',
 			'click button[data-dismiss]': 'hide'
 		},
+		initialize: function(){
+			HTMLModal.prototype.initialize.apply(this, arguments);
+
+			window.addEventListener('message', this.onMessage.bind(this));
+		},
 		onRender: function(){
 			this.dom.image = this.$el.find('#image');
 		},
 		save: function(){
 			if(this.base64Data.length > 0){
-				window.showLoading('Guardando...');
-
-				var img = new Parse.File('foto.jpg', { base64: this.base64Data });
-				var file = new File({image: img});
-
-				file.save().then(this.onSave.bind(this), this.onError.bind(this));
+				window.showLoading('Guardando');
+				window.postMessage({message: 'gallery:image:save', image: this.base64Data});
 			}
 		},
 		update: function(data){
 			this.img = new Image();
 
-			window.showLoading('Cargando imagen...');
+			window.showLoading('Cargando imagen');
 
 			this.img.onload = function(){
 				window.hideLoading();
@@ -334,39 +288,26 @@ define(function(require){
 			window.hideLoading();
 		},
 		onSave: function(file){
-			console.log('on save');
-			var user = Parse.User.current();
-			var images = user.relation('images');
-			//Add image to relation;
-			images.add(file);
-			//Save user relation a
-			user
-				.save()
-				.then(function(){
-					console.log('user save');
-					return file.fetch();
-				}.bind({file: file}))
-				.then(function(file){
-					window.showLoading('Imagen Guardada');
+			steroids.logger.log(file);
 
-					_.delay(window.hideLoading.bind(window), 1000);
+			window.showLoading('Imagen Guardada');
 
-					return this.collection.prepend(file);
-				}.bind({collection: this.collection, hide: this.hide}))
-				.then(
-					this.hide.bind(this),
-					function(error){
-						console.log(error, 'errrrrror');
-					}
-				);
+			_.delay(window.hideLoading.bind(window), 1000);
+
+			this.collection.prepend(file);
+			this.hide();
 		},
-		onError: function(){
-			console.log('can not save', arguments);
+		onMessage: function(event){
+			var data = event.data;
+			switch(data.message){
+			case 'gallery:image:success':
+				this.onSave(data.image);
+				break;
+			case 'gallery:image:error':
+				this.onError(null, data.error);
+			}
 		}
 	});
 
-	return {
-		Index: Index,
-		Picture: PicView
-	};
+	return Index;
 });

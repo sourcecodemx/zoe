@@ -12,6 +12,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-steroids');
 	grunt.loadNpmTasks('grunt-jade');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-imagemin');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 
 	grunt.registerTask('steroids-jshint', 'JSHINT:ALL', function(){
 		grunt.extendConfig({
@@ -61,25 +63,46 @@ module.exports = function(grunt) {
 	grunt.registerTask('steroids-uglify', 'Compress Javascript files', function(){
 		grunt.extendConfig({
 			uglify: {
-				options: {
-					compress: {
-						drop_console: true
-					}
-				},
 				dist: {
-					files: {
+					options: {
+						compress: {
+							drop_console: true
+						}
+					},
+					files: [{
 						expand: true,
 						cwd: 'dist/',
 						src: [
-							'**/**.js'
+							'components/*/**/*.js',
+							'javascripts/*.js',
+							'collections/**/*.js',
+							'models/**/*.js',
+							'*.js'
 						],
-						dest: 'dist'
-					}
+						dest: 'dist/'
+					}]
 				}
 			}
 		});
 
 		return grunt.task.run('uglify');
+	});
+
+	grunt.registerTask('steroids-imagemin', 'Optimize images', function(){
+		grunt.extendConfig({
+			imagemin: {
+				dist: {
+					files: [{
+						expand: true,
+						cwd: 'www/images',
+						src: '{,*/}*.{png,jpg,jpeg}',
+						dest: 'dist/images'
+					}]
+				}
+			}
+		});
+
+		return grunt.task.run('imagemin');
 	});
 
 	grunt.registerTask('steroids-copy-www', 'Copy files from www/ to dist/ (except for .scss and .coffee)', function() {
@@ -115,6 +138,13 @@ module.exports = function(grunt) {
 		return grunt.task.run('copy:www');
 	});
 
-	grunt.registerTask('default', ['steroids-jshint', 'steroids-make', 'steroids-compile-sass', 'steroids-jade']);
+	grunt.registerTask('default', [
+		'steroids-jshint',
+		'steroids-make',
+		'steroids-compile-sass',
+		'steroids-jade'/*,
+		'steroids-uglify',
+		'steroids-imagemin'*/
+	]);
 
 };

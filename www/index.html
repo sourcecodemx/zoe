@@ -32,14 +32,17 @@
         });
       }
 
-      require(['AuthController', 'HomeController'], function(Auth, Home){
+      require(['Auth', 'Home', 'APIController'], function(Auth, Home, API){
+        //CManages API calls
+        window.ZOEApiManager = API;
         //Initialize function, will be used for refreshing
         //the view later
         var initialize = function(){
           if(Parse.User.current()){
-            return new Home.Index().show();
+            return new Home({model: Parse.User.current()}).show();
           }else{
-            return new Auth.Index().show();
+            //Login index
+            return new Auth.show();
           }
         };
         var view = window.view = initialize();
@@ -57,25 +60,10 @@
           }.bind(this);
           
           switch(data.message){
-          case 'login':
-          case 'signup':
-            window.showLoading('Sincronizando...');
-
-            Parse.User.become(data.token, {
-              success: function(){
-                window.postMessage({message:'reload'});
-              },
-              error: function(){
-                window.hideLoading();
-
-                setTimeout(function(){
-                navigator.notification.alert('Error al iniciar sesion', $.noop, 'Error');
-                }, 1);
-              }
-            });
-            break;
           case 'fbauth':
           case 'reload':
+          case 'user:saved:login':
+          case 'user:saved:signup':
             reload();
             break;
           case 'logout':
@@ -83,6 +71,8 @@
             Parse.User.logOut();
             reload();
             break;
+          //API Communication events
+          'gallery:picture:upvote'
           }
         }.bind({view: view, fn: initialize});
 
@@ -98,7 +88,5 @@
 </head>
 <body>
   <script src="/components/requirejs/require.js" data-main="http://localhost/javascripts/application"></script>
-  <!--script src="http://192.168.0.13:31173/target/target-script-min.js#anonymous"></script-->
-  <!--script src="http://192.168.1.72:8089/target/target-script-min.js#anonymous"></script-->
 </body>
 </html>

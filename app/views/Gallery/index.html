@@ -3,9 +3,8 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['GalleryController'], function(C){
-    	window.controller = new C.Index().show();
-      //(new C.Index()).show();
+    require(['http://localhost/controllers/Gallery.js'], function(C){
+    	(new C()).show();
     });
   }
 

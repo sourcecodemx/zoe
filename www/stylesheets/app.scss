@@ -42,6 +42,12 @@ body {
 		overflow-y: scroll;
 		-webkit-overflow-scrolling: touch;
 	}
+
+	.error-message {
+		color: darken($dark, 0.2);
+		text-shadow: 1px 1px 0 $stable;
+		text-align: center;
+	}
 }
 
 .modal-open .ionic-body {
@@ -121,4 +127,15 @@ body {
 
 .spinner-open {
 	@extend .modal-open;
+}
+
+.ion-infinite-scroll {
+	@extend ion-infinite-scroll;
+	text-align: center;
+}
+
+.block-refresher {
+	@extend .scroll-refresher;
+	top: 50%;
+	margin-top: -30px;
 }

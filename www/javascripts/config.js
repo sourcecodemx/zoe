@@ -8,10 +8,10 @@ define('config', function(){
 			JSKEY: 'ex5SBIHB9bNN9ELyx1ZRFoqiWVfrl5SIukRct2zt'
 		},
 		FB: {
-			DEFAULT_PERMISSION: ['email'],
+			DEFAULT_PERMISSION: ['email', 'read_stream'],
+			BROADCAST_PERMISSION: [],
 			APP_ID: '733603660030225',
-			APP_NAME: 'Zoe Water Dev',
-			SCOPE: 'email,read_stream,publish_stream'
+			APP_NAME: 'Zoe Water Dev'
 		},
 		MAPBOX: {
 			ID: 'jtanori.j9ab13k4',

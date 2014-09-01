@@ -1,13 +1,14 @@
-/* globals define, _, steroids */
+/* globals define, steroids, _ */
 define(function(require){
 	'use strict';
 
 	var Controller = require('http://localhost/controllers/core/Root.js');
 	var template = require('http://localhost/javascripts/templates/about.js');
 
-	var Index = Controller.extend({
+	return Controller.extend({
 		id: 'about-page',
 		template: template,
+		title: '¿Que es Zoé Water?',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 
@@ -23,18 +24,21 @@ define(function(require){
 			leftButton.onTap = this.onLeftButton.bind(this);
 
 			steroids.view.navigationBar.update({
-				title: '¿Que es Zoé Water?',
+				title: this.title,
 				buttons: {
 					left: [leftButton]
 				}
 			});
-			steroids.view.navigationBar.show();
 
 			return this.render();
+		},
+		onLayerWillChange: function(event){
+			if(event && event.target && event.target.webview.id === 'aboutIndexView'){
+				steroids.view.navigationBar.update({
+					title: this.title
+				});
+			}
 		}
 	});
-
-	return {
-		Index: Index
-	};
+	
 });

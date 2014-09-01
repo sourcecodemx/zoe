@@ -2,19 +2,19 @@
 	.page-content
 		br
 		.list.list-inset
-			a.item.item-icon-right.item-dark#updateName(data-view='name')
+			a.item.item-icon-right.item-dark#updateName(data-view='Settings/name', child)
 				| Cambiar Nombre
 				i.ion-ios7-arrow-right.icon
 
-			a.item.item-icon-right.item-dark#updateEmail(data-view='email')
+			a.item.item-icon-right.item-dark#updateEmail(data-view='Settings/email', child)
 				| Cambiar Correo
 				i.ion-ios7-arrow-right.icon
 
-			a.item.item-icon-right.item-dark#updatePassword(data-view='password')
+			a.item.item-icon-right.item-dark#updatePassword(data-view='Settings/password', child)
 				| Cambiar Contraseña
 				i.ion-ios7-arrow-right.icon
 
-			a.item.item-icon-right.item-dark#updateWeight(data-view='weight')
+			a.item.item-icon-right.item-dark#updateWeight(data-view='Settings/weight', child)
 				| Cambiar Peso
 				i.ion-ios7-arrow-right.icon
 
@@ -24,7 +24,7 @@
 			img#settingsBottle(src='http://localhost/images/bottle.png')
 
 		.text-center
-			button.button.button-clear#tos(data-view='tos') Ver terminos de uso
+			button.button.button-clear#tos(data-view='TOS/index', child, modal) Ver terminos de uso
 
 
 		p.text-center Welcome to the Source/Code

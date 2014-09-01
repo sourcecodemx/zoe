@@ -1,5 +1,5 @@
 /* global define */
-define(['backbone', 'aspect'], function(Backbone, aspect){
+define(['underscore', 'jquery', 'backbone', 'aspect'], function(_, $, Backbone, aspect){
 	'use strict';
 	
 	return Backbone.View.extend({

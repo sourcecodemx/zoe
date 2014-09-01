@@ -24,7 +24,7 @@ define(function(require){
 
 			this.listenTo(this.collection, 'request', this.showLoading.bind(this));
 			this.listenTo(this.collection, 'reset', this.addAll.bind(this));
-			this.listenTo(this.collection, 'error', this.onError.bind(this));
+			this.listenTo(this.collection, 'error', this.onContentError.bind(this));
 
 			var leftButton = new steroids.buttons.NavigationBarButton();
 			leftButton.imagePath = '/images/menu.png';
@@ -50,10 +50,10 @@ define(function(require){
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
 
-			this.dom.entries = this.$el.find('#entries');
+			this.dom.content = this.$el.find('#entries');
 		},
 		showLoading: function(){
-			window.showLoading('Cargando...');
+			window.showLoading('Cargando');
 		},
 		addAll: function(){
 			this.collection.each(this.addOne.bind(this));
@@ -66,15 +66,9 @@ define(function(require){
 			});
 
 			this.entries[view.cid] = view;
-			this.dom.entries.append(view.$el);
+			this.dom.content.append(view.$el);
 
 			return this;
-		},
-		onError: function(){
-			window.hideLoading();
-			setTimeout(function(){
-				navigator.notification.alert('No se han podido cargar entradas para el blog.', $.noop, 'Ups!');
-			}, 1);
 		},
 		onRightButton: function(){
 			this.collection.fetch();
@@ -85,7 +79,6 @@ define(function(require){
 		className: 'card.list',
 		template: require('http://localhost/javascripts/templates/blog_entry_item.js'),
 		initialize: function(){
-			console.log('initialize blog entry view');
 			this.render();
 		}
 	});

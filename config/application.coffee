@@ -31,18 +31,6 @@ steroids.config.location = "http://localhost/index.html"
 # ## Preloads
 steroids.config.preloads = [
 	{
-		id: 'signup'
-		location: 'http://localhost/views/Auth/new.html'
-	},
-	{
-		id: 'signupPassword'
-		location: 'http://localhost/views/Auth/new_password.html'
-	},
-	{
-		id: 'login'
-		location: 'http://localhost/views/Auth/login.html'
-	},
-	{
 		id: 'tos'
 		location: 'http://localhost/views/Auth/tos.html'
 	}

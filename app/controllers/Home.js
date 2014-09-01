@@ -1,10 +1,17 @@
-/* globals define, steroids, _, Parse */
+/* globals define, steroids, _ */
 define(function(require){
 	'use strict';
+
+	require('polyfill');
+	require('spinner');
 
 	var Controller = require('http://localhost/controllers/core/Root.js');
 	var HTMLModal  = require('http://localhost/ui/Modal.js');
 	var template = require('http://localhost/javascripts/templates/home.js');
+
+	//Load dependencie
+	//require('tomeline');
+	//require('timelineCSS');
 
 	var Index = Controller.extend({
 		id: 'home-page',
@@ -23,17 +30,12 @@ define(function(require){
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
-			this.views = {
-				settings: new steroids.views.WebView({location: 'http://localhost/views/Settings/index.html',id: 'settingsView'}),
-				stats: new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsView'})
-			};
+			this.views.stats = new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsView'});
 			//Preload view
-			this.views.settings.preload();
 			this.views.stats.preload();
 
 			var fakeGoal = _.random(1, 3);
 
-			this.data = Parse.User.current().toJSON();
 			this.data.goal =  fakeGoal > 1 ? fakeGoal + ' litros' : fakeGoal + ' litro';
 
 			this.canvas = null;
@@ -66,6 +68,7 @@ define(function(require){
 			window.view = this;
 
 			this.dom.canvas = this.$el.find('#progress');
+			this.dom.settings = this.$el.find('#settings');
 			this.canvas = this.dom.canvas[0].getContext('2d');
 
 			this._drawMultiRadiantCircle(150, 150, 120, this.progressColors);
@@ -75,19 +78,15 @@ define(function(require){
 			if(this.dom.menu && this.dom.menu.position().top === 0){
 				this.toggleMenu();
 			}
+			//Use DOM defined attributes
 
-			setTimeout(function(){
-				steroids.layers.push({
-					view: this.views.settings
-				});
-			}.bind(this), 1);
+			this.dom.settings.trigger('click');
 		},
 		onClose: function(){
 			this.views.settings.unload();
 			this.views.settings = null;
 		},
 		track: function(){
-			console.log('track');
 			if(!this.modal){
 				this.modal = new CheckModal();
 			}
@@ -98,6 +97,7 @@ define(function(require){
 			console.log('share');
 		},
 		stats: function(){
+			console.log(this.views.stats, 'stats');
 			steroids.modal.show({
 				view: this.views.stats,
 				navigationBar: true
@@ -161,7 +161,5 @@ define(function(require){
 		template: require('http://localhost/javascripts/templates/home_modal_check.js')
 	});
 
-	return {
-		Index: Index
-	};
+	return Index;
 });
