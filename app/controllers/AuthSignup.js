@@ -26,6 +26,8 @@ define(function(require){
 			this.tosView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/tos.html', id: 'tos'});
 			this.signupPasswordView = new steroids.views.WebView({location: 'http://localhost/views/Auth/new_password.html', id: 'signupPassword'});
 
+			this.signupPasswordView.preload();
+			
 			this.messageListener();
 
 			this.backButton = new steroids.buttons.NavigationBarButton({
@@ -46,7 +48,7 @@ define(function(require){
 			};
 		},
 		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'signup')){
+			if(event && event.target && (event.target.webview.id === 'authNewView')){
 				steroids.view.navigationBar.update({
 					title: this.title
 				});

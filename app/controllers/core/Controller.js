@@ -70,7 +70,7 @@ define(function(require){
 
 		//Override whenever it makes sense
 		render: function(){
-			var model = this.model instanceof Backbone.Model ? this.model.attributes : ((_.isObject(this.model) || _.isArray(this.model)) ? this.model : {});
+			var model = this.model && this.model.attributes ? this.model.attributes : ((_.isObject(this.model) || _.isArray(this.model)) ? this.model : {});
 			var collection = this.collection instanceof Backbone.Collection ? this.collection.toJSON() : ((_.isObject(this.collection) || _.isArray(this.collection)) ? this.collection : []);
 			//Extend data
 			var data = _.extend({

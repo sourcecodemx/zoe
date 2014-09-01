@@ -5,7 +5,7 @@ define(function(require){
 	var Modal = require('http://localhost/controllers/core/Modal.js');
 	var template = require('http://localhost/javascripts/templates/stats.js');
 
-	var Index = Modal.extend({
+	return Modal.extend({
 		id: 'stats-page',
 		template: template,
 		title: 'Estadisticas',
@@ -38,8 +38,4 @@ define(function(require){
 			}
 		}
 	});
-
-	return {
-		Index: Index
-	};
 });

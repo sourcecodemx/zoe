@@ -3,7 +3,7 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['Settings.Weight'], function(C){
+    require(['http://localhost/controllers/SettingsWeight.js'], function(C){
       (new C()).show();
     });
   }

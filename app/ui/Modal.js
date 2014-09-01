@@ -10,6 +10,8 @@ define(function(require){
 		id: 'modal',
 		className: 'modal-wrapper',
 		template: template,
+		showFx: 'fadeIn',
+		hideFx: 'fadeOut',
 		events: {
 			'click .close': 'hide',
 			'click .modal-backdrop': 'hide',

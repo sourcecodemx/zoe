@@ -42,7 +42,7 @@
             return new Home({model: Parse.User.current()}).show();
           }else{
             //Login index
-            return new Auth.show();
+            return new Auth().show();
           }
         };
         var view = window.view = initialize();
@@ -71,8 +71,6 @@
             Parse.User.logOut();
             reload();
             break;
-          //API Communication events
-          'gallery:picture:upvote'
           }
         }.bind({view: view, fn: initialize});
 

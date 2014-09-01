@@ -3,7 +3,7 @@ define(function(require){
 	'use strict';
 
 	var Controller = require('http://localhost/controllers/core/Controller.js');
-	var AuthWeight = require('Auth.Weight');
+	var AuthWeight = require('http://localhost/controllers/AuthWeight.js');
 
 	return AuthWeight.extend({
 		id: 'settings-weight-page',
@@ -21,6 +21,7 @@ define(function(require){
 				backButton: this.backButton
 			});
 
+			this.messageListener();
 			this.render();
 		},
 		onLayerWillChange: function(event){
@@ -36,7 +37,17 @@ define(function(require){
 			}, 1);
 		},
 		onSuccess: function(){
-			window.hideLoading();
+			window.showLoading('Tu peso ha sido cambiado.');
+			setTimeout(window.hideLoading.bind(window), 2000);
+		},
+		onMessage: function(event){
+			switch(event.data.message){
+			case 'user:weight:success':
+				this.onSuccess();
+				break;
+			case 'user:weight:error':
+				this.onError(null, event.data.error);
+			}
 		}
 	});
 });

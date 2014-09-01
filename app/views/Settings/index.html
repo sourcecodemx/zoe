@@ -3,7 +3,7 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['Settings'], function(C){
+    require(['http://localhost/controllers/Settings.js'], function(C){
       (new C()).show();
     });
   }

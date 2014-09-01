@@ -3,8 +3,8 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['Auth.Login'], function(C){
-      (new C()).show();
+    require(['http://localhost/controllers/AuthLogin.js'], function(C){
+    	(new C()).show();
     });
   }
 

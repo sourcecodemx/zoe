@@ -7,6 +7,6 @@
 						img(src='/images/logo.png').full-image
 
 			.padding-large
-				button.button.button-block.button-positive#facebookSignup(type='button') Registro con Facebook
-				button.button.button-block.button-stable#mailSignup(type='button') Registro con Mail
-				button.button.button-block.button-stable#signin(type='button') Ya tengo cuenta
+				button.button.button-block.button-positive#facebook(type='button') Registro con Facebook
+				button.button.button-block.button-stable(type='button', data-view='Auth/new', child) Registro con Mail
+				button.button.button-block.button-stable(type='button', data-view='Auth/login', child) Ya tengo cuenta

@@ -1,30 +1,24 @@
-/* globals define, _, Backbone, steroids */
+/* globals define, _, steroids */
 define(function(require){
 	'use strict';
 
 	var Controller = require('http://localhost/controllers/core/Root.js');
-	var template = require('http://localhost/javascripts/templates/blog.js');
-	var Collection = require('http://localhost/collections/Blog.js');
+	var Detachable = require('http://localhost/controllers/core/Detachable.js');
+	var Blog       = require('http://localhost/collections/BlogSimple.js');
 
 	var Index = Controller.extend({
 		id: 'blog-page',
-		template: template,
-		events: (function () {
-			var events = _.extend({}, Controller.prototype.events, {
-
-			});
-
-			return events;
-		})(),
+		template: require('http://localhost/javascripts/templates/blog.js'),
+		title: 'Blog',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
-			this.collection = new Collection();
+			window.addEventListener('message', this.onMessage.bind(this));
+
+			this.collection = new Blog();
 			this.entries = {};
 
-			this.listenTo(this.collection, 'request', this.showLoading.bind(this));
 			this.listenTo(this.collection, 'reset', this.addAll.bind(this));
-			this.listenTo(this.collection, 'error', this.onContentError.bind(this));
 
 			var leftButton = new steroids.buttons.NavigationBarButton();
 			leftButton.imagePath = '/images/menu.png';
@@ -35,7 +29,7 @@ define(function(require){
 			rightButton.onTap = this.onRightButton.bind(this);
 
 			steroids.view.navigationBar.update({
-				title: 'Blog',
+				title: this.title,
 				buttons: {
 					left: [leftButton],
 					right: [rightButton]
@@ -43,47 +37,85 @@ define(function(require){
 			});
 			steroids.view.navigationBar.show();
 
-			this.collection.fetch();
-
 			return this.render();
 		},
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
 
 			this.dom.content = this.$el.find('#entries');
+
+			window.postMessage({message: 'blog:fetch'});
 		},
-		showLoading: function(){
+		onRightButton: function(){
 			window.showLoading('Cargando');
+
+			this.removeAll();
+			window.postMessage({message: 'blog:fetch'});
+		},
+		onLayerWillChange: function(event){
+			if(event && event.target && event.target.webview.id === 'blogView'){
+				steroids.view.navigationBar.update({
+					title: this.title
+				});
+			}
 		},
 		addAll: function(){
 			this.collection.each(this.addOne.bind(this));
 
+			//Call show on all images
+			_.invoke(this.entries, Entry.prototype.show);
+
 			window.hideLoading();
+		},
+		removeAll: function(){
+			_.invoke(this.entries, Entry.prototype.destroy);
+			_.each(this.entries, function(i){
+				i = null;
+			});
+			this.entries = {};
 		},
 		addOne: function(model){
 			var view = new Entry({
-				model: model
+				model: model,
+				appendTo: this.dom.content
 			});
 
 			this.entries[view.cid] = view;
-			this.dom.content.append(view.$el);
 
 			return this;
 		},
-		onRightButton: function(){
-			this.collection.fetch();
+		onMessage: function(event){
+			var data = event.data;
+			switch(data.message){
+			case 'blog:fetch:success':
+				this.collection.reset(data.entries);
+				break;
+			case 'blog:fetch:error':
+				if(this.dom.content.find('.card').length){
+					this.onError(null, data.error);
+				}else{
+					this.onContentError(data.error);
+				}
+			}
 		}
 	});
 
-	var Entry = Backbone.View.extend({
-		className: 'card.list',
+	var Entry = Detachable.extend({
+		showFx: 'slideDown',
+		hideFx: 'fadeOut',
+		className: 'card list',
 		template: require('http://localhost/javascripts/templates/blog_entry_item.js'),
 		initialize: function(){
+			Detachable.prototype.initialize.apply(this, arguments);
+
 			this.render();
+		},
+		render: function(){
+			this.$el.html(this.template({data: this.model.toJSON()}));
+
+			return this;
 		}
 	});
 
-	return {
-		Index: Index
-	};
+	return Index;
 });

@@ -1,12 +1,9 @@
-/* globals define, Backbone */
+/* globals define, Parse */
 define(['http://localhost/models/Entry.js'], function(Model){
 	'use strict';
 	
-	return Backbone.Collection.extend({
+	return Parse.Collection.extend({
 		model: Model,
-		url: 'http://saludalcalina.com/feed/',
-		initialize: function(){
-			console.log('initialize blog collection');
-		}
+		query: (new Parse.Query(Model)).descending('createdAt').limit(10)
 	});
 });

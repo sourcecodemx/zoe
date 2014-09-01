@@ -1,8 +1,10 @@
-/* globals define, _, steroids, aspect */
+/* globals define, _, steroids, Zoe */
 define(function(require){
 	'use strict';
 
 	var Controller = require('http://localhost/controllers/core/Controller.js');
+	var config = require('config');
+
 	return Controller.extend({
 		id: 'gallery-image-page',
 		template: require('http://localhost/javascripts/templates/gallery_image.js'),
@@ -31,8 +33,6 @@ define(function(require){
 				title: this.title,
 				backButton: this.backButton
 			});
-
-			aspect.add(this, ['upvote', 'downvote'], this.afterVote.bind(this), 'after');
 
 			return this.render();
 		},
@@ -73,9 +73,17 @@ define(function(require){
 			switch(data.message){
 			case 'gallery:image:show':
 				try{
+					var user = Zoe.storage.getItem('Parse/' + config.PARSE.ID + '/currentUser');
+					var isLiked = user.likedImages.some(function(val){return val === data.picture.id;});
+
 					this.currentPicture = data.picture;
 					this.image.src = data.picture.url;
 					this.dom.likes.text(data.picture.likes);
+
+					if(isLiked){
+						this.dom.likeIcon.removeClass('ion-ios7-heart-outline').addClass('ion-ios7-heart');
+						this.dom.likeButton.removeClass('upvote').addClass('downvote');
+					}
 				}catch(e){
 					this.onError(null, e);
 				}
@@ -83,7 +91,7 @@ define(function(require){
 			case 'gallery:image:upvote:success':
 			case 'gallery:image:downvote:success':
 			case 'gallery:image:vote:error':
-				this.dom.likeButton.attr('disabled', false);
+				this.dom.likeButton.removeAttr('disabled');
 				break;
 			}
 		},
@@ -95,8 +103,9 @@ define(function(require){
 			var currLikes = parseInt(this.currentPicture.likes, 10) + 1;
 			this.currentPicture.likes = currLikes;
 
-			this.dom.likeIcon.toggleClass('ion-ios7-heart-outline ion-ios7-heart upvote downvote');
-			this.dom.likeButton.attr('disabled', true);
+			this.dom.likeIcon.removeClass('ion-ios7-heart-outline').addClass('ion-ios7-heart');
+			this.dom.likeButton.removeClass('upvote').addClass('downvote').attr('disabled', true);
+
 			this.dom.likes.text(currLikes);
 			window.postMessage({message: 'gallery:image:upvote', id: this.currentPicture.id});
 		},
@@ -108,13 +117,11 @@ define(function(require){
 			var currLikes = parseInt(this.currentPicture.likes, 10) - 1;
 			this.currentPicture.likes = currLikes;
 
-			this.dom.likeIcon.toggleClass('ion-ios7-heart-outline ion-ios7-heart downvote upvote');
-			this.dom.likeButton.attr('disabled', true);
+			this.dom.likeIcon.addClass('ion-ios7-heart-outline').removeClass('ion-ios7-heart');
+			this.dom.likeButton.addClass('upvote').removeClass('downvote').attr('disabled', true);
+
 			this.dom.likes.text(currLikes);
 			window.postMessage({message: 'gallery:image:downvote', id: this.currentPicture.id});
-		},
-		afterVote: function(){
-			window.postMessage({message: 'gallery:image:vote:' + this.currentPicture.id, likes: this.currentPicture.likes});
 		},
 		clear: function(){
 			// Controller.prototype.back.call(this);

@@ -40,7 +40,6 @@ define(function(require){
 
 			//Listen for images collection
 			this.listenTo(this.collection, 'reset', this.addAll, this);
-			this.listenTo(this.collection, 'error', this.onContentError, this);
 			this.listenTo(this.collection, 'prepend', this.prependOne, this);
 
 			//Open picture view
@@ -109,7 +108,6 @@ define(function(require){
 			}, 1000);
 		},
 		addOne: function(model){
-			console.log(model, 'model to add');
 			//Create image view
 			var view = new PicItem({
 				model: model,
@@ -121,7 +119,6 @@ define(function(require){
 			return this;
 		},
 		prependOne: function(model){
-			console.log(model, 'model to prepend');
 			var view = new PicItem({
 				model: model,
 				appendTo: this.dom.content,
@@ -196,7 +193,7 @@ define(function(require){
 				break;
 			case 'gallery:image:upvote:success':
 			case 'gallery:image:downvote:success':
-				this.collection.get(data.image.objectId).set('likes', data.image.likes);
+				this.collection.get(data.id).set('likes', data.likes);
 				break;
 			}
 		}
@@ -288,19 +285,22 @@ define(function(require){
 			window.hideLoading();
 		},
 		onSave: function(file){
-			steroids.logger.log(file);
+			try{
+				window.showLoading('Imagen Guardada');
 
-			window.showLoading('Imagen Guardada');
+				_.delay(window.hideLoading.bind(window), 1000);
 
-			_.delay(window.hideLoading.bind(window), 1000);
-
-			this.collection.prepend(file);
-			this.hide();
+				this.collection.prepend(file);
+				this.hide();
+			}catch(e){
+				this.onError(null, e);
+			}
 		},
 		onMessage: function(event){
 			var data = event.data;
 			switch(data.message){
 			case 'gallery:image:success':
+				console.log(data, 'passed image');
 				this.onSave(data.image);
 				break;
 			case 'gallery:image:error':

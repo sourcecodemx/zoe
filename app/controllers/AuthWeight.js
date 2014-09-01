@@ -16,7 +16,8 @@ define(function(require){
 			});
 			steroids.view.navigationBar.update({
 				title: this.title,
-				backButton: null
+				backButton: null,
+				overrideBackButton: true
 			});
 
 			this.messageListener();
@@ -41,12 +42,17 @@ define(function(require){
 					e.preventDefault();
 				}
 
-				window.showLoading('Guardando');
-
 				var w = parseInt(this.dom.weight.val(), 10);
-				window.postMessage({message: 'user:save:weight', weight: w});
+
+				if(!w){
+					throw new Error('Necesitamos saber su pero para poder calcular el consumo optimo diario, por favor intente de nuevo');
+				}else if(isNaN(w)){
+					throw new Error('El peso debe ser un numero, por favor intente de nuevo.');
+				}
+
+				window.showLoading('Guardando');
+				window.postMessage({message: 'user:weight:save', weight: w});
 			}catch(e){
-				window.hideLoading();
 				this.onError(null, e);
 			}
 		},
@@ -61,10 +67,10 @@ define(function(require){
 		},
 		onMessage: function(event){
 			switch(event.data.message){
-			case 'user:saved:weight':
+			case 'user:weight:success':
 				this.back();
 				break;
-			case 'user:saved:weight:error':
+			case 'user:weight:error':
 				this.onError(null, event.data.error);
 			}
 		}

@@ -1,46 +1,26 @@
-/* global define, Parse */
+/* global define, Parse, steroids */
 define(function(require){
 	'use strict';
 
-	var File = require('http://localhost/models/File.js');
+	steroids.logger.log('APIController loaded');
+
+	var File   = require('http://localhost/models/File.js');
+	var Journal = require('http://localhost/models/Journal.js');
+
 	var Images = require('http://localhost/collections/Images.js');
-	
+	var Blog   = require('http://localhost/collections/Blog.js');
+
 	var Controller = function(){
 		window.addEventListener('message', this.onMessage.bind(this));
 
 		this.images = new Images();
+		this.blog   = new Blog();
+		this.user   = Parse.User.current();
 
 		return this;
 	};
 
 	Controller.prototype = {
-		post: function(data){
-			window.postMessage(data);
-		},
-		onSignin: function(){
-			window.postMessage({message: 'user:saved:login'});
-		},
-
-		onSigninError: function(model, error){
-			window.postMessage({message: 'user:saved:login:error', error: error});
-		},
-
-		onSignup: function(){
-			window.postMessage({message: 'user:saved:signup'});
-		},
-
-		onSignupError: function(model, error){
-			window.postMessage({message: 'user:saved:signup:error', error: error});
-		},
-
-		onWeight: function(){
-			window.postMessage({message: 'user:saved:weight'});
-		},
-
-		onWeightError: function(model, error){
-			window.postMessage({message: 'user:saved:weight:error', error: error});
-		},
-		
 		onMessage: function(event){
 			var data = event.data;
 
@@ -50,13 +30,24 @@ define(function(require){
 					this.weightView.unload();
 				}
 				break;
+			/**
+			*
+			*
+			* User Login/Signup Events
+			*
+			*/
 			case 'user:save:login':
 				Parse.User.logIn(
 					data.user.username,
 					data.user.password,
 					{
-						success: this.onSignin.bind(this),
-						error: this.onSigninError.bind(this)
+						success: function(){
+							this.user = Parse.User.current();
+							window.postMessage({message: 'user:saved:login'});
+						}.bind(this),
+						error: function(model, error){
+							window.postMessage({message: 'user:saved:login:error', error: error});
+						}
 					}
 				);
 				break;
@@ -70,16 +61,25 @@ define(function(require){
 				this.user.signUp(
 					null,
 					{
-						success: this.onSignup.bind(this),
-						error: this.onSignupError.bind(this)
+						success: function(){
+							this.user = Parse.User.current();
+							window.postMessage({message: 'user:saved:signup'});
+						}.bind(this),
+						error: function(model, error){
+							window.postMessage({message: 'user:saved:signup:error', error: error});
+						}
 					}
 				);
 
 				break;
-			case 'user:save:weight':
+			case 'user:weight:save':
 				Parse.User.current().save({weight: data.weight}, {
-					success: this.onWeight.bind(this),
-					error: this.onWeightError.bind(this)
+					success: function(){
+						window.postMessage({message: 'user:weight:success'});
+					},
+					error: function(error){
+						window.postMessage({message: 'user:weight:error', error: error});
+					}
 				});
 				break;
 			case 'user:save:fbsignup':
@@ -100,6 +100,56 @@ define(function(require){
 					}.bind(this)
 				});
 				break;
+			case 'user:consumption:save':
+				var type = parseInt(data.type, 10);
+				var consumption = new Journal({consumption: type});
+
+				consumption.save()
+					.then(function(){
+						var user = Parse.User.current();
+						var journals = user.relation('journal');
+
+						journals.add(consumption);
+						user.set('lastConsumption', consumption);
+
+						user
+							.save()
+							.then(function(){
+								window.postMessage({message: 'user:consumption:success'});
+							}, function(error){
+								window.postMessage({message: 'user:consumption:error', error: error});
+							});
+					}, function(error){
+						window.postMessage({message: 'user:consumption:error', error: error});
+					});
+				break;
+			case 'user:journal:fetch':
+				var journal = this.user.relation('journal');
+				var today = new Date();
+				var todayEnd = new Date();
+
+				today.setHours(0,0,0,0);
+				todayEnd.setHours(23,59,59,999);
+
+				journal.query()
+					.greaterThan('createdAt', today)
+					.lessThan('createdAt', todayEnd)
+					.find({
+						success: function(results){
+							var todayConsumption = results.reduce(function(current, next){return current+next.get('consumption');}, 0);
+							window.postMessage({message: 'user:journal:success', consumption: todayConsumption});
+						},
+						error: function(error){
+							window.postMessage({message: 'user:journal:error', error: error});
+						}
+					});
+				break;
+			/**
+			*
+			*
+			* Gallery Events
+			*
+			*/
 			case 'gallery:fetch':
 				this.images.fetch({
 					success: function(collection){
@@ -119,18 +169,19 @@ define(function(require){
 					var images = user.relation('images');
 					//Add image to relation;
 					images.add(file);
+					this.images.add(file);
 					//Save user relation a
 					user
 						.save()
-						.then(
-							function(){
-								window.postMessage({message: 'gallery:image:success', image: file.toJSON()});
-							},
-							function(error){
-								window.postMessage({message: 'gallery:image:error', error: error});
-							}
-						);
-				}, function(error){
+						.then(function(){
+							return file.fetch();
+						})
+						.then(function(f){
+							window.postMessage({message: 'gallery:image:success', image: f.toJSON()});
+						},function(error){
+							window.postMessage({message: 'gallery:image:error', error: error});
+						});
+				}.bind(this), function(error){
 					window.postMessage({message: 'gallery:image:error', error: error});
 				});
 				break;
@@ -138,28 +189,62 @@ define(function(require){
 				this.images.get(data.id)
 					.increment('likes')
 					.save()
-					.then(
-						function(img){
-							window.postMessage({message: 'gallery:image:upvote:success', image: img.toJSON()});
-						},
-						function(error){
-							window.postMessage({message: 'gallery:image:vote:error', error: error});
-						}
-					);
+					.then(function(img){
+						data.likes = img.get('likes');
+						return this.user.addUnique('likedImages', data.id).save();
+					}.bind(this))
+					.then(function(){
+						window.postMessage({message: 'gallery:image:upvote:success', id:data.id, likes: data.likes});
+					}.bind(this),function(error){
+						window.postMessage({message: 'gallery:image:vote:error', error: error});
+					});
 				break;
-			case 'gallery:image.downvote':
+			case 'gallery:image:downvote':
+				console.log('downvote', data);
 				this.images.get(data.id)
-					.increment('likes')
+					.increment('likes', -1)
 					.save()
-					.then(
-						function(img){
-							window.postMessage({message: 'gallery:image:downvote:success', image: img.toJSON()});
-						},
-						function(error){
-							window.postMessage({message: 'gallery:image:vote:error', error: error});
-						}
-					);
+					.then(function(img){
+						data.likes = img.get('likes');
+						return this.user.remove('likedImages', data.id).save();
+					}.bind(this))
+					.then(function(){
+						window.postMessage({message: 'gallery:image:downvote:success', id:data.id, likes: data.likes});
+					}.bind(this),function(error){
+						window.postMessage({message: 'gallery:image:vote:error', error: error});
+					});
 				break;
+			/**
+			*
+			*
+			* Blog Events
+			*
+			*/
+			case 'blog:fetch':
+				this.blog.fetch({
+					success: function(collection){
+						window.postMessage({message: 'blog:fetch:success', entries: collection.toJSON()});
+					},
+					error: function(collection, error){
+						window.postMessage({message: 'blog:fetch:error', error: error});
+					}
+				});
+				break;
+			/**
+			*
+			*
+			* Zoe Premier Events
+			*
+			*/
+			case 'premier:contact':
+				Parse.Cloud
+					.run('contact', data.details)
+					.done(function(){
+						window.postMessage({message: 'premier:contact:success'});
+					}.bind(this))
+					.fail(function(error){
+						window.postMessage({message: 'premier:contact:error', error: error});
+					});
 			}
 		}
 	};

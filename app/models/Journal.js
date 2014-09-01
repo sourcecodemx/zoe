@@ -2,9 +2,9 @@
 define(function(){
 	'use strict';
 	return Parse.Object.extend({
-		className: 'Blog',
+		className: 'Journal',
 		initialize: function(){
-			console.log('initialize blog model');
+			console.log('initialize journal model');
 		}
 	});
 });

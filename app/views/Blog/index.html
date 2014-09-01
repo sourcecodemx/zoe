@@ -3,9 +3,9 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['BlogController'], function(C){
-    	window.controller = new C.Index().show();
-    	//(new C.Index()).show();
+    require(['http://localhost/controllers/Blog.js'], function(C){
+    	//window.controller = new C.Index().show();
+    	(new C()).show();
     });
   }
 

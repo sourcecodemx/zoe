@@ -1,4 +1,4 @@
-/* globals define, steroids, CryptoJS, facebookConnectPlugin */
+/* globals define, steroids, CryptoJS, facebookConnectPlugin, _ */
 define(function(require){
 	'use strict';
 
@@ -21,19 +21,15 @@ define(function(require){
 		template: require('http://localhost/javascripts/templates/index.js'),
 		hideFx: 'fadeOut',
 		showFb: 'fadeIn',
-		events: {
-			'click #facebookSignup': 'facebook',
-			'click #mailSignup':     'signup',
-			'click #signin':         'signin'
-		},
+		events: (function () {
+			var events = _.extend({}, Controller.prototype.events, {
+				'click #facebookSignup': 'facebook'
+			});
+
+			return events;
+		})(),
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
-
-			this.signupView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/new.html', id: 'signup'});
-			this.loginView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/login.html', id: 'login'});
-			this.weightView = new steroids.views.WebView({location: 'http://localhost/views/Auth/weight.html',id: 'signupWeightView'});
-			
-			this.weightView.preload();
 
 			this.messageListener();
 
@@ -130,26 +126,6 @@ define(function(require){
 					);
 				}
 			}.bind(this));
-		},
-		signup: function(){
-			setTimeout(
-				function(){
-					steroids.layers.push({
-						view: this.signupView
-					});
-				}.bind(this),
-				1
-			);
-		},
-		signin: function(){
-			setTimeout(
-				function(){
-					steroids.layers.push({
-						view: this.loginView
-					});
-				}.bind(this),
-				1
-			);
 		},
 		onMessage: function(event){
 			var data = event.data;

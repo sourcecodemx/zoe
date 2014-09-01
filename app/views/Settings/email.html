@@ -2,7 +2,7 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['Settings.Email'], function(C){
+    require(['http://localhost/controllers/SettingsEmail.js'], function(C){
       (new C()).show();
     });
   }

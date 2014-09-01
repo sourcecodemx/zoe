@@ -8,11 +8,7 @@ define(function(require){
 	var Controller = require('http://localhost/controllers/core/Root.js');
 	var HTMLModal  = require('http://localhost/ui/Modal.js');
 	var template = require('http://localhost/javascripts/templates/home.js');
-
-	//Load dependencie
-	//require('tomeline');
-	//require('timelineCSS');
-
+	
 	var Index = Controller.extend({
 		id: 'home-page',
 		template: template,
@@ -34,9 +30,13 @@ define(function(require){
 			//Preload view
 			this.views.stats.preload();
 
-			var fakeGoal = _.random(1, 3);
+			var weight = this.model.get('weight');
+			var goal = (weight * 0.03).toFixed(2);
 
-			this.data.goal =  fakeGoal > 1 ? fakeGoal + ' litros' : fakeGoal + ' litro';
+			this.goal = goal;
+
+			this.data.goal =  goal + ' litros';
+			this.data.username = this.model.get('username');
 
 			this.canvas = null;
 			this.progressColors = ['#54BB2F', '#0093C2'];
@@ -60,15 +60,17 @@ define(function(require){
 			});
 			steroids.view.navigationBar.show();
 
+			window.addEventListener('message', this.onMessage.bind(this));
+			window.postMessage({message: 'user:journal:fetch'});
+
 			return this.render();
 		},
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
 
-			window.view = this;
-
 			this.dom.canvas = this.$el.find('#progress');
 			this.dom.settings = this.$el.find('#settings');
+			this.dom.percentage = this.$el.find('#percentage');
 			this.canvas = this.dom.canvas[0].getContext('2d');
 
 			this._drawMultiRadiantCircle(150, 150, 120, this.progressColors);
@@ -83,8 +85,8 @@ define(function(require){
 			this.dom.settings.trigger('click');
 		},
 		onClose: function(){
-			this.views.settings.unload();
-			this.views.settings = null;
+			//this.views.settings.unload();
+			//this.views.settings = null;
 		},
 		track: function(){
 			if(!this.modal){
@@ -154,11 +156,85 @@ define(function(require){
 			// line color
 			context.strokeStyle = '#0093C2';
 			context.stroke();
+		},
+		onSuccess: function(milltrs){
+			try{
+				var liters = parseFloat((milltrs/1000).toFixed(2), 10);
+				var goal = this.goal;
+				var percentage = Math.round((liters/goal)*100);
+
+				this.dom.percentage.text(percentage + '%');
+			}catch(e){
+				this.onError(null, e);
+			}
+			
+		},
+		onMessage: function(event){
+			var data = event.data;
+			switch(data.message){
+			case 'user:journal:success':
+				this.onSuccess(data.consumption);
+				break;
+			case 'user:journal:error':
+				this.onError(null, data.error);
+				break;
+			}
 		}
 	});
 
 	var CheckModal = HTMLModal.extend({
-		template: require('http://localhost/javascripts/templates/home_modal_check.js')
+		events: (function () {
+			var events = _.extend({}, HTMLModal.prototype.events, {
+				'click .check': 'save',
+				'click #deleteLast': 'deleteLast'
+			});
+
+			return events;
+		})(),
+		template: require('http://localhost/javascripts/templates/home_modal_check.js'),
+		initialize: function(){
+			HTMLModal.prototype.initialize.apply(this, arguments);
+
+			window.addEventListener('message', this.onMessage.bind(this));
+
+			return this;
+		},
+		save: function(e){
+			try{
+				var value = $(e.currentTarget).attr('data-value');
+
+				window.showLoading('Guardando Consumo');
+				window.postMessage({message: 'user:consumption:save', type: value});
+			}catch(e){
+				this.onError(null, e);
+			}
+		},
+		deleteLast: function(){
+			console.log('delete last');
+		},
+		onSuccess: function(){
+			window.showLoading('Consumo Guardado');
+			setTimeout(window.hideLoading.bind(window), 2000);
+			this.hide();
+		},
+		onError: function(model, error){
+			window.hideLoading();
+			setTimeout(function(){
+				navigator.notification.alert(this.message, $.noop, 'Ups!');
+			}.bind(error), 1);
+		},
+		onMessage: function(event){
+			var data = event.data;
+			switch(data.message){
+			case 'user:consumption:success':
+				this.onSuccess();
+				break;
+			case 'user:consumption:error':
+				console.log('consumption error', data);
+				this.onError(null, data.error);
+				break;
+			}
+		}
 	});
 
 	return Index;

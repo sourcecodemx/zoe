@@ -10,7 +10,7 @@ define(function(){
 		model: Img,
 		url: '',
 		prepend: function(model){
-			this.add(model, {silent: true});
+			model = this.add(model, {silent: true});
 			this.trigger('prepend', model);
 		}
 	});

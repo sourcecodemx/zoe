@@ -3,8 +3,8 @@
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['PremierController'], function(C){
-      (new C.Information()).show();
+    require(['http://localhost/controllers/PremierInformation.js'], function(C){
+      (new C()).show();
     });
   }
 
