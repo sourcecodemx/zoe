@@ -2,4 +2,16 @@
 	#settingsBottle {
 		height: 120px;
 	}
+
+	#options {
+		a {
+			margin: 0;
+			border: 0;
+			border-bottom: $border-calm;
+
+			&:last-child {
+				border-bottom: 0;
+			}
+		}
+	}
 }

@@ -40,7 +40,8 @@ define(function(require){
 		onLayerWillChange: function(event){
 			if(event && event.target && (event.target.webview.id === 'authLoginView')){
 				steroids.view.navigationBar.update({
-					title: this.title
+					title: this.title,
+					backButton: this.backButton
 				});
 			}
 		},
@@ -58,7 +59,7 @@ define(function(require){
 				}
 
 				window.showLoading('Autenticando');
-				window.postMessage({message: 'user:save:login', user: {username: u, password: p}});
+				window.postMessage({message: 'user:login', user: {username: u, password: p}});
 			}catch(e){
 				this.onError(null, e);
 			}
@@ -74,10 +75,10 @@ define(function(require){
 		},
 		onMessage: function(event){
 			switch(event.data.message){
-			case 'user:saved:login':
+			case 'user:login:success':
 				this.onSuccess();
 				break;
-			case 'user:saved:login:error':
+			case 'user:login:error':
 				this.onError(null, event.data.error);
 			}
 		}

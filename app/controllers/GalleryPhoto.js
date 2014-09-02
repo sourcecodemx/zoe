@@ -25,8 +25,7 @@ define(function(require){
 			this._createImage();
 
 			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: '',
-				onTap: this.back.bind(this)
+				title: ''
 			});
 
 			steroids.view.navigationBar.update({
@@ -50,7 +49,8 @@ define(function(require){
 		onLayerWillChange: function(event){
 			if(event && event.target && (event.target.webview.id === 'galleryImageView')){
 				steroids.view.navigationBar.update({
-					title: this.title
+					title: this.title,
+					backButton: this.backButton
 				});
 			}
 		},
@@ -74,7 +74,7 @@ define(function(require){
 			case 'gallery:image:show':
 				try{
 					var user = Zoe.storage.getItem('Parse/' + config.PARSE.ID + '/currentUser');
-					var isLiked = user.likedImages.some(function(val){return val === data.picture.id;});
+					var isLiked = user.likedImages ? user.likedImages.some(function(val){return val === data.picture.id;}) : false;
 
 					this.currentPicture = data.picture;
 					this.image.src = data.picture.url;

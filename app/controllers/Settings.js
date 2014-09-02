@@ -19,7 +19,7 @@ define(function(require){
 			Controller.prototype.initialize.apply(this, arguments);
 
 			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: '8'
+				title: ''
 			});
 
 			steroids.view.navigationBar.update({
@@ -32,13 +32,14 @@ define(function(require){
 		onLayerWillChange: function(event){
 			if(event && event.target && (event.target.webview.id === 'settingsIndexView')){
 				steroids.view.navigationBar.update({
-					title: this.title
+					title: this.title,
+					backButton: this.backButton
 				});
 			}
 		},
 		signout: function(){
 			//Broadcast signout message
-			window.postMessage({message: 'logout'});
+			window.postMessage({message: 'user:logout'});
 
 			setTimeout(function(){
 				//Back to the home page

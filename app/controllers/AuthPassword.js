@@ -47,7 +47,8 @@ define(function(require){
 		onLayerWillChange: function(event){
 			if(event && event.target && (event.target.webview.id === 'signupPasswordView')){
 				steroids.view.navigationBar.update({
-					title: this.title
+					title: this.title,
+					backButton: this.backButton
 				});
 			}
 		},
@@ -68,7 +69,7 @@ define(function(require){
 					prefilledData.password = password;
 
 					//Atempt saving the user
-					window.postMessage({message: 'user:save:signup', user: prefilledData});
+					window.postMessage({message: 'user:signup', user: prefilledData});
 				}else{
 					if(_.isEmpty(prefilledData)){
 
@@ -107,21 +108,10 @@ define(function(require){
 		},
 		onMessage: function(event){
 			switch(event.data.message){
-			case 'signup':
-				this.reset();
-				if(this.tosView){
-					this.tosView.unload();
-				}
-				break;
-			case 'signup_weight':
-				if(this.weightView){
-					this.weightView.unload();
-				}
-				break;
-			case 'user:saved:signup':
+			case 'user:signup:success':
 				this.onSuccess();
 				break;
-			case 'user:saved:signup:error':
+			case 'user:signup:error':
 				this.onError(null, event.data.error);
 				break;
 			}

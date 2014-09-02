@@ -46,6 +46,7 @@ define(['underscore', 'jquery', 'backbone', 'aspect'], function(_, $, Backbone, 
 		show: function(){
 			try{
 				if(!this.isAttached()){
+					this.$el.hide();
 					this._append();
 				}
 				this.$el[this.showFx]();

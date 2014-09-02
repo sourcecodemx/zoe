@@ -5,6 +5,8 @@ define(function(require){
 	var Controller = require('http://localhost/controllers/core/Controller.js');
 
 	return Controller.extend({
+		showFx: 'fadeIn',
+		hideFx: 'fadeOut',
 		events: {
 			'click #leftButton': 'onLeftButton',
 			'click #headerBrand': 'onLeftButton',

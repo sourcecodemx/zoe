@@ -137,6 +137,9 @@ define(function(require){
 				this.onError(null, data.error);
 				break;
 			}
+		},
+		onDestroy: function(){
+			window.removeEventListener('message', this.onMessage.bind(this));
 		}
 	});
 });

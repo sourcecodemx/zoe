@@ -35,48 +35,42 @@
       require(['Auth', 'Home', 'APIController'], function(Auth, Home, API){
         //CManages API calls
         window.ZOEApiManager = API;
-        //Initialize function, will be used for refreshing
-        //the view later
-        var initialize = function(){
-          if(Parse.User.current()){
-            return new Home({model: Parse.User.current()}).show();
-          }else{
-            //Login index
-            return new Auth().show();
-          }
-        };
-        var view = window.view = initialize();
         //Listen for messages
+        var destroy = function(){
+          if(window.view && window.view.destroy){
+            window.view.destroy();
+            window.view = null;
+          }
+        }
         var onMessage = function(event){
           var data = event.data;
-          var reload = function(){
-            //Destroy current view
-            this.view.destroy();
-            this.view = null;
-            //Create home view
-            this.view = window.view = this.fn();
-            //Hide loading
-            window.hideLoading();
-          }.bind(this);
-          
           switch(data.message){
-          case 'fbauth':
-          case 'reload':
-          case 'user:saved:login':
-          case 'user:saved:signup':
-            reload();
+          case 'user:login:success':
+          case 'user:signup:success':
+            console.log('create new home view', Parse.User.current());
+            destroy();
+            window.view = new Home();
+            window.view.show();
+            window.hideLoading();
             break;
-          case 'logout':
-            //Logout
-            Parse.User.logOut();
-            reload();
+          case 'user:logout:success':
+            console.log('create new auth view');
+            destroy();
+            window.view = new Auth();
+            window.view.show();
+            window.hideLoading();
             break;
           }
-        }.bind({view: view, fn: initialize});
+        };
 
         //Listen for auth/deauth messages, this is needed
         //because of the way Steroids is architected
         window.addEventListener('message', onMessage);
+
+        //Initialize main view
+        window.view = Parse.User.current() ?
+          (new Home({model: Parse.User.current()})).show() :
+          (new Auth()).show();
       });
     }
 

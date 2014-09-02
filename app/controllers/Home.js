@@ -1,4 +1,4 @@
-/* globals define, steroids, _ */
+/* globals define, steroids, _, Parse */
 define(function(require){
 	'use strict';
 
@@ -26,21 +26,26 @@ define(function(require){
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
+			this.model = Parse.User.current();
+
+			//Listen for model changes
+			this.listenTo(this.model, 'change:weight', this.onWeightChange, this);
+			this.listenTo(this.model, 'change:lastConsumption', this.onConsumptionChange, this);
+
+			//Create stats view
 			this.views.stats = new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsView'});
 			//Preload view
 			this.views.stats.preload();
 
-			var weight = this.model.get('weight');
-			var goal = (weight * 0.03).toFixed(2);
-
-			this.goal = goal;
-
-			this.data.goal =  goal + ' litros';
+			//get goal
+			this.data.goal =  this.model.getGoal() + ' litros';
 			this.data.username = this.model.get('username');
 
+			//Consumption canvas
 			this.canvas = null;
 			this.progressColors = ['#54BB2F', '#0093C2'];
 
+			//Nivigationbar
 			var leftButton = new steroids.buttons.NavigationBarButton();
 			leftButton.imagePath = '/images/menu.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
@@ -60,6 +65,7 @@ define(function(require){
 			});
 			steroids.view.navigationBar.show();
 
+			//Listen for messages
 			window.addEventListener('message', this.onMessage.bind(this));
 			window.postMessage({message: 'user:journal:fetch'});
 
@@ -71,6 +77,7 @@ define(function(require){
 			this.dom.canvas = this.$el.find('#progress');
 			this.dom.settings = this.$el.find('#settings');
 			this.dom.percentage = this.$el.find('#percentage');
+			this.dom.goal = this.$el.find('#goal');
 			this.canvas = this.dom.canvas[0].getContext('2d');
 
 			this._drawMultiRadiantCircle(150, 150, 120, this.progressColors);
@@ -99,11 +106,16 @@ define(function(require){
 			console.log('share');
 		},
 		stats: function(){
-			console.log(this.views.stats, 'stats');
 			steroids.modal.show({
 				view: this.views.stats,
 				navigationBar: true
 			});
+		},
+		onWeightChange: function(){
+			this.dom.goal.text(this.model.getGoal());
+		},
+		onConsumptionChange: function(){
+			console.log(arguments, 'updateConsumption');
 		},
 		_drawMultiRadiantCircle: function(/*xc, yc, r, radientColors*/) {
 			/*var ctx = this.canvas;
@@ -144,7 +156,7 @@ define(function(require){
 			var y = canvas.height/2;
 			var radius = 100;
 			var startAngle = 1.5 * Math.PI;
-			var endAngle = 2.9 * Math.PI;
+			var endAngle = 3.5 * Math.PI;
 			var counterClockwise = false;
 
 			context.beginPath();
@@ -160,7 +172,7 @@ define(function(require){
 		onSuccess: function(milltrs){
 			try{
 				var liters = parseFloat((milltrs/1000).toFixed(2), 10);
-				var goal = this.goal;
+				var goal = this.model.getGoal();
 				var percentage = Math.round((liters/goal)*100);
 
 				this.dom.percentage.text(percentage + '%');
@@ -179,6 +191,10 @@ define(function(require){
 				this.onError(null, data.error);
 				break;
 			}
+		},
+		onDestroy: function(){
+			this.stopListening(this.model);
+			window.removeEventListener('message', this.onMessage.bind(this));
 		}
 	});
 

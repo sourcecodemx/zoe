@@ -1,7 +1,7 @@
 .scroll-content
 	.page-content
 		br
-		.list.list-inset
+		.list#options
 			a.item.item-icon-right.item-dark#updateName(data-view='Settings/name', child)
 				| Cambiar Nombre
 				i.ion-ios7-arrow-right.icon
@@ -24,7 +24,8 @@
 			img#settingsBottle(src='http://localhost/images/bottle.png')
 
 		.text-center
-			button.button.button-clear#tos(data-view='TOS/index', child, modal) Ver terminos de uso
+			button.button.button-clear#tos(data-view='TOS/index', child, modal)
+				strong Ver terminos de uso
 
 
 		p.text-center Welcome to the Source/Code

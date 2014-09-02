@@ -1,3 +1,5 @@
+include ./button_submit_outline.jade
+
 .scroll-content
 	.page-content
 		form.row
@@ -10,9 +12,9 @@
 					.list
 						label.item.item-input
 							input#email(type='email', placeholder="Correo electronico")
+					
+					+submitButton('Siguiente')
 
-					.text-center
-						button(type='submit').button.button-outline.button-light Siguiente
 					br
 					.text-center
 						| Al crear tu cuenta confirmas que has leido y 

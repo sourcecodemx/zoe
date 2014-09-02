@@ -16,6 +16,7 @@ require.config({
 		mixins:      'http://localhost/javascripts/mixins',
 		polyfill:    'http://localhost/javascripts/polyfill',
 		spinner:     'http://localhost/javascripts/spinner',
+		user:        'http://localhost/javascripts/user',
 
 		//MVC
 		//TODO: Setup modules for MVC blocks

@@ -5,7 +5,8 @@ include ./menu.jade
 	.page-content
 		.padding-top#homeGreeting
 			.h4.text-center ¡Hola #{data.username}!
-			.h4.text-center Tu meta del dia son #{data.goal}
+			.h4.text-center Tu meta del dia son 
+				span#goal #{data.goal}
 
 		.text-center
 			button.button.button-clear#stats

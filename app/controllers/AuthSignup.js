@@ -50,7 +50,8 @@ define(function(require){
 		onLayerWillChange: function(event){
 			if(event && event.target && (event.target.webview.id === 'authNewView')){
 				steroids.view.navigationBar.update({
-					title: this.title
+					title: this.title,
+					backButton: this.backButton
 				});
 			}
 		},

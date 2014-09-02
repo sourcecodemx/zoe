@@ -1,3 +1,5 @@
+include ./button_submit_outline.jade
+
 .scroll-content
 	.page-content
 		form.row
@@ -7,4 +9,4 @@
 						label.item.item-input
 							input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off")
 					
-					include ./button_submit_outline.jade
+					+submitButton()

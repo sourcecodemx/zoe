@@ -16,6 +16,8 @@ define(function(require){
 		loadingLabel: 'Loading',
 		title: 'Default title',
 		description: 'Default Description',
+		showFx: 'fadeIn',
+		hideFx: 'fadeOut',
 		events: {
 			'click #leftButton': 'onLeftButton',
 			'click #title': 'onTitle',
@@ -36,6 +38,8 @@ define(function(require){
 
 			steroids.layers.on('willchange', this.onLayerWillChange.bind(this));
 			steroids.layers.on('didchange', this.onLayerChange.bind(this));
+
+			return this;
 		},
 
 		onBeforeShow: function(){
@@ -200,12 +204,7 @@ define(function(require){
 			window.addEventListener('message', this.onMessage.bind(this));
 		},
 		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'reload':
-				this.render();
-				break;
-			}
+			//Implement yours
 		},
 		onError: function(model, error){
 			window.hideLoading();

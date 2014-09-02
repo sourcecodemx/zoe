@@ -10,12 +10,14 @@ define(function(require){
 	var Images = require('http://localhost/collections/Images.js');
 	var Blog   = require('http://localhost/collections/Blog.js');
 
+	var User   = require('user');
+
 	var Controller = function(){
 		window.addEventListener('message', this.onMessage.bind(this));
 
 		this.images = new Images();
 		this.blog   = new Blog();
-		this.user   = Parse.User.current();
+		this.user   = User.current();
 
 		return this;
 	};
@@ -25,55 +27,49 @@ define(function(require){
 			var data = event.data;
 
 			switch(data.message){
-			case 'signup_weight':
-				if(this.weightView){
-					this.weightView.unload();
-				}
-				break;
 			/**
 			*
 			*
 			* User Login/Signup Events
 			*
 			*/
-			case 'user:save:login':
-				Parse.User.logIn(
+			case 'user:login':
+				User.logIn(
 					data.user.username,
 					data.user.password,
 					{
 						success: function(){
-							this.user = Parse.User.current();
-							window.postMessage({message: 'user:saved:login'});
+							this.user = User.current();
+							window.postMessage({message: 'user:login:success'});
 						}.bind(this),
 						error: function(model, error){
-							window.postMessage({message: 'user:saved:login:error', error: error});
+							window.postMessage({message: 'user:login:error', error: error});
 						}
 					}
 				);
 				break;
-			case 'user:save:signup':
-				if(!this.user){
-					this.user = new Parse.User();
-				}
+			case 'user:signup':
+				var user = new User();
 
-				this.user.set(data.user);
-				//Atempt saving the user
-				this.user.signUp(
-					null,
-					{
-						success: function(){
-							this.user = Parse.User.current();
-							window.postMessage({message: 'user:saved:signup'});
-						}.bind(this),
-						error: function(model, error){
-							window.postMessage({message: 'user:saved:signup:error', error: error});
+				user
+					.set(data.user)
+					.signUp(
+						null,
+						{success: function(){
+							this.user = User.current();
+							window.postMessage({message: 'user:signup:success'});
+						}.bind(this), error: function(model, error){
+							window.postMessage({message: 'user:signup:error', error: error});
 						}
-					}
-				);
+					});
 
+				break;
+			case 'user:logout':
+				User.logOut();
+				window.postMessage({message: 'user:logout:success'});
 				break;
 			case 'user:weight:save':
-				Parse.User.current().save({weight: data.weight}, {
+				User.current().save({weight: data.weight}, {
 					success: function(){
 						window.postMessage({message: 'user:weight:success'});
 					},
@@ -106,7 +102,7 @@ define(function(require){
 
 				consumption.save()
 					.then(function(){
-						var user = Parse.User.current();
+						var user = User.current();
 						var journals = user.relation('journal');
 
 						journals.add(consumption);
@@ -115,7 +111,7 @@ define(function(require){
 						user
 							.save()
 							.then(function(){
-								window.postMessage({message: 'user:consumption:success'});
+								window.postMessage({message: 'user:consumption:success', type: type});
 							}, function(error){
 								window.postMessage({message: 'user:consumption:error', error: error});
 							});
@@ -165,7 +161,7 @@ define(function(require){
 				var file = new File({image: img});
 
 				file.save().then(function(){
-					var user = Parse.User.current();
+					var user = User.current();
 					var images = user.relation('images');
 					//Add image to relation;
 					images.add(file);

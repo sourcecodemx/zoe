@@ -1,4 +1,4 @@
-/* globals require */
+/* globals require, steroids */
 require.config({
 	paths: {
 		//Core libraries
@@ -41,6 +41,8 @@ require(
 	['underscore', 'jquery', 'backbone', 'aspect', 'polyfill', 'spinner', 'jade', 'config'],
 	function(){
 		'use strict';
+		//Set background color
+		steroids.view.setBackgroundColor('#33465d');
 		//Notify parent window that we're ready to rumble
 		window.dispatchEvent(window.setupEvent);
 	}
