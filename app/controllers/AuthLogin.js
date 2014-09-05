@@ -1,4 +1,4 @@
-/* globals define, steroids, _ */
+/* globals define, steroids, _, ActivityIndicator  */
 define(function(require){
 	'use strict';
 
@@ -58,18 +58,17 @@ define(function(require){
 					throw new Error('Por favor ingresa tus credenciales.');
 				}
 
-				window.showLoading('Autenticando');
+				ActivityIndicator.show('Autenticando');
 				window.postMessage({message: 'user:login', user: {username: u, password: p}});
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
 		onSuccess: function(){
-			_.delay(function(){console.log('on login success');}, 30000);
+			ActivityIndicator.hide();
 			//Go back to the top most view
 			steroids.layers.popAll();
 			//Hide loading indicator
-			window.hideLoading();
 			//Reset form
 			this.reset();
 		},

@@ -10,8 +10,8 @@ define(['backbone'], function(Backbone){
 	
 	return Backbone.Collection.extend({
 		model: Entry,
-		//url: 'http://saludalcalina.com/feed/',
-		url: '',
+		url: 'http://saludalcalina.com/feed/',
+		//url: '',
 		initialize: function(){
 			console.log('initialize blog collection');
 		}

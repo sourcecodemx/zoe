@@ -8,7 +8,7 @@ Parse.Cloud.afterSave('File', function(request, response){
 		return;
 	}
 
-	//Looks very messy but it is a long data buffer
+	//Looks very messy but it is just a long data buffer
 	Parse.Cloud.httpRequest({
 		url: f.get('image').url()
 	}).then(function(response){
@@ -34,6 +34,10 @@ Parse.Cloud.afterSave('File', function(request, response){
 });
 
 Parse.Cloud.afterSave('_User', function(request){
+	if (request.object.existed()) {
+		return;
+	}
+
 	var user = request.object;
 	var email = user.get('email');
 

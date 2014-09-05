@@ -1,4 +1,4 @@
-/* globals define, steroids, Zoe, _ */
+/* globals define, steroids, Zoe, _,  ActivityIndicator  */
 define(function(require){
 	'use strict';
 
@@ -63,7 +63,7 @@ define(function(require){
 				var confirmation = this.dom.passwordConfirmation.val();
 
 				if(!_.isEmpty(prefilledData) && !_.isEmpty(password) && !_.isEmpty(confirmation) && (password === confirmation)){
-					window.showLoading('Creando Cuenta');
+					ActivityIndicator.show('Creando Cuenta');
 
 					//Add password to the object
 					prefilledData.password = password;
@@ -103,7 +103,7 @@ define(function(require){
 					view: this.weightView
 				});
 				//Hide loading indicator
-				window.hideLoading();
+				ActivityIndicator.hide();
 			}.bind(this), 1);
 		},
 		onMessage: function(event){

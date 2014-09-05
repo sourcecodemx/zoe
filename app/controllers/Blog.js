@@ -1,4 +1,4 @@
-/* globals define, _, steroids */
+/* globals define, _, steroids, ActivityIndicator  */
 define(function(require){
 	'use strict';
 
@@ -47,7 +47,7 @@ define(function(require){
 			window.postMessage({message: 'blog:fetch'});
 		},
 		onRightButton: function(){
-			window.showLoading('Cargando');
+			ActivityIndicator.show('Cargando');
 
 			this.removeAll();
 			window.postMessage({message: 'blog:fetch'});
@@ -65,7 +65,7 @@ define(function(require){
 			//Call show on all images
 			_.invoke(this.entries, Entry.prototype.show);
 
-			window.hideLoading();
+			ActivityIndicator.hide();
 		},
 		removeAll: function(){
 			_.invoke(this.entries, Entry.prototype.destroy);

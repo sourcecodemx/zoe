@@ -19,11 +19,9 @@ define('user', ['parse'], function(Parse){
 				.greaterThan('createdAt', today)
 				.lessThan('createdAt', todayEnd)
 				.find(function(results){
-					console.log(results, 'first results');
 					return results;
 				})
 				.then(function(results){
-					console.log(results, 'results');
 					return results.reduce(function(current, next){return current+next.get('consumption');}, 0);
 				});
 		}

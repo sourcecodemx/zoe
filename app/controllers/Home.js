@@ -1,9 +1,11 @@
-/* globals define, steroids, _, Parse */
+/* globals define, steroids, _, Parse, ActivityIndicator  */
 define(function(require){
 	'use strict';
 
 	require('polyfill');
 	require('spinner');
+	require('jquery');
+	require('progressCircle');
 
 	var Controller = require('http://localhost/controllers/core/Root.js');
 	var HTMLModal  = require('http://localhost/ui/Modal.js');
@@ -17,8 +19,7 @@ define(function(require){
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'click #track': 'track',
-				'click #share': 'share',
-				'click #stats': 'stats'
+				'click #share': 'share'
 			});
 
 			return events;
@@ -30,20 +31,16 @@ define(function(require){
 
 			//Listen for model changes
 			this.listenTo(this.model, 'change:weight', this.onWeightChange, this);
+			this.listenTo(this.model, 'change:username', this.onUsernameChange, this);
 			this.listenTo(this.model, 'change:lastConsumption', this.onConsumptionChange, this);
 
 			//Create stats view
 			this.views.stats = new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsView'});
-			//Preload view
 			this.views.stats.preload();
 
 			//get goal
 			this.data.goal =  this.model.getGoal() + ' litros';
 			this.data.username = this.model.get('username');
-
-			//Consumption canvas
-			this.canvas = null;
-			this.progressColors = ['#54BB2F', '#0093C2'];
 
 			//Nivigationbar
 			var leftButton = new steroids.buttons.NavigationBarButton();
@@ -67,20 +64,39 @@ define(function(require){
 
 			//Listen for messages
 			window.addEventListener('message', this.onMessage.bind(this));
-			window.postMessage({message: 'user:journal:fetch'});
+
+			//Get Journal data
+			this.model.getJournal()
+				.then(this.onJournal.bind(this))
+				.fail(this.onJournalError.bind(this));
 
 			return this.render();
 		},
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
 
-			this.dom.canvas = this.$el.find('#progress');
-			this.dom.settings = this.$el.find('#settings');
+			this.dom.username = this.$el.find('#username');
 			this.dom.percentage = this.$el.find('#percentage');
 			this.dom.goal = this.$el.find('#goal');
-			this.canvas = this.dom.canvas[0].getContext('2d');
-
-			this._drawMultiRadiantCircle(150, 150, 120, this.progressColors);
+			this.dom.circle = this.$el.find('#circle');
+			//Fake buttons
+			this.dom.settings = this.$el.find('#settings');
+			this.dom.weight = this.$el.find('#weight');
+		},
+		onShow: function(){
+			this.dom.circle.circleProgress({
+				//value: 0.01,
+				startAngle: -Math.PI/2,
+				thickness: 30,
+				size: 220,
+				//reversed: true,
+				animation: {
+					duration: 3000
+				},
+				fill: {
+					gradient: ['rgb(86, 139, 180)', 'rgb(105,160,180)', 'rgb(132,177,77)']
+				}
+			});
 		},
 		onRightButton: function(){
 			//Hide menu (if visible)
@@ -96,11 +112,20 @@ define(function(require){
 			//this.views.settings = null;
 		},
 		track: function(){
-			if(!this.modal){
-				this.modal = new CheckModal();
-			}
+			if(!this.model.get('weight')){
+				navigator.notification.confirm(
+					'Necesitas definir tu peso para poder capturar consumo',
+					this.onWeightConfirmation.bind(this),
+					'Hey!',
+					['Hacerlo', 'Despues']
+				);
+			}else{
+				if(!this.modal){
+					this.modal = new CheckModal();
+				}
 
-			return this.modal.show();
+				return this.modal.show();
+			}
 		},
 		share: function(){
 			console.log('share');
@@ -111,84 +136,80 @@ define(function(require){
 				navigationBar: true
 			});
 		},
+		onUsernameChange: function(){
+			this.dom.username.text(this.model.get('username'));
+		},
+		onWeightConfirmation: function(index){
+			switch(index){
+			case 1:
+				this.dom.weight.trigger('click');
+				break;
+			}
+		},
 		onWeightChange: function(){
 			this.dom.goal.text(this.model.getGoal());
 		},
 		onConsumptionChange: function(){
-			console.log(arguments, 'updateConsumption');
+			var goal = this.model.getGoal();
+			var consumption = this.model.get('lastConsumption').get('consumption')/1000;
+			var percentage = Math.round((consumption/goal)*100);
+			var current = parseInt(this.dom.percentage.text(), 10);
+			var total = current + percentage;
+
+			console.log(parseFloat(total/100, 10), 'new value');
+
+			this.dom.circle.circleProgress({
+				value: parseFloat(total/100, 10),
+				startAngle: -Math.PI/2,
+				thickness: 30,
+				size: 220,
+				//reversed: true,
+				animation: {
+					duration: 3000
+				},
+				fill: {
+					gradient: ['rgb(86, 139, 180)', 'rgb(105,160,180)', 'rgb(132,177,77)']
+				}
+			});
+			this.dom.percentage.text(total);
 		},
-		_drawMultiRadiantCircle: function(/*xc, yc, r, radientColors*/) {
-			/*var ctx = this.canvas;
-			var partLength = (2 * Math.PI) / radientColors.length;
-			var start = 0;
-			var gradient = null;
-			var startColor = null;
-			var endColor = null;
-
-			for (var i = 0; i < radientColors.length; i++) {
-				startColor = radientColors[i];
-				endColor = radientColors[(i + 1) % radientColors.length];
-
-				// x start / end of the next arc to draw
-				var xStart = xc + Math.cos(start) * r;
-				var xEnd = xc + Math.cos(start + partLength) * r;
-				// y start / end of the next arc to draw
-				var yStart = yc + Math.sin(start) * r;
-				var yEnd = yc + Math.sin(start + partLength) * r;
-
-				ctx.beginPath();
-
-				gradient = ctx.createLinearGradient(xStart, yStart, xEnd, yEnd);
-				gradient.addColorStop(0, startColor);
-				gradient.addColorStop(1.0, endColor);
-
-				ctx.strokeStyle = gradient;
-				ctx.arc(xc, yc, r, start, start + partLength);
-				ctx.lineWidth = 30;
-				ctx.stroke();
-				ctx.closePath();
-
-				start += partLength;
-			}*/
-			var canvas = this.dom.canvas[0];
-			var context = canvas.getContext('2d');
-			var x = canvas.width/2;
-			var y = canvas.height/2;
-			var radius = 100;
-			var startAngle = 1.5 * Math.PI;
-			var endAngle = 3.5 * Math.PI;
-			var counterClockwise = false;
-
-			context.beginPath();
-			context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-			context.lineWidth = 20;
-
-			context.lineCap = 'round';
-
-			// line color
-			context.strokeStyle = '#0093C2';
-			context.stroke();
-		},
-		onSuccess: function(milltrs){
+		onJournal: function(milltrs){
 			try{
 				var liters = parseFloat((milltrs/1000).toFixed(2), 10);
 				var goal = this.model.getGoal();
-				var percentage = Math.round((liters/goal)*100);
+				var total = Math.round((liters/goal)*100) || 0;
 
-				this.dom.percentage.text(percentage + '%');
+				console.log(parseFloat(total/100, 10), 'current value');
+				this.dom.circle.circleProgress({
+					value: parseFloat(total/100, 10),
+					startAngle: -Math.PI/2,
+					thickness: 30,
+					size: 220,
+					//reversed: true,
+					animation: {
+						duration: 3000
+					},
+					fill: {
+						gradient: ['rgb(86, 139, 180)', 'rgb(105,160,180)', 'rgb(132,177,77)']
+					}
+				});
+				this.dom.percentage.text(total);
 			}catch(e){
 				this.onError(null, e);
 			}
 			
 		},
+		onJournalError: function(error){
+			this.onError(null, error);
+		},
 		onMessage: function(event){
 			var data = event.data;
 			switch(data.message){
 			case 'user:journal:success':
-				this.onSuccess(data.consumption);
+				//this.onSuccess(data.consumption);
 				break;
 			case 'user:journal:error':
-				this.onError(null, data.error);
+				//this.onError(null, data.error);
 				break;
 			}
 		},
@@ -219,7 +240,7 @@ define(function(require){
 			try{
 				var value = $(e.currentTarget).attr('data-value');
 
-				window.showLoading('Guardando Consumo');
+				ActivityIndicator.show('Guardando Consumo');
 				window.postMessage({message: 'user:consumption:save', type: value});
 			}catch(e){
 				this.onError(null, e);
@@ -229,12 +250,13 @@ define(function(require){
 			console.log('delete last');
 		},
 		onSuccess: function(){
-			window.showLoading('Consumo Guardado');
-			setTimeout(window.hideLoading.bind(window), 2000);
+			ActivityIndicator.hide();
+			ActivityIndicator.show('Consumo Guardado');
+			setTimeout(ActivityIndicator.hide, 2000);
 			this.hide();
 		},
 		onError: function(model, error){
-			window.hideLoading();
+			ActivityIndicator.hide();
 			setTimeout(function(){
 				navigator.notification.alert(this.message, $.noop, 'Ups!');
 			}.bind(error), 1);
@@ -246,7 +268,6 @@ define(function(require){
 				this.onSuccess();
 				break;
 			case 'user:consumption:error':
-				console.log('consumption error', data);
 				this.onError(null, data.error);
 				break;
 			}

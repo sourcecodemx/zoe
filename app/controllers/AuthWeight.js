@@ -1,4 +1,4 @@
-/* globals define, steroids */
+/* globals define, steroids, ActivityIndicator  */
 define(function(require){
 	'use strict';
 
@@ -51,20 +51,18 @@ define(function(require){
 					throw new Error('El peso debe ser un numero, por favor intente de nuevo.');
 				}
 
-				window.showLoading('Guardando');
+				ActivityIndicator.show('Guardando');
 				window.postMessage({message: 'user:weight:save', weight: w});
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
 		back: function(){
-			window.hideLoading();
-
 			this.reset();
 
-			setTimeout(function(){
-				steroids.layers.popAll();
-			}, 1);
+			ActivityIndicator.hide();
+
+			steroids.layers.popAll();
 		},
 		onMessage: function(event){
 			switch(event.data.message){

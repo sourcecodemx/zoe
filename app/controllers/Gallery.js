@@ -1,4 +1,4 @@
-/* globals define, _, steroids, Camera, Backbone, window */
+/* globals define, _, steroids, Camera, Backbone, window, ActivityIndicator  */
 define(function(require){
 	'use strict';
 
@@ -69,7 +69,7 @@ define(function(require){
 		onRender: function(){
 			RootController.prototype.onRender.call(this);
 
-			window.showLoading('Cargando');
+			ActivityIndicator.show('Cargando');
 
 			//Pics container
 			this.dom.content = this.$el.find('#pics');
@@ -77,7 +77,7 @@ define(function(require){
 			window.postMessage({message: 'gallery:fetch'});
 		},
 		onRightButton: function(){
-			window.showLoading('Cargando');
+			ActivityIndicator.show('Cargando');
 
 			this.removeAll();
 			window.postMessage({message: 'gallery:fetch'});
@@ -104,8 +104,8 @@ define(function(require){
 			}
 
 			setTimeout(function(){
-				window.hideLoading();
-			}, 1000);
+				ActivityIndicator.hide();
+			}, 1);
 		},
 		addOne: function(model){
 			//Create image view
@@ -158,7 +158,6 @@ define(function(require){
 				this.onPictureError.bind(this),
 				config.CAMERA.DEFAULT
 			);
-			window.showLoading('Trabajando');
 		},
 		grabPicture: function(){
 			navigator.camera.getPicture(
@@ -170,7 +169,6 @@ define(function(require){
 					{ sourceType : Camera.PictureSourceType.PHOTOLIBRARY }
 				)
 			);
-			window.showLoading('Trabajando');
 		},
 		onSuccess: function(imageData) {
 			this.uploadModal.update(imageData).show();
@@ -249,17 +247,17 @@ define(function(require){
 		},
 		save: function(){
 			if(this.base64Data.length > 0){
-				window.showLoading('Guardando');
+				ActivityIndicator.show('Guardando');
 				window.postMessage({message: 'gallery:image:save', image: this.base64Data});
 			}
 		},
 		update: function(data){
 			this.img = new Image();
 
-			window.showLoading('Cargando imagen');
+			ActivityIndicator.show('Cargando imagen');
 
 			this.img.onload = function(){
-				window.hideLoading();
+				ActivityIndicator.hide();
 				this.dom.image.append($(this.img).addClass('full-image rounded'));
 			}.bind(this);
 
@@ -282,13 +280,16 @@ define(function(require){
 		onShow: function(){
 			HTMLModal.prototype.onShow.call(this);
 
-			window.hideLoading();
+			ActivityIndicator.hide();
 		},
 		onSave: function(file){
 			try{
-				window.showLoading('Imagen Guardada');
+				ActivityIndicator.hide();
+				setTimeout(function(){
+					ActivityIndicator.show('Imagen Guardada');
+				}, 1);
 
-				_.delay(window.hideLoading.bind(window), 1000);
+				_.delay(ActivityIndicator.hide, 1000);
 
 				this.collection.prepend(file);
 				this.hide();
@@ -300,7 +301,6 @@ define(function(require){
 			var data = event.data;
 			switch(data.message){
 			case 'gallery:image:success':
-				console.log(data, 'passed image');
 				this.onSave(data.image);
 				break;
 			case 'gallery:image:error':

@@ -78,6 +78,40 @@ define(function(require){
 					}
 				});
 				break;
+			case 'user:name:save':
+				console.log('user name save', data);
+				User.current().save({username: data.name}, {
+					success: function(){
+						console.log('user saved');
+						window.postMessage({message: 'user:name:success'});
+					},
+					error: function(error){
+						window.postMessage({message: 'user:name:error', error: error});
+					}
+				});
+				break;
+			case 'user:email:save':
+				User.current().save({email: data.email}, {
+					success: function(){
+						window.postMessage({message: 'user:email:success'});
+					},
+					error: function(error){
+						window.postMessage({message: 'user:email:error', error: error});
+					}
+				});
+				break;
+			case 'user:password:save':
+				User.current()
+					.save({password: data.password})
+					.then({
+						success: function(){
+							window.postMessage({message: 'user:password:success'});
+						},
+						error: function(error){
+							window.postMessage({message: 'user:password:error', error: error});
+						}
+					});
+				break;
 			case 'user:save:fbsignup':
 				var model = Parse.Object.extend({className: '_User'});
 				var query = new Parse.Query(model);
@@ -196,7 +230,6 @@ define(function(require){
 					});
 				break;
 			case 'gallery:image:downvote':
-				console.log('downvote', data);
 				this.images.get(data.id)
 					.increment('likes', -1)
 					.save()
@@ -241,6 +274,31 @@ define(function(require){
 					.fail(function(error){
 						window.postMessage({message: 'premier:contact:error', error: error});
 					});
+				break;
+			/**
+			*
+			*
+			* Zoe POS Events
+			*
+			*/
+			case 'pos:fetch':
+				console.log(data, 'pos:fetch');
+				var location = new Parse.GeoPoint({latitude: data.position.latitude, longitude: data.position.longitude});
+				var pos = Parse.Object.extend('POS');
+				var posquery = new Parse.Query(pos);
+
+				posquery
+					.near('location', location)
+					.withinKilometers('location', location, 10)
+					.find()
+					.then(function(places){
+						window.postMessage({message: 'pos:fetch:success', places: places});
+					})
+					.fail(function(error){
+						console.log(error.code);
+						window.postMessage({message: 'pos:fetch:error', error: error});
+					});
+				break;
 			}
 		}
 	};

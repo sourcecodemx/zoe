@@ -31,6 +31,11 @@ define('config', function(){
 				targetWidth: 600,
 				targetHeight: 600
 			}
+		},
+		GEO: {
+			DEFAULT: { maximumAge: 3000, timeout: 5000, enableHighAccuracy: true },
+			DEFAULT_CENTER: {lat: 23.634501, lng: -102.552784},
+			DEFAULT_ZOOM: 6
 		}
 	};
 });

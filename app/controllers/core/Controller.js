@@ -102,9 +102,7 @@ define(function(require){
 				var route = $target.attr('data-view');
 				var page = route.length ? route.split('/') : [];
 				var ismodal = $target[0].hasAttribute('modal');
-
-				setTimeout(function(){console.log('is modal', ismodal);}, 10000);
-
+				
 				var push = function(){
 					var conf = {view: this.view, navigationBar: true};
 					switch(ismodal){
@@ -136,18 +134,18 @@ define(function(require){
 					}
 					// If object has not been previously loaded then preload it
 					if(!preloaded){
-						window.showLoading('Cargando...');
+						ActivityIndicator.show('Cargando');
 						//Preload the view
 						this.views[pageId].preload({}, {
 							onSuccess: function(){
-								window.hideLoading();
+								ActivityIndicator.hide();
 								//Save load status for other pages to check it
 								Zoe.storage.setItem(this.id + '-preloaded', true);
 								//Replace the thing
 								_.delay(this.push.bind({view: this.views[this.id]}), 1000);
 							}.bind({views: this.views, id: pageId, push: push}),
 							onFailure: function(){
-								window.hideLoading();
+								ActivityIndicator.hide();
 								//Remove preload status
 								Zoe.storage.removeItem(this.id + '-preloaded');
 								//Delete view if it exists
@@ -207,13 +205,13 @@ define(function(require){
 			//Implement yours
 		},
 		onError: function(model, error){
-			window.hideLoading();
+			ActivityIndicator.hide();
 			_.delay(function(){
 				navigator.notification.alert(this.message, $.noop, 'Ups!');
 			}.bind(error), 1);
 		},
 		onContentError: function(error){
-			window.hideLoading();
+			ActivityIndicator.hide();
 			this.dom.content.html(this.errorTemplate({message: error.message}));
 		}
 	});

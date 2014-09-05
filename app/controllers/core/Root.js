@@ -75,18 +75,18 @@ define(function(require){
 					}
 					// If object has not been previously loaded then preload it
 					if(!preloaded){
-						window.showLoading('Cargando...');
+						//ActivityIndicator.show('Cargando');
 						//Preload the view
 						this.views[page].preload({}, {
 							onSuccess: function(){
-								window.hideLoading();
+								//ActivityIndicator.hide();
 								//Save load status for other pages to check it
 								Zoe.storage.setItem(this.id + '-preloaded', true);
 								//Replace the thing
 								_.delay(this.replace.bind({view: this.views[this.id]}), 1000);
 							}.bind({views: this.views, id: page, replace: replace}),
 							onFailure: function(){
-								window.hideLoading();
+								//ActivityIndicator.hide();
 								//Remove preload status
 								Zoe.storage.removeItem(this.id + '-preloaded');
 								//Delete view if it exists
@@ -125,10 +125,10 @@ define(function(require){
 			}
 
 			if(!preloaded){
-				window.showLoading('Cargando...');
+				ActivityIndicator.show('Cargando');
 				this.views.store.preload({},{
 					onSuccess: function(){
-						window.hideLoading();
+						ActivityIndicator.hide();
 						Zoe.storage.setItem('store-preloaded', true);
 						_.delay(function(){
 							steroids.layers.push({
@@ -137,7 +137,7 @@ define(function(require){
 						}.bind({view: this.views.store}), 1);
 					}.bind(this),
 					onFailure: function(){
-						window.hideLoading();
+						ActivityIndicator.hide();
 						_.delay(function(){
 							navigator.notification.alert(
                                 'Ha ocurrido un error al cargar la tienda, por favor intente de nuevo', 

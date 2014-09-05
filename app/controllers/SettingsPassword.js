@@ -1,4 +1,4 @@
-/* globals define, steroids */
+/* globals define, steroids, ActivityIndicator  */
 define(function(require){
 	'use strict';
 
@@ -10,9 +10,11 @@ define(function(require){
 		events: {
 			'click .back-button': 'back'
 		},
-		title: 'Cambiar Password',
+		title: 'Cambiar Contrasena',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
+
+			window.addEventListener('message', this.onMessage.bind(this));
 
 			this.backButton = new steroids.buttons.NavigationBarButton({
 				title: ''
@@ -33,5 +35,46 @@ define(function(require){
 				});
 			}
 		},
+		onRender: function(){
+			this.dom = {
+				password: this.$el.find('#password'),
+				passwordConfirmation: this.$el.find('#passwordConfirmation')
+			};
+		},
+		submit: function(e){
+			try{
+				if(e && e.preventDefault){
+					e.preventDefault();
+				}
+
+				var password = this.dom.password.val();
+				var confirmation = this.dom.passwordConfirmation.val();
+
+				if(!password || !confirmation){
+					throw new Error('Por favor introduce tu nueva contrasena y su confirmacion.');
+				}else if(password !== confirmation){
+					throw new Error('La contrasena no parece conincidir con la confirmacion.');
+				}
+
+				ActivityIndicator.show('Guardando');
+				window.postMessage({message: 'user:password:save', password: password});
+			}catch(e){
+				this.onError(null, e);
+			}
+		},
+		onSuccess: function(){
+			ActivityIndicator.hide();
+			ActivityIndicator.show('Tu contrasena ha sido actualizada.');
+			setTimeout(ActivityIndicator.hide.bind(window), 2000);
+		},
+		onMessage: function(event){
+			switch(event.data.message){
+			case 'user:password:success':
+				this.onSuccess();
+				break;
+			case 'user:password:error':
+				this.onError(null, event.data.error);
+			}
+		}
 	});
 });

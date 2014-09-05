@@ -1,10 +1,17 @@
-// MapKit.js
 
 (function() {
 
 	var cordovaRef = window.PhoneGap || window.Cordova || window.cordova;
 
 	var MapKit = function() {
+		this.options = {
+			height: 460,
+			diameter: 1000,
+			atBottom: true,
+			lat: 49.281468,
+			lon: -123.104446
+		};
+
 		this.mapType = {
             MAP_TYPE_NONE: 0, //No base map tiles.
             MAP_TYPE_NORMAL: 1, //Basic maps.
@@ -28,11 +35,9 @@
 	};
 
 	MapKit.prototype = {
-		onMapCallback: function(pindex) {
-			//do stuff on tap
-        },
-		showMap: function(options, success, error) {
-			cordovaRef.exec(success, error, 'MapKit', 'showMap', [options]);
+
+		showMap: function(success, error) {
+			cordovaRef.exec(success, error, 'MapKit', 'showMap', [this.options]);
 		},
 
 		addMapPins: function(pins, success, error) {

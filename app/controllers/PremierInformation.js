@@ -1,4 +1,4 @@
-/* globals define, steroids */
+/* globals define, steroids, ActivityIndicator  */
 define(function(require){
 	'use strict';
 
@@ -48,13 +48,14 @@ define(function(require){
 			}
 		},
 		onSuccess: function(){
-			window.showLoading('Mensaje enviado');
-			setTimeout(window.hideLoading.bind(window), 2000);
+			ActivityIndicator.hide();
+			ActivityIndicator.show('Mensaje enviado');
+			setTimeout(ActivityIndicator.hide.bind(window), 2000);
 			this.dom.form.trigger('reset');
 		},
 		submit: function(e){
 			try{
-				window.showLoading('Enviando');
+				ActivityIndicator.show('Enviando');
 
 				if(e && e.preventDefault){
 					e.preventDefault();

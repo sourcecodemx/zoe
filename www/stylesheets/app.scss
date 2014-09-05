@@ -143,3 +143,15 @@ body {
 button[type='submit']{
 	width: 200px;
 }
+
+.list.clean {
+	.item {
+		margin: 0;
+		border: 0;
+		border-bottom: $border-calm;
+
+		&:last-child {
+			border-bottom: 0;
+		}
+	}
+}

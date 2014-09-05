@@ -11,7 +11,7 @@
     <preference name="EnableViewportScale" value="false" />
     <preference name="HideKeyboardFormAccessoryBar" value="true" />
     <preference name="KeyboardDisplayRequiresUserAction" value="false" />
-    <preference name="KeyboardShrinksView" value="false" />
+    <preference name="KeyboardShrinksView" value="true" />
     <preference name="SuppressesIncrementalRendering" value="false" />
 
     <preference name="PaginationMode" value="unpaginated"/>
@@ -24,4 +24,11 @@
     <preference name="AutoHideSplashScreen" value="true" />
     <preference name="DisableDoubleTapToFocus" value="true" />
     <preference name="ViewIgnoresStatusBar" value="false" />
+
+    <feature name="Geolocation">
+        <param name="ios-package" value="CDVLocation" />
+    </feature>
+    <feature name="MapKitView">
+        <param name="ios-package" value="CDVLocation" />
+    </feature>
 </widget>

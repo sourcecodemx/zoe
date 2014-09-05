@@ -7,6 +7,6 @@ include ./button_submit_outline.jade
 				.padding
 					.list
 						label.item.item-input
-							input#email(type='email', placeholder="Correo electronico")
+							input#email(type='email', placeholder="Correo electronico", value="#{data.email}")
 					
 					+submitButton()

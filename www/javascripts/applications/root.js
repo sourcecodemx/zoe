@@ -7,12 +7,12 @@ require.config({
 		functional:  'http://localhost/components/aspect.js/src/functional',
 		jquery:      'http://localhost/components/jquery/dist/jquery.min',
 		underscore:  'http://localhost/components/lodash/dist/lodash.min',
+		progressCircle: 'http://localhost/javascripts/progressCircle',
 
 		templates:   'http://localhost/javascripts/templates',
 		jade:        'http://localhost/javascripts/templates/jade',
 		mixins:      'http://localhost/javascripts/mixins',
 		polyfill:    'http://localhost/javascripts/polyfill',
-		spinner:     'http://localhost/javascripts/spinner',
 		config:      'http://localhost/javascripts/config'
 	},
 	shim: {
@@ -32,13 +32,16 @@ require.config({
 		},
 		mixins: {
 			deps: ['underscore']
+		},
+		progressCircle: {
+			deps: ['jquery']
 		}
 	}
 });
 
 //Main require
 require(
-	['underscore', 'jquery', 'backbone', 'aspect', 'polyfill', 'spinner', 'jade', 'config'],
+	['underscore', 'jquery', 'backbone', 'aspect', 'polyfill', 'jade', 'config'],
 	function(){
 		'use strict';
 		//Set background color

@@ -31,7 +31,9 @@ module.exports = function(grunt) {
 					'!www/javascripts/console.log.js',
 					'!www/javascripts/onerror.android.js',
 					'!www/javascripts/onerror.js',
-					'!www/javascripts/zoe.js'
+					'!www/javascripts/zoe.js',
+					'!www/javascripts/progressCircle.js',
+					'!www/javascripts/infobox.js'
 				]
 			}
 		});
@@ -74,10 +76,7 @@ module.exports = function(grunt) {
 						cwd: 'dist/',
 						src: [
 							'components/*/**/*.js',
-							'javascripts/*.js',
-							'collections/**/*.js',
-							'models/**/*.js',
-							'*.js'
+							'!components/steroids-js/steroids.js'
 						],
 						dest: 'dist/'
 					}]
@@ -121,12 +120,8 @@ module.exports = function(grunt) {
 						'components/aspect.js/src/*.js',
 						'components/backbone/backbone.js',
 						'components/cryptojslib/rollups/sha3.js',
-						'components/gsap/src/minified/**/*.*',
 						'components/jquery/dist/jquery.min.js',
 						'components/lodash/dist/lodash.min.js',
-						'components/mapbox.js/images/*',
-						'components/mapbox.js/mapbox.css',
-						'components/mapbox.js/mapbox.js',
 						'components/parse-1.2.19.min/index.js',
 						'components/requirejs/require.js',
 						'components/steroids-js/steroids.js'
@@ -143,8 +138,9 @@ module.exports = function(grunt) {
 		'steroids-make',
 		'steroids-compile-sass',
 		'steroids-jade'/*,
-		'steroids-uglify',
-		'steroids-imagemin'*/
+		'steroids-imagemin',
+		'steroids-uglify'
+		*/
 	]);
 
 };

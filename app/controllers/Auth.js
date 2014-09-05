@@ -1,4 +1,4 @@
-/* globals define, steroids, CryptoJS, facebookConnectPlugin, _ */
+/* globals define, steroids, CryptoJS, facebookConnectPlugin, _, ActivityIndicator */
 define(function(require){
 	'use strict';
 
@@ -46,7 +46,7 @@ define(function(require){
 			}
 		},
 		onMe: function(response){
-			window.showLoading('Autenticando');
+			ActivityIndicator.show('Autenticando');
 
 			var data = {
 				email: response.email,
@@ -83,19 +83,19 @@ define(function(require){
 					view: this.weightView
 				});
 				//Hide loading indicator
-				window.hideLoading();
+				ActivityIndicator.hide();
 
 				window.postMessage({message: 'fbauth'});
 			}.bind(this), 1);
 		},
 		onFBError: function(){
-			window.hideLoading();
+			ActivityIndicator.hide();
 			setTimeout(function(){
 				navigator.notification.alert('No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.', $.noop, 'Ups!');
 			}, 1);
 		},
 		onFBLogin: function(){
-			window.hideLoading();
+			ActivityIndicator.hide();
 			window.postMessage({message: 'fbauth'});
 		},
 		onClose: function(){
@@ -104,7 +104,7 @@ define(function(require){
 			this.weightView = null;
 		},
 		facebook: function(){
-			window.showLoading('Autenticando');
+			ActivityIndicator.show('Autenticando');
 
 			var me = function(){
 				facebookConnectPlugin.api(

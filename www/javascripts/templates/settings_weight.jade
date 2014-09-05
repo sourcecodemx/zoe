@@ -12,6 +12,6 @@ include ./button_submit_outline.jade
 				.padding
 					.list
 						label.item.item-input
-							input#weight.text-center(type='tel', placeholder="00.00", autocomplete="off", autocapitalize="off")
+							input#weight.text-center(type='tel', placeholder="00.00", autocomplete="off", autocapitalize="off", value="#{data.weight}")
 					
 					+submitButton()

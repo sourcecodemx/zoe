@@ -9,5 +9,12 @@
 		bottom: 0;
 		width: 100%;
 		padding: 0;
+
+		.icon {
+			background: url('http://localhost/images/gota.png') no-repeat;
+			background-size: contain;
+			width: 20px;
+			background-position-y: 13px
+		}
 	}
 }

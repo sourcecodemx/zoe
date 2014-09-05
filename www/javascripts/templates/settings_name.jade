@@ -7,6 +7,6 @@ include ./button_submit_outline.jade
 				.padding
 					.list
 						label.item.item-input
-							input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off")
+							input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off", value="#{data.username}")
 					
 					+submitButton()
