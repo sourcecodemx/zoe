@@ -24,6 +24,7 @@ define(function(require){
 		})(),
 		title: 'Puntos de Venta',
 		markers: [],
+		loading: false,
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
@@ -34,12 +35,12 @@ define(function(require){
 			window.addEventListener('message', this.onMessage.bind(this));
 
 			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/menu.png';
+			leftButton.imagePath = '/images/menu@2x.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
 			leftButton.imageAsOriginal = false;
 			
 			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/pointer.png';
+			rightButton.imagePath = '/images/location@2x.png';
 			rightButton.onTap = this.onRightButton.bind(this);
 			rightButton.imageAsOriginal = false;
 
@@ -126,7 +127,7 @@ define(function(require){
 			);
 		},
 		onCenterChange: function(){
-			if(this.map.getZoom() < 12){
+			if((this.map.getZoom() < 12) || this.loading){
 				return;
 			}
 
@@ -139,6 +140,7 @@ define(function(require){
 			if(distanceFromLastPosition >= 10){
 				ActivityIndicator.show('Cargando');
 				var latlng = {latitude: position.lat(), longitude: position.lng()};
+				this.loading = true;
 				window.postMessage({message: 'pos:fetch', position: latlng});
 			}
 
@@ -175,7 +177,7 @@ define(function(require){
 
 			this.currentCenter = this.map.getCenter();
 			this.currentZoom = this.map.getZoom();
-
+			this.loading = true;
 			window.postMessage({message: 'pos:fetch', position: position.coords});
 		},
 		onGeolocationError: function(error){
@@ -194,12 +196,13 @@ define(function(require){
 			var data = event.data;
 			switch(data.message){
 			case 'pos:fetch:success':
+				this.loading = false;
+
 				if(data.places.length){
 					this.removeAll();
 					this.collection.reset(data.places);
 				}else{
 					ActivityIndicator.hide();
-					
 					this.onError(null, {message: 'Al parecer no hay ningun punto de venta cercano a ti, intenta de nuevo.'});
 				}
 				break;

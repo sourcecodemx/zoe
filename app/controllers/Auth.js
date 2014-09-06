@@ -1,4 +1,4 @@
-/* globals define, steroids, CryptoJS, facebookConnectPlugin, _, ActivityIndicator */
+/* globals define, steroids, CryptoJS, facebookConnectPlugin, _, ActivityIndicator, Parse */
 define(function(require){
 	'use strict';
 
@@ -23,7 +23,7 @@ define(function(require){
 		showFb: 'fadeIn',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
-				'click #facebookSignup': 'facebook'
+				'click #facebook': 'facebook'
 			});
 
 			return events;
@@ -33,6 +33,9 @@ define(function(require){
 
 			this.messageListener();
 
+			this.weightView = new steroids.views.WebView({location: 'http://localhost/views/Auth/weight.html',id: 'signupWeightView'});
+			this.weightView.preload();
+
 			steroids.view.navigationBar.update({
 				title: ''
 			});
@@ -40,14 +43,15 @@ define(function(require){
 
 			return this.render();
 		},
+		onRender: function(){
+			this.dom.weight = this.$el.find('#weight');
+		},
 		onLayerWillChange: function(event){
 			if(event && event.target && (event.target.webview.id === 'index') && $('#index-page').length){
 				steroids.view.navigationBar.hide();
 			}
 		},
 		onMe: function(response){
-			ActivityIndicator.show('Autenticando');
-
 			var data = {
 				email: response.email,
 				username: response.id,
@@ -59,49 +63,24 @@ define(function(require){
 				facebook: true
 			};
 
-			/*
-			//start creating user
-			var user = new Parse.User();
-			user.set(data);
-
 			//Atempt saving the user
-			user.signUp(
-				null,
-				{
-					success: this.onFBSignupSuccess.bind(this),
-					error: this.onFBSignupError.bind(this)
-				}
-			);
-			*/
-			//Atempt saving the user
-			window.postMessage({message: 'user:save:fbsignup', user: data});
+			window.postMessage({message: 'user:fbsignup', user: data});
 		},
 		onFBSignupSuccess: function(){
-			setTimeout(function(){
-				//Push weight view
-				steroids.layers.push({
-					view: this.weightView
-				});
-				//Hide loading indicator
-				ActivityIndicator.hide();
+			ActivityIndicator.hide();
 
-				window.postMessage({message: 'fbauth'});
-			}.bind(this), 1);
+			var user = Parse.User.current();
+			if(!user.get('weight')){
+				this.dom.weight.trigger('click');
+			}
+
+			window.postMessage({message: 'user:fblogin:success'});
 		},
 		onFBError: function(){
 			ActivityIndicator.hide();
 			setTimeout(function(){
 				navigator.notification.alert('No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.', $.noop, 'Ups!');
 			}, 1);
-		},
-		onFBLogin: function(){
-			ActivityIndicator.hide();
-			window.postMessage({message: 'fbauth'});
-		},
-		onClose: function(){
-			this.signupView = null;
-			this.loginView = null;
-			this.weightView = null;
 		},
 		facebook: function(){
 			ActivityIndicator.show('Autenticando');
@@ -130,10 +109,10 @@ define(function(require){
 		onMessage: function(event){
 			var data = event.data;
 			switch(data.message){
-			case 'user:saved:fbsignup':
+			case 'user:fbsignup:success':
 				this.onFBSignupSuccess();
 				break;
-			case 'user:saved:fbsignup:error':
+			case 'user:fbsignup:error':
 				this.onError(null, data.error);
 				break;
 			}

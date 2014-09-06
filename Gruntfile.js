@@ -115,6 +115,7 @@ module.exports = function(grunt) {
 						'images/**/*.*',
 						'javascripts/**/*.js',
 						'stylesheets/**/*.*',
+						'audio/*',
 						'!stylesheets/**/*.scss',
 						//Define components to copy
 						'components/aspect.js/src/*.js',

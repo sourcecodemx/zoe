@@ -64,6 +64,45 @@ define(function(require){
 					});
 
 				break;
+			case 'user:fbsignup':
+				var model = Parse.Object.extend({className: '_User'});
+				var query = new Parse.Query(model);
+
+				query.equalTo('username', data.user.username);
+				query.count({
+					success: function(count){
+						if(count){
+							User.logIn(
+								data.user.username,
+								data.user.password,
+								{
+									success: function(){
+										this.user = User.current();
+										window.postMessage({message: 'user:fbsignup:success'});
+									}.bind(this),
+									error: function(model, error){
+										window.postMessage({message: 'user:fbsignup:error', error: error});
+									}
+								}
+							);
+						}else{
+							var user = new User();
+							user.set(data.user)
+								.signUp(null, {
+									success: function(){
+										window.postMessage({message:'user:fbsignup:success'});
+									},
+									error: function(error){
+										window.postMessage({message:'user:fbsignup:error', error: error});
+									}
+								});
+						}
+					}.bind(this),
+					error: function(e){
+						window.postMessage({message: 'user:fbsignup:error', error: e});
+					}.bind(this)
+				});
+				break;
 			case 'user:logout':
 				User.logOut();
 				window.postMessage({message: 'user:logout:success'});
@@ -111,24 +150,6 @@ define(function(require){
 							window.postMessage({message: 'user:password:error', error: error});
 						}
 					});
-				break;
-			case 'user:save:fbsignup':
-				var model = Parse.Object.extend({className: '_User'});
-				var query = new Parse.Query(model);
-
-				query.equalTo('username', data.user.username);
-				query.count({
-					success: function(count){
-						if(count){
-							window.postMessage({message:'user:save:login', user: data.user});
-						}else{
-							window.postMessage({message: 'user:save:signup', user: data.user});
-						}
-					}.bind(this),
-					error: function(e){
-						window.postMessage({message: 'user:saved:login:error', error: e});
-					}.bind(this)
-				});
 				break;
 			case 'user:consumption:save':
 				var type = parseInt(data.type, 10);

@@ -15,7 +15,7 @@ define(function(require){
 
 			var leftButton = new steroids.buttons.NavigationBarButton();
 				
-			leftButton.imagePath = '/images/close.png';
+			leftButton.imagePath = '/images/close@2x.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
 
 			steroids.view.navigationBar.update({

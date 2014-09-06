@@ -46,12 +46,12 @@ define(function(require){
 			Backbone.on('gallery:image:show', this.showPicture, this);
 
 			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/menu.png';
+			leftButton.imagePath = '/images/menu@2x.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
 			leftButton.imageAsOriginal = false;
 			
 			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/refresh.png';
+			rightButton.imagePath = '/images/reload@2x.png';
 			rightButton.onTap = this.onRightButton.bind(this);
 			rightButton.imageAsOriginal = false;
 

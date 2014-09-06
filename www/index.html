@@ -45,6 +45,7 @@
         var onMessage = function(event){
           var data = event.data;
           switch(data.message){
+          case 'user:fblogin:success':
           case 'user:login:success':
           case 'user:signup:success':
             destroy();

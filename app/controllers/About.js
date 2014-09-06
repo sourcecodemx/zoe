@@ -20,7 +20,7 @@ define(function(require){
 			Controller.prototype.initialize.apply(this, arguments);
 
 			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/menu.png';
+			leftButton.imagePath = '/images/menu@2x.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
 
 			steroids.view.navigationBar.update({

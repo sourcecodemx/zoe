@@ -13,10 +13,11 @@ define(function(require){
 			Modal.prototype.initialize.apply(this, arguments);
 
 			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/share.png';
+			rightButton.imagePath = '/images/share@2x.png';
+			rightButton.onTap = this.onRightButton.bind(this);
 
 			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/close.png';
+			leftButton.imagePath = '/images/close@2x.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
 
 			steroids.view.navigationBar.update({
@@ -36,6 +37,9 @@ define(function(require){
 					title: this.title
 				});
 			}
+		},
+		onRightButton: function(){
+			
 		}
 	});
 });

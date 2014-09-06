@@ -1,4 +1,4 @@
-/* globals define, steroids, _, Parse, ActivityIndicator  */
+/* globals define, steroids, _, Parse, ActivityIndicator, Media  */
 define(function(require){
 	'use strict';
 
@@ -24,6 +24,7 @@ define(function(require){
 
 			return events;
 		})(),
+		consumption: 0,
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
@@ -44,17 +45,17 @@ define(function(require){
 
 			//Nivigationbar
 			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/menu.png';
+			leftButton.imagePath = '/images/menu@2x.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
 			leftButton.imageAsOriginal = false;
 			
 			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/settings.png';
+			rightButton.imagePath = '/images/settings@2x.png';
 			rightButton.onTap = this.onRightButton.bind(this);
 			rightButton.imageAsOriginal = false;
 
 			steroids.view.navigationBar.update({
-				titleImagePath: '/images/zoe.png',
+				titleImagePath: '/images/logo@2x.png',
 				buttons: {
 					left: [leftButton],
 					right: [rightButton]
@@ -124,11 +125,62 @@ define(function(require){
 					this.modal = new CheckModal();
 				}
 
-				return this.modal.show();
+				if(this.consumption && this.consumption >= 100){
+					setTimeout(function(){
+						navigator.notification.confirm(
+							'Ya has logrado tu meta diaria, la sobrehidrtacion no es buena.',
+							function(index){
+								switch(index){
+								case 1:
+									if(!this.hyperhidratationView){
+										this.hyperhidratationView = new steroids.views.WebView({
+											location: 'http://es.wikipedia.org/wiki/Hiperhidrataci%C3%B3n',
+											id: 'hyperhidratationView'
+										});
+										this.hyperhidratationView.preload({}, {
+											onSuccess: function(){
+												steroids.layers.push({
+													view: this.hyperhidratationView,
+													navigationBar: true
+												});
+											}.bind(this)
+										});
+									}else{
+										steroids.layers.push({
+											view: this.hyperhidratationView,
+											navigationBar: true
+										});
+									}
+									break;
+								case 2:
+									this.modal.show();
+								}
+							}.bind(this),
+							'Hey',
+							['Leer mas', 'Ok']);
+					}.bind(this), 1);
+				}else {
+					this.modal.show();
+				}
 			}
 		},
 		share: function(){
 			console.log('share');
+		},
+		playAudio: function(url) {
+			// Play the audio file at url
+			var media = new Media(url,
+				// success callback
+				function () {
+					console.log('playAudio():Audio Success');
+				},
+				// error callback
+				function (err) {
+					console.log('playAudio():Audio Error: ' + err);
+				}
+			);
+			// Play audio
+			media.play();
 		},
 		stats: function(){
 			steroids.modal.show({
@@ -156,7 +208,7 @@ define(function(require){
 			var current = parseInt(this.dom.percentage.text(), 10);
 			var total = current + percentage;
 
-			console.log(parseFloat(total/100, 10), 'new value');
+			this.consumption = total;
 
 			this.dom.circle.circleProgress({
 				value: parseFloat(total/100, 10),
@@ -172,6 +224,14 @@ define(function(require){
 				}
 			});
 			this.dom.percentage.text(total);
+
+			if(this.consumption >= 100){
+				setTimeout(function(){
+					navigator.notification.alert('Lograste tu meta de hoy', $.noop, 'Felicidades');
+				}, 1);
+			}
+
+			this.playAudio('http://localhost/audio/confirmation.wav');
 		},
 		onJournal: function(milltrs){
 			try{
@@ -179,7 +239,6 @@ define(function(require){
 				var goal = this.model.getGoal();
 				var total = Math.round((liters/goal)*100) || 0;
 
-				console.log(parseFloat(total/100, 10), 'current value');
 				this.dom.circle.circleProgress({
 					value: parseFloat(total/100, 10),
 					startAngle: -Math.PI/2,
@@ -194,6 +253,7 @@ define(function(require){
 					}
 				});
 				this.dom.percentage.text(total);
+				this.consumption = total;
 			}catch(e){
 				this.onError(null, e);
 			}
