@@ -196,6 +196,16 @@ define(function(require){
 						}
 					});
 				break;
+			case 'user:forgot:request':
+				User.requestPasswordReset(data.email, {
+					success: function() {
+						window.postMessage({message: 'user:forgot:success'});
+					},
+					error: function(error) {
+						window.postMessage({message: 'user:forgot:error', error: error});
+					}
+				});
+				break;
 			/**
 			*
 			*
