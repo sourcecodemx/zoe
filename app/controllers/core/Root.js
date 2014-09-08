@@ -14,7 +14,6 @@ define(function(require){
 			'click #menu button[root]': 'showRootView',
 			'swipedown #menu': 'onLeftButton',
 			'click #home': 'home',
-			'click #store': 'store',
 			'click button[child]': 'showView'
 		},
 		initialize: function(){
@@ -117,43 +116,6 @@ define(function(require){
 		},
 		home: function(){
 			steroids.layers.replace({view: this.views.home});
-		},
-		store: function(){
-			var preloaded = Zoe.storage.getItem('store-preloaded') ? true : false;
-			if(preloaded || !this.views.store){
-				this.views.store = new steroids.views.WebView({location: 'http://zoewater.com.mx/movil', id: 'storeView'});
-			}
-
-			if(!preloaded){
-				ActivityIndicator.show('Cargando');
-				this.views.store.preload({},{
-					onSuccess: function(){
-						ActivityIndicator.hide();
-						Zoe.storage.setItem('store-preloaded', true);
-						_.delay(function(){
-							steroids.layers.push({
-								view: this.view
-							});
-						}.bind({view: this.views.store}), 1);
-					}.bind(this),
-					onFailure: function(){
-						ActivityIndicator.hide();
-						_.delay(function(){
-							navigator.notification.alert(
-                                'Ha ocurrido un error al cargar la tienda, por favor intente de nuevo', 
-                                $.noop, 
-                                'Ups!'
-                            );
-						}, 1);
-					}
-				});
-			}else{
-				_.delay(function(){
-					steroids.layers.push({
-						view: this.view
-					});
-				}.bind({view: this.views.store}), 1);
-			}
 		},
 		toggleMenu: function(){
 			var $el = this.dom.menu;

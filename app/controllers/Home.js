@@ -1,4 +1,4 @@
-/* globals define, steroids, _, Parse, ActivityIndicator, Media  */
+/* globals define, steroids, _, Parse, ActivityIndicator, Media, Backbone  */
 define(function(require){
 	'use strict';
 
@@ -19,7 +19,8 @@ define(function(require){
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'click #track': 'track',
-				'click #share': 'share'
+				'click #share': 'share',
+				'click #stats': 'stats'
 			});
 
 			return events;
@@ -36,7 +37,7 @@ define(function(require){
 			this.listenTo(this.model, 'change:lastConsumption', this.onConsumptionChange, this);
 
 			//Create stats view
-			this.views.stats = new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsView'});
+			this.views.stats = new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsIndexView'});
 			this.views.stats.preload();
 
 			//get goal
@@ -65,13 +66,19 @@ define(function(require){
 
 			//Listen for messages
 			window.addEventListener('message', this.onMessage.bind(this));
+			//Update current journal
+			this.updateJournal();
+			//Listen for deletion of last consumption
+			Backbone.on('journal:deletelast', this.updateJournal, this);
 
+			return this.render();
+		},
+		updateJournal: function(){
+			ActivityIndicator.show('Actualizando Consumo');
 			//Get Journal data
 			this.model.getJournal()
 				.then(this.onJournal.bind(this))
 				.fail(this.onJournalError.bind(this));
-
-			return this.render();
 		},
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
@@ -83,21 +90,6 @@ define(function(require){
 			//Fake buttons
 			this.dom.settings = this.$el.find('#settings');
 			this.dom.weight = this.$el.find('#weight');
-		},
-		onShow: function(){
-			this.dom.circle.circleProgress({
-				//value: 0.01,
-				startAngle: -Math.PI/2,
-				thickness: 30,
-				size: 220,
-				//reversed: true,
-				animation: {
-					duration: 3000
-				},
-				fill: {
-					gradient: ['rgb(86, 139, 180)', 'rgb(105,160,180)', 'rgb(132,177,77)']
-				}
-			});
 		},
 		onRightButton: function(){
 			//Hide menu (if visible)
@@ -124,7 +116,7 @@ define(function(require){
 				if(!this.modal){
 					this.modal = new CheckModal();
 				}
-
+				//Callback hell!
 				if(this.consumption && this.consumption >= 100){
 					setTimeout(function(){
 						navigator.notification.confirm(
@@ -165,7 +157,12 @@ define(function(require){
 			}
 		},
 		share: function(){
-			console.log('share');
+			//Ask to share message
+			window.plugins.socialsharing.share(
+				'Mi meta del dia son ' + this.model.getGoal() + ' litros, hoy he completado el ' + this.consumption + '% de mi hidratacion diaria.',
+				null,
+				null,
+				'http://zoewater.com.mx');
 		},
 		playAudio: function(url) {
 			// Play the audio file at url
@@ -183,10 +180,23 @@ define(function(require){
 			media.play();
 		},
 		stats: function(){
-			steroids.modal.show({
-				view: this.views.stats,
-				navigationBar: true
-			});
+			ActivityIndicator.show('Cargando Estadisticas');
+
+			this.model.getStats()
+				.then(function(computed){
+					ActivityIndicator.hide();
+					
+					window.postMessage({message: 'stats:fetch:success', stats: computed, goal: this.model.getGoal()});
+					
+					steroids.modal.show({
+						view: this.views.stats,
+						navigationBar: true
+					});
+				}.bind(this))
+				.fail(function(error){
+					ActivityIndicator.hide();
+					this.onError(null, error);
+				}.bind(this));
 		},
 		onUsernameChange: function(){
 			this.dom.username.text(this.model.get('username'));
@@ -201,10 +211,12 @@ define(function(require){
 		onWeightChange: function(){
 			this.dom.goal.text(this.model.getGoal());
 		},
-		onConsumptionChange: function(){
+		onConsumptionChange: function(model, lastConsumption){
+			console.log('consumption change', model, lastConsumption);
+
+			var consumption = lastConsumption.get('consumption')/1000;
 			var goal = this.model.getGoal();
-			var consumption = this.model.get('lastConsumption').get('consumption')/1000;
-			var percentage = Math.round((consumption/goal)*100);
+			var percentage = Math.floor((consumption/goal)*100);
 			var current = parseInt(this.dom.percentage.text(), 10);
 			var total = current + percentage;
 
@@ -215,12 +227,11 @@ define(function(require){
 				startAngle: -Math.PI/2,
 				thickness: 30,
 				size: 220,
-				//reversed: true,
 				animation: {
 					duration: 3000
 				},
 				fill: {
-					gradient: ['rgb(86, 139, 180)', 'rgb(105,160,180)', 'rgb(132,177,77)']
+					gradient: ['rgb(27,166,217)', 'rgb(95,189,49)']
 				}
 			});
 			this.dom.percentage.text(total);
@@ -232,12 +243,15 @@ define(function(require){
 			}
 
 			this.playAudio('http://localhost/audio/confirmation.wav');
+			
 		},
 		onJournal: function(milltrs){
 			try{
+				ActivityIndicator.hide();
+
 				var liters = parseFloat((milltrs/1000).toFixed(2), 10);
 				var goal = this.model.getGoal();
-				var total = Math.round((liters/goal)*100) || 0;
+				var total = Math.floor((liters/goal)*100) || 0;
 
 				this.dom.circle.circleProgress({
 					value: parseFloat(total/100, 10),
@@ -249,7 +263,7 @@ define(function(require){
 						duration: 3000
 					},
 					fill: {
-						gradient: ['rgb(86, 139, 180)', 'rgb(105,160,180)', 'rgb(132,177,77)']
+						gradient: ['rgb(27,166,217)', 'rgb(95,189,49)']
 					}
 				});
 				this.dom.percentage.text(total);
@@ -260,18 +274,8 @@ define(function(require){
 			
 		},
 		onJournalError: function(error){
+			ActivityIndicator.hide();
 			this.onError(null, error);
-		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'user:journal:success':
-				//this.onSuccess(data.consumption);
-				break;
-			case 'user:journal:error':
-				//this.onError(null, data.error);
-				break;
-			}
 		},
 		onDestroy: function(){
 			this.stopListening(this.model);
@@ -303,11 +307,38 @@ define(function(require){
 				ActivityIndicator.show('Guardando Consumo');
 				window.postMessage({message: 'user:consumption:save', type: value});
 			}catch(e){
+				console.log(e, e.stack);
 				this.onError(null, e);
 			}
 		},
 		deleteLast: function(){
-			console.log('delete last');
+			var user = Parse.User.current();
+			var lastConsumption = user.get('lastConsumption');
+
+			if(lastConsumption && lastConsumption.id){
+				lastConsumption.destroy()
+					.then(this.onDeleteLast.bind(this))
+					.fail(this.onDeleteLastError.bind(this));
+			}
+		},
+		onDeleteLast: function(){
+			this.dom.deleteLast.prop('disabled', true);
+			Backbone.trigger('journal:deletelast');
+			this.hide();
+		},
+		onDeleteLastError: function(error){
+			this.onError(null, error);
+		},
+		onRender: function(){
+			this.dom.deleteLast = this.$el.find('#deleteLast');
+		},
+		onShow: function(){
+			var user = Parse.User.current();
+			var lastConsumption = user.get('lastConsumption');
+
+			if(lastConsumption && lastConsumption.id){
+				this.dom.deleteLast.removeAttr('disabled');
+			}
 		},
 		onSuccess: function(){
 			ActivityIndicator.hide();

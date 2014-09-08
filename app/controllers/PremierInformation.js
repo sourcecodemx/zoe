@@ -49,9 +49,8 @@ define(function(require){
 		},
 		onSuccess: function(){
 			ActivityIndicator.hide();
-			ActivityIndicator.show('Mensaje enviado');
-			setTimeout(ActivityIndicator.hide.bind(window), 2000);
 			this.dom.form.trigger('reset');
+			navigator.notification.alert('Nos podremos en contacto contigo', $.noop, '¡Gracias!');
 		},
 		submit: function(e){
 			try{

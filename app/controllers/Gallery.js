@@ -200,6 +200,8 @@ define(function(require){
 	var PicItem = Detachable.extend({
 		template: require('http://localhost/javascripts/templates/gallery_image_item.js'),
 		className: 'padding pic',
+		showFx: 'fadeIn',
+		hideFx: 'fadeOut',
 		events: {
 			'click': 'pic'
 		},

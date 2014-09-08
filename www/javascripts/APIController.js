@@ -161,6 +161,7 @@ define(function(require){
 						var journals = user.relation('journal');
 
 						journals.add(consumption);
+						console.log('about to set consumption', consumption);
 						user.set('lastConsumption', consumption);
 
 						user

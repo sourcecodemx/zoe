@@ -1,5 +1,7 @@
 var Image = require('parse-image');
+
 var Mandrill = require('mandrill');
+Mandrill.initialize('mxhWmtMyRCF56l7Ax6ksSA');
 
 Parse.Cloud.afterSave('File', function(request, response){
 	var f = request.object;
@@ -41,16 +43,13 @@ Parse.Cloud.afterSave('_User', function(request){
 	var user = request.object;
 	var email = user.get('email');
 
-	Mandrill.initialize('mxhWmtMyRCF56l7Ax6ksSA');
-
 	if(!email){
 		response.error("Uh oh, something went wrong");
 	}else{
-		Mandrill.sendEmail({
+		Mandrill.sendTemplate({
 			message: {
-				text: 'Gracias por usar nuestra aplicacion',
-				subject: "Zoe Water Movil",
-				from_email: 'jaime.tanori@gmail.com',
+				subject: "Registro Zoe Water Movil",
+				from_email: 'app@zoewater.mx',
 				from_name: 'Zoe Water Movil',
 				to: [
 					{
@@ -59,6 +58,12 @@ Parse.Cloud.afterSave('_User', function(request){
 					}
 				]
 			},
+			template_name: 'zoewelcome',
+			template_content: [
+				{
+					"name": user.get('username')
+				}
+			],
 			async: true
 		},{
 			success: function(httpResponse) {
@@ -74,35 +79,41 @@ Parse.Cloud.afterSave('_User', function(request){
 });
 
 Parse.Cloud.define('contact', function(request, response){
-	Mandrill.initialize('mxhWmtMyRCF56l7Ax6ksSA');
-
 	var p = request.params;
 
 	if(!p.phone || !p.email || !p.name){
 		response.error("Uh oh, something went wrong");
 	}else{
-		Mandrill.sendEmail({
-			message: {
-				text: p.phone,
-				subject: "Zoe Water Premier",
-				from_email: p.email,
-				from_name: p.name,
-				to: [
-					{
-						email: "jaime.tanori@gmail.com",
-						name: "Jaime Tanori"
-					}
-				]
+		var text = ['<p>Nombre: ' + p.name, 'Email: ' + p.email, 'Telefono: ' + p.phone + '</p>'];
+
+		Parse.Cloud.httpRequest({
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json; charset=utf-8'
 			},
-			async: true
-		},{
+			url: 'https://mandrillapp.com/api/1.0/messages/send.json',
+			body: {
+				key: "mxhWmtMyRCF56l7Ax6ksSA",
+				message: {
+				  html: text.join('<br />'),
+				  subject: "Solicito Informacion (via app)",
+				  from_email: "app@zoewater.com.mx",
+				  from_name: "Zoe Water Movil",
+				  to: [
+				    {
+				       email: "jaime.tanori@gmail.com",
+				       name: "Jaime Tanori"
+				    }
+				  ]
+				}
+			},
 			success: function(httpResponse) {
+				response.success('Mensaje enviado');
 				console.log(httpResponse);
-				response.success("Mensaje Enviado");
 			},
 			error: function(httpResponse) {
+				response.error('No hemos podido enviar su mensaje');
 				console.error(httpResponse);
-				response.error("No hemos podido enviar su mensaje, por favor intente de nuevo.");
 			}
 		});
 	}

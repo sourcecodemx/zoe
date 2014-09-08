@@ -56,7 +56,7 @@ steroids.config.initialView =
     location: "http://localhost/index.html"
 
 # ## Navigation Bar
-steroids.config.navigationBar.tintColor = "#222242"
+steroids.config.navigationBar.tintColor = "#1d3045"
 steroids.config.navigationBar.titleColor = "#ffffff"
 steroids.config.navigationBar.buttonTintColor = "#ffffff"
 
@@ -64,7 +64,7 @@ steroids.config.navigationBar.borderColor = "#222242"
 steroids.config.navigationBar.borderSize = 0
 
 # steroids.config.navigationBar.landscape.backgroundImage = ""
-#steroids.config.navigationBar.portrait.backgroundImage = "http://localhost/images/portrait-navbar@2x.png"
+# steroids.config.navigationBar.portrait.backgroundImage = "http://localhost/images/portrait-navbar@2x.png"
 
 # ## Android Loading Screen
 steroids.config.loadingScreen.tintColor = "#262626"

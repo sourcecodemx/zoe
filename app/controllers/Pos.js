@@ -159,16 +159,30 @@ define(function(require){
 		onGeolocation: function(position){
 			this.position = position;
 			this.location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-			
 			if(this.map){
 				this.map.setOptions({
 					center: this.location,
 					zoom: 12
 				});
+				this.marker.setOptions({
+					center: this.location
+				});
 			}else{
+				var image = {
+					url: '/images/user_marker@2x.png',
+					scaledSize: new google.maps.Size(30, 30),
+					anchor: new google.maps.Point(10, 10)
+				};
 				this.map = new google.maps.Map(this.dom.map[0], {
 					center: this.location,
 					zoom: 12
+				});
+				this.marker = new google.maps.Marker({
+					position: this.location,
+					map: this.map,
+					title: 'Mi ubicacion',
+					animation: google.maps.Animation.DROP,
+					icon: image
 				});
 
 				google.maps.event.addListener(this.map, 'center_changed', this.onCenterChange.bind(this));
