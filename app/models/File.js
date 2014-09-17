@@ -4,7 +4,7 @@ define(function(){
 	return Parse.Object.extend({
 		className: 'File',
 		initialize: function(){
-			console.log('initialize file model');
+			//.log('initialize file model');
 		}
 	});
 });

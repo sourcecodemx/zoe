@@ -35,7 +35,7 @@ define(function(require){
 			var data = this.model.toJSON();
 			var total = parseFloat(data.total/data.goal, 10)*100;
 
-			data.total = Math.floor(total);
+			data.total = parseInt(Math.floor(total), 10);
 
 			switch(this.model.get('type')){
 			case 'today':

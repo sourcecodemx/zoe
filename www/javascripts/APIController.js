@@ -3,15 +3,17 @@ define(function(require){
 	'use strict';
 
 	steroids.logger.log('APIController loaded');
-
+	//Models
 	var File   = require('http://localhost/models/File.js');
 	var Journal = require('http://localhost/models/Journal.js');
-
+	//Collections
 	var Images = require('http://localhost/collections/Images.js');
 	var Blog   = require('http://localhost/collections/Blog.js');
-
+	//User extend
 	var User   = require('user');
-
+	//Configuration
+	var config = require('config');
+	//API Controller
 	var Controller = function(){
 		window.addEventListener('message', this.onMessage.bind(this));
 
@@ -118,10 +120,8 @@ define(function(require){
 				});
 				break;
 			case 'user:name:save':
-				console.log('user name save', data);
 				User.current().save({username: data.name}, {
 					success: function(){
-						console.log('user saved');
 						window.postMessage({message: 'user:name:success'});
 					},
 					error: function(error){
@@ -161,7 +161,6 @@ define(function(require){
 						var journals = user.relation('journal');
 
 						journals.add(consumption);
-						console.log('about to set consumption', consumption);
 						user.set('lastConsumption', consumption);
 
 						user
@@ -213,6 +212,11 @@ define(function(require){
 			*
 			*/
 			case 'gallery:fetch':
+				//Paginate
+				if(data.page >= 0){
+					this.images.query.skip(data.page*config.GALLERY.LIMIT);
+				}
+
 				this.images.fetch({
 					success: function(collection){
 						window.postMessage({message: 'gallery:fetch:success', images: collection.toJSON()});
@@ -314,7 +318,6 @@ define(function(require){
 			*
 			*/
 			case 'pos:fetch':
-				console.log(data, 'pos:fetch');
 				var location = new Parse.GeoPoint({latitude: data.position.latitude, longitude: data.position.longitude});
 				var pos = Parse.Object.extend('POS');
 				var posquery = new Parse.Query(pos);
@@ -327,7 +330,6 @@ define(function(require){
 						window.postMessage({message: 'pos:fetch:success', places: places});
 					})
 					.fail(function(error){
-						console.log(error.code);
 						window.postMessage({message: 'pos:fetch:error', error: error});
 					});
 				break;

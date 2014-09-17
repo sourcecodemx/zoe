@@ -1,10 +1,9 @@
 <script>
-  
   window.setupEvent = new Event('setup');
 
   var onSetup = function(){
-    require(['http://localhost/controllers/AuthSignup.js'], function(C){
-    	(new C()).show();
+    require(['http://localhost/controllers/BlogEntry.js'], function(C){
+    	view = (new C());
     });
   }
 

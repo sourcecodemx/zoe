@@ -2,14 +2,14 @@
 define(function(require){
 	'use strict';
 
+	//require('swipe');
+
 	var RootController = require('http://localhost/controllers/core/Root.js');
 	var Detachable     = require('http://localhost/controllers/core/Detachable.js');
 	var HTMLModal      = require('http://localhost/ui/Modal.js');
 	var Images         = require('http://localhost/collections/ImagesSimple.js');
 	var config         = require('config');
 
-	window.config = config;
-	
 	var Index = RootController.extend({
 		id: 'gallery-page',
 		template: require('http://localhost/javascripts/templates/gallery.js'),
@@ -17,11 +17,14 @@ define(function(require){
 		events: (function () {
 			var events = _.extend({}, RootController.prototype.events, {
 				'click #take': 'takePicture',
-				'click #grab': 'grabPicture'
+				'click #grab': 'grabPicture',
+				'touchmove #pics': 'checkPosition',
+				'touchend #pics': 'onTouchEnd'
 			});
 
 			return events;
 		})(),
+		page: 0,
 		initialize: function(){
 			RootController.prototype.initialize.apply(this, arguments);
 
@@ -73,6 +76,7 @@ define(function(require){
 
 			//Pics container
 			this.dom.content = this.$el.find('#pics');
+			this.dom.indicator = this.$el.find('.ion-infinite-scroll');
 			//Load pictures from server
 			window.postMessage({message: 'gallery:fetch'});
 		},
@@ -80,7 +84,11 @@ define(function(require){
 			ActivityIndicator.show('Cargando');
 
 			this.removeAll();
-			window.postMessage({message: 'gallery:fetch'});
+			//Reset pagination
+			this.page = 0;
+			$('#end').remove();
+			this.$el.removeClass('end-reached');
+			window.postMessage({message: 'gallery:fetch', page: 0});
 		},
 		onLayerWillChange: function(event){
 			if(event && event.target && event.target.webview.id === 'galleryView'){
@@ -170,6 +178,24 @@ define(function(require){
 				)
 			);
 		},
+		checkPosition: function(e){
+			if(!this.$el.hasClass('scrolling') || !this.$el.hasClass('end-reached')){
+				var offset = Math.abs($(e.currentTarget).offset().top);
+				var wheight = $(window).height();
+				var height = $(e.currentTarget).outerHeight();
+
+				if(offset + wheight - 150 > height){
+					this.$el.addClass('scrolling');
+					this.dom.indicator.addClass('active');
+				}
+			}
+		},
+		onTouchEnd: function(){
+			if(this.$el.hasClass('scrolling')){
+				this.$el.addClass('active');
+				window.postMessage({message: 'gallery:fetch', page: this.page});
+			}
+		},
 		onSuccess: function(imageData) {
 			this.uploadModal.update(imageData).show();
 		},
@@ -180,7 +206,18 @@ define(function(require){
 			var data = event.data;
 			switch(data.message){
 			case 'gallery:fetch:success':
+				this.page++;
 				this.collection.reset(data.images);
+				//Remove scrolling class
+				if(this.$el.hasClass('scrolling')){
+					this.$el.removeClass('active scrolling');
+					this.dom.indicator.removeClass('active');
+				}
+				//Once we get to the end of the gallery, display the no-more-photos legend
+				if(data.images.length < config.GALLERY.LIMIT){
+					this.$el.addClass('end-reached');
+					this.dom.content.after('<div id="end" class="padding-large text-center">No hay mas fotografias.</div>');
+				}
 				break;
 			case 'gallery:fetch:error':
 				if(this.dom.content.find('.pic').length){

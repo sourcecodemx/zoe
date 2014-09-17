@@ -26,7 +26,6 @@ var Zoe = (function(){
         }
       }catch(e){
         item = null;
-        console.log(e, e.stack);
       }finally{
         return item;
       }
@@ -55,7 +54,6 @@ var Zoe = (function(){
         localStorage.setItem(key, JSON.stringify(item));
       }catch(e){
         item = null;
-        console.log(e, e.stack);
       }finally{
         return item;
       }
@@ -87,7 +85,6 @@ var Zoe = (function(){
         item = this.setItem(key, item, expiration);
       }catch(e){
         item = null;
-        console.log(e, e.stack);
       }finally{
         return item;
       }

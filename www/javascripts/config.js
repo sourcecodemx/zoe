@@ -10,17 +10,7 @@ define('config', function(){
 		FB: {
 			DEFAULT_PERMISSION: ['email', 'read_stream'],
 			BROADCAST_PERMISSION: [],
-			APP_ID: '733603660030225',
-			APP_NAME: 'Zoe Water Dev'
-		},
-		MAPBOX: {
-			ID: 'jtanori.j9ab13k4',
-			TOKEN: 'pk.eyJ1IjoianRhbm9yaSIsImEiOiItaTAtRGZjIn0.KY5t660Lp8nPlAEOcCP_LQ'
-		},
-		GOOGLE: {
-			MAPS: {
-				API_KEY: 'AIzaSyDrn-K18_6y9j9Vc-HzEO0jpzURmDwdaNg'
-			}
+			APP_NAME: 'Zoe Water Movil'
 		},
 		CAMERA: {
 			DEFAULT: {
@@ -47,6 +37,9 @@ define('config', function(){
 				'Viernes',
 				'Sabado'
 			]
+		},
+		GALLERY: {
+			LIMIT: 24
 		}
 	};
 });

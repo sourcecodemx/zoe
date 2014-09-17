@@ -90,7 +90,8 @@ define(function(require){
 				animation: google.maps.Animation.DROP,
 				icon: image
 			});
-			var content = require('http://localhost/javascripts/templates/pos_info_window.js')(model.toJSON());
+			
+			var content = require('http://localhost/javascripts/templates/pos_info_window.js')({data: model.toJSON()});
 			google.maps.event.addListener(marker, 'click', function() {
 				box.setContent(content);
 				box.open(map, this);
@@ -175,7 +176,9 @@ define(function(require){
 				};
 				this.map = new google.maps.Map(this.dom.map[0], {
 					center: this.location,
-					zoom: 12
+					zoom: 12,
+					zoomControl: false,
+					streetViewControl: false
 				});
 				this.marker = new google.maps.Marker({
 					position: this.location,

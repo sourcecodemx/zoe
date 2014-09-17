@@ -33,7 +33,8 @@ module.exports = function(grunt) {
 					'!www/javascripts/onerror.js',
 					'!www/javascripts/zoe.js',
 					'!www/javascripts/progressCircle.js',
-					'!www/javascripts/infobox.js'
+					'!www/javascripts/infobox.js',
+					'!www/javascripts/Pusher.js'
 				]
 			}
 		});
@@ -138,10 +139,9 @@ module.exports = function(grunt) {
 		'steroids-jshint',
 		'steroids-make',
 		'steroids-compile-sass',
-		'steroids-jade'/*,
+		'steroids-jade',
 		'steroids-imagemin',
 		'steroids-uglify'
-		*/
 	]);
 
 };

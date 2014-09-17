@@ -49,4 +49,17 @@
 			}
 		}
 	}
+
+	&.scrolling {
+		.ion-infinite-scroll {
+			@extend ion-infinite-scroll.active;
+		}
+
+		&.active{
+			#pics {
+				margin-bottom: 70px;
+				pointer-events: none;
+			}
+		}
+	}
 }

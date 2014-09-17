@@ -4,7 +4,7 @@ define(function(){
 	return Parse.Object.extend({
 		className: 'Blog',
 		initialize: function(){
-			console.log('initialize blog model');
+			//console.log('initialize blog model');
 		}
 	});
 });

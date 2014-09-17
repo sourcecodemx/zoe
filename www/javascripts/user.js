@@ -51,8 +51,7 @@ define('user', ['parse'], function(Parse){
 				.then(function(results){
 					var computed = [];
 					var sum = function(current, next){return current+next.get('consumption');};
-
-					console.log(userAge, 'userAge');
+					
 					computed.push({
 						total: results.filter(function(r){return (r.createdAt > today && r.createdAt <= todayEnd);}).reduce(sum, 0),
 						label: 'Hoy ' + config.DATE.DAY[today.getDay()] + ' ' + today.getDate(),

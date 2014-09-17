@@ -4,7 +4,7 @@ define(['backbone'], function(Backbone){
 
 	var Entry = Backbone.Model.extend({
 		initialize: function(){
-			console.log('initialize entry model');
+			//console.log('initialize entry model');
 		}
 	});
 	
@@ -13,7 +13,7 @@ define(['backbone'], function(Backbone){
 		url: 'http://saludalcalina.com/feed/',
 		//url: '',
 		initialize: function(){
-			console.log('initialize blog collection');
+			//console.log('initialize blog collection');
 		}
 	});
 });

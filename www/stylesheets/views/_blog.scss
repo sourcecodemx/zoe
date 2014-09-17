@@ -12,3 +12,17 @@
 		margin: 0;
 	}
 }
+
+#blog-entry-page {
+	-webkit-user-select: all;
+	
+	#hero {
+		border-bottom: 4px solid $energized;
+	}
+
+	a {
+		color: white;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+}

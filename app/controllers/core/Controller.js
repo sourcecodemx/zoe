@@ -55,22 +55,8 @@ define(function(require){
 			}
 		},
 
-		onLayerChange: function(event){
-			if(event && event.target){
-				console.log('layer changed target', event.target.webview.id);
-			}
-			if(event && event.source){
-				console.log('layer changed source', event.source.webview.id);
-			}
-		},
-		onLayerWillChange: function(event){
-			if(event && event.target){
-				console.log('layer will change target', event.target.webview.id);
-			}
-			if(event && event.source){
-				console.log('layer will change source', event.source.webview.id);
-			}
-		},
+		onLayerChange: function(event){},
+		onLayerWillChange: function(event){},
 
 		//Override whenever it makes sense
 		render: function(){
@@ -117,21 +103,37 @@ define(function(require){
 				var preloaded = false;
 				var pageId;
 
-				if(page.length && page.length > 1){
-					//Convert to standard name
-					pageId = (page.shift()).toLowerCase() + _.capitalize(page.shift());
-					//If there is more than two arguments, append all others in the same fashion
-					if(page.length){
-						pageId += page.map(_.capitalize).join('');
-					}
+				//Determine if it is a local or external page
+				if(page && page.length){
+					if(page[0] === 'http:' || page[0] === 'https:'){
+						pageId = _.escape(route);
 
-					// Check preloaded status
-					preloaded = Zoe.storage.getItem(pageId + '-preloaded') ? true : false;
-					// Create webview object if view has been previously loaded (in some other page)
-					// or if it does not exists in the views object
-					if(preloaded || !this.views[page]){
-						this.views[pageId] = new steroids.views.WebView({location: 'http://localhost/views/' + route + '.html', id: pageId + 'View'});
+						// Check preloaded status
+						preloaded = Zoe.storage.getItem(pageId + '-preloaded') ? true : false;
+						// Create webview object if view has been previously loaded (in some other page)
+						// or if it does not exists in the views object
+						if(preloaded || !this.views[page]){
+							this.views[pageId] = new steroids.views.WebView({location: route, id: pageId + 'View'});
+						}
+					}else{
+						//Convert to standard name
+						pageId = (page.shift()).toLowerCase() + _.capitalize(page.shift());
+						//If there is more than two arguments, append all others in the same fashion
+						if(page.length){
+							pageId += page.map(_.capitalize).join('');
+						}
+
+						// Check preloaded status
+						preloaded = Zoe.storage.getItem(pageId + '-preloaded') ? true : false;
+						// or if it does not exists in the views object
+						if(preloaded || !this.views[page]){
+							this.views[pageId] = new steroids.views.WebView({location: 'http://localhost/views/' + route + '.html', id: pageId + 'View'});
+						}
 					}
+				}
+
+				//if pageid has been set
+				if(pageId){
 					// If object has not been previously loaded then preload it
 					if(!preloaded){
 						ActivityIndicator.show('Cargando');
@@ -201,9 +203,7 @@ define(function(require){
 		messageListener: function(){
 			window.addEventListener('message', this.onMessage.bind(this));
 		},
-		onMessage: function(event){
-			//Implement yours
-		},
+		onMessage: function(event){},
 		onError: function(model, error){
 			ActivityIndicator.hide();
 			_.delay(function(){

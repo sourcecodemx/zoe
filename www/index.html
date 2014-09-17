@@ -14,6 +14,7 @@
   <!-- cordova.js is served from localhost to ensure the correct version -->
   <script src="http://localhost/cordova.js"></script>
   <script src="http://localhost/SocialSharing.js"></script>
+  <script src="http://localhost/PushNotification.js"></script>
 
   <script src="http://localhost/javascripts/zoe.js"></script>
   <script src="/components/steroids-js/steroids.js"></script>
@@ -51,13 +52,11 @@
             destroy();
             window.view = new Home();
             window.view.show();
-            window.hideLoading();
             break;
           case 'user:logout:success':
             destroy();
             window.view = new Auth();
             window.view.show();
-            window.hideLoading();
             break;
           }
         };
@@ -79,5 +78,6 @@
 </head>
 <body>
   <script src="/components/requirejs/require.js" data-main="http://localhost/javascripts/application"></script>
+  <script src="http://192.168.1.72:8089/target/target-script-min.js#anonymous"></script>
 </body>
 </html>

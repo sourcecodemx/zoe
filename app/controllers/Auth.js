@@ -82,6 +82,10 @@ define(function(require){
 				navigator.notification.alert('No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.', $.noop, 'Ups!');
 			}, 1);
 		},
+		onError: function(model, error){
+			steroids.logger.log(error);
+			Controller.prototype.onError.apply(this, Array.prototype.slice.call(arguments));
+		},
 		facebook: function(){
 			ActivityIndicator.show('Autenticando');
 

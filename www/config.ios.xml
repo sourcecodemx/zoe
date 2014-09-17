@@ -31,4 +31,7 @@
     <feature name="MapKitView">
         <param name="ios-package" value="CDVLocation" />
     </feature>
+    <feature name="PushPlugin">
+        <param name="ios-package" value="PushPlugin" />
+    </feature>
 </widget>

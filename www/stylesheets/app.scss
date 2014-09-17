@@ -133,6 +133,16 @@ body {
 .ion-infinite-scroll {
 	@extend ion-infinite-scroll;
 	text-align: center;
+
+	.icon {
+		color: white;
+	}
+
+	&.active {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+	}
 }
 
 .block-refresher {

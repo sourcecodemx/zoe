@@ -1,4 +1,4 @@
-/* globals define, _, steroids, ActivityIndicator  */
+/* globals define, _, steroids, ActivityIndicator, Backbone, Zoe */
 define(function(require){
 	'use strict';
 
@@ -12,6 +12,14 @@ define(function(require){
 		title: 'Blog',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
+
+			//TODO: Improve preload for child views
+			this.views.entry = new steroids.views.WebView({location: 'http://localhost/views/Blog/entry.html', id: 'blogEntryView'});
+			this.views.entry.preload({}, {
+				onSuccess: function(){
+					Zoe.storage.setItem('blogEntry-preloaded', true);
+				}
+			});
 
 			window.addEventListener('message', this.onMessage.bind(this));
 
@@ -37,12 +45,15 @@ define(function(require){
 			});
 			steroids.view.navigationBar.show();
 
+			Backbone.on('blog:entry:show', this.onEntry, this);
+
 			return this.render();
 		},
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
 
 			this.dom.content = this.$el.find('#entries');
+			this.dom.entryButton = this.$el.find('#entry');
 
 			window.postMessage({message: 'blog:fetch'});
 		},
@@ -97,6 +108,10 @@ define(function(require){
 					this.onContentError(data.error);
 				}
 			}
+		},
+		onEntry: function(data){
+			window.postMessage({message: 'blog:entry:show', entry: data});
+			this.dom.entryButton.trigger('click');
 		}
 	});
 
@@ -105,6 +120,9 @@ define(function(require){
 		hideFx: 'fadeOut',
 		className: 'card list',
 		template: require('http://localhost/javascripts/templates/blog_entry_item.js'),
+		events: {
+			'click': 'entry'
+		},
 		initialize: function(){
 			Detachable.prototype.initialize.apply(this, arguments);
 
@@ -114,6 +132,9 @@ define(function(require){
 			this.$el.html(this.template({data: this.model.toJSON()}));
 
 			return this;
+		},
+		entry: function(){
+			Backbone.trigger('blog:entry:show', this.model.toJSON());
 		}
 	});
 

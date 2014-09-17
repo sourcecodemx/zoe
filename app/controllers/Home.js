@@ -3,7 +3,6 @@ define(function(require){
 	'use strict';
 
 	require('polyfill');
-	require('spinner');
 	require('jquery');
 	require('progressCircle');
 
@@ -42,7 +41,7 @@ define(function(require){
 
 			//get goal
 			this.data.goal =  this.model.getGoal() + ' litros';
-			this.data.username = this.model.get('username');
+			this.data.username = this.model.get('firstName') ? this.model.get('firstName') : this.model.get('username');
 
 			//Nivigationbar
 			var leftButton = new steroids.buttons.NavigationBarButton();
@@ -70,8 +69,28 @@ define(function(require){
 			this.updateJournal();
 			//Listen for deletion of last consumption
 			Backbone.on('journal:deletelast', this.updateJournal, this);
+			Backbone.on('home:reload', this.reload, this);
+
+			//Setup drink and midnight watchers
+			this._setupWatchers();
 
 			return this.render();
+		},
+		reload: function(){
+			this.$el.empty();
+			//get goal
+			this.data.goal =  this.model.getGoal() + ' litros';
+			this.data.username = this.model.get('firstName') ? this.model.get('firstName') : this.model.get('username');
+			//Reset consumption
+			this.consumption = 0;
+			//Clear watchers
+			this._clearWatchers();
+			//Setup drink and midnight watchers
+			this._setupWatchers();
+			//Re-render
+			this.render().show();
+			//Update current journal
+			this.updateJournal();
 		},
 		updateJournal: function(){
 			ActivityIndicator.show('Actualizando Consumo');
@@ -99,10 +118,6 @@ define(function(require){
 			//Use DOM defined attributes
 
 			this.dom.settings.trigger('click');
-		},
-		onClose: function(){
-			//this.views.settings.unload();
-			//this.views.settings = null;
 		},
 		track: function(){
 			if(!this.model.get('weight')){
@@ -212,8 +227,6 @@ define(function(require){
 			this.dom.goal.text(this.model.getGoal());
 		},
 		onConsumptionChange: function(model, lastConsumption){
-			console.log('consumption change', model, lastConsumption);
-
 			var consumption = lastConsumption.get('consumption')/1000;
 			var goal = this.model.getGoal();
 			var percentage = Math.floor((consumption/goal)*100);
@@ -279,7 +292,67 @@ define(function(require){
 		},
 		onDestroy: function(){
 			this.stopListening(this.model);
+			this._clearWatchers();
+			this.consumption = null;
+			this.data = null;
+			this.views.stats.unload();
+			this.views.stats = null;
+			this.views = null;
+
 			window.removeEventListener('message', this.onMessage.bind(this));
+		},
+		_clearWatchers: function(){
+			clearTimeout(this.noonWatcher);
+			clearTimeout(this.afternoonWatcher);
+			clearTimeout(this.midnightWatcher);
+
+			this.noonWatcher = null;
+			this.afternoonWatcher = null;
+			this.midnightWatcher = null;
+		},
+		_setupWatchers: function(){
+			//Setup drink watchers
+			var noonWatcher = new Date();
+			noonWatcher.setHours(12,0,0,0);
+
+			var afternoonWatcher = new Date();
+			afternoonWatcher.setHours(18,0,0,0);
+
+			var midnightWatcher = new Date();
+			midnightWatcher.setHours(23,59,59,59);
+
+			var now = new Date();
+			var tillMidnight = midnightWatcher - now;
+
+			if(now < noonWatcher){
+				this.noonWatcher = setTimeout(function(){
+					if(this.consumption < 50){
+						navigator.notification.vibrate();
+						navigator.notification.beep(1);
+						navigator.notification.alert('Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(', _.noop, 'Hey!');
+					}
+				}.bind(this), noonWatcher - now);
+			}
+
+			if(now < afternoonWatcher){
+				this.afternoonWatcher = setTimeout(function(){
+					if(this.consumption < 75){
+						navigator.notification.vibrate();
+						navigator.notification.beep(1);
+						navigator.notification.alert('Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(', _.noop, 'Hey!');
+					}
+				}.bind(this), afternoonWatcher - now);
+			}
+			//Reload home page layout after midnight
+			if(tillMidnight > 1000*60){
+				this.midnightWatcher = setTimeout(function(){
+					this.playAudio('http://localhost/audio/confirmation.wav');
+					navigator.notification.vibrate();
+					navigator.notification.beep(1);
+					navigator.notification.alert('El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.', _.noop, 'Hey!');
+					Backbone.trigger('home:reload');
+				}.bind(this), tillMidnight);
+			}
 		}
 	});
 
@@ -307,7 +380,6 @@ define(function(require){
 				ActivityIndicator.show('Guardando Consumo');
 				window.postMessage({message: 'user:consumption:save', type: value});
 			}catch(e){
-				console.log(e, e.stack);
 				this.onError(null, e);
 			}
 		},
@@ -327,6 +399,12 @@ define(function(require){
 			this.hide();
 		},
 		onDeleteLastError: function(error){
+			switch(error.code){
+			case 101:
+				error.message = 'Solo puedes borrar el ultimo consumo capturado.';
+				break;
+			}
+
 			this.onError(null, error);
 		},
 		onRender: function(){

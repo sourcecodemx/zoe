@@ -35,10 +35,7 @@ require.config({
 		},
 		jquery: {
 			exports: '$'
-		},/*
-		jquerygsap: {
-			deps: ['jquery', 'gsap']
-		},*/
+		},
 		underscore: {
 			exports: '_'
 		},
