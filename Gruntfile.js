@@ -34,7 +34,8 @@ module.exports = function(grunt) {
 					'!www/javascripts/zoe.js',
 					'!www/javascripts/progressCircle.js',
 					'!www/javascripts/infobox.js',
-					'!www/javascripts/Pusher.js'
+					'!www/javascripts/Pusher.js',
+					'!www/javascripts/offline.js'
 				]
 			}
 		});
@@ -77,7 +78,12 @@ module.exports = function(grunt) {
 						cwd: 'dist/',
 						src: [
 							'components/*/**/*.js',
-							'!components/steroids-js/steroids.js'
+							'!components/jquery/dist/jquery.min',
+							'!components/parse-1.2.19.min/index',
+							'!components/pusher/dist/pusher.min',
+							'!components/lodash/dist/lodash.min',
+							'!components/steroids-js/steroids.js',
+							'!javascripts/offline.js'
 						],
 						dest: 'dist/'
 					}]
@@ -123,10 +129,12 @@ module.exports = function(grunt) {
 						'components/backbone/backbone.js',
 						'components/cryptojslib/rollups/sha3.js',
 						'components/jquery/dist/jquery.min.js',
+						'components/offline/offline.min',
 						'components/lodash/dist/lodash.min.js',
 						'components/parse-1.2.19.min/index.js',
 						'components/requirejs/require.js',
-						'components/steroids-js/steroids.js'
+						'components/steroids-js/steroids.js',
+						'components/pusher/dist/pusher.min.js'
 					],
 					dest: 'dist/'
 				}
@@ -139,9 +147,9 @@ module.exports = function(grunt) {
 		'steroids-jshint',
 		'steroids-make',
 		'steroids-compile-sass',
-		'steroids-jade',
+		'steroids-jade'/*,
 		'steroids-imagemin',
-		'steroids-uglify'
+		'steroids-uglify'*/
 	]);
 
 };

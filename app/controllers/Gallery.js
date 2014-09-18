@@ -71,24 +71,31 @@ define(function(require){
 		},
 		onRender: function(){
 			RootController.prototype.onRender.call(this);
-
-			ActivityIndicator.show('Cargando');
-
+			
 			//Pics container
 			this.dom.content = this.$el.find('#pics');
 			this.dom.indicator = this.$el.find('.ion-infinite-scroll');
-			//Load pictures from server
-			window.postMessage({message: 'gallery:fetch'});
+
+			if(this.online){
+				ActivityIndicator.show('Cargando');
+				window.postMessage({message: 'gallery:fetch'});
+			}else{
+				this.onContentError({message: 'No hay conexion a internet.'});
+			}
 		},
 		onRightButton: function(){
-			ActivityIndicator.show('Cargando');
-
-			this.removeAll();
-			//Reset pagination
-			this.page = 0;
-			$('#end').remove();
-			this.$el.removeClass('end-reached');
-			window.postMessage({message: 'gallery:fetch', page: 0});
+			if(this.online){
+				ActivityIndicator.show('Cargando');
+				this.removeAll();
+				//Reset pagination
+				this.page = 0;
+				$('#end').remove();
+				this.$el.removeClass('end-reached');
+				window.postMessage({message: 'gallery:fetch', page: 0});
+			}else{
+				this.offlineError();
+			}
+			
 		},
 		onLayerWillChange: function(event){
 			if(event && event.target && event.target.webview.id === 'galleryView'){
@@ -161,6 +168,11 @@ define(function(require){
 			}.bind(this), 1);
 		},
 		takePicture: function(){
+			if(!this.online){
+				this.onError(null, {message: 'Es necesaria una conexion a internet para poder guardar tus fotos.'});
+				return;
+			}
+
 			navigator.camera.getPicture(
 				this.onSuccess.bind(this),
 				this.onPictureError.bind(this),
@@ -168,6 +180,11 @@ define(function(require){
 			);
 		},
 		grabPicture: function(){
+			if(!this.online){
+				this.onError(null, {message: 'Es necesaria una conexion a internet para poder guardar tus fotos.'});
+				return;
+			}
+
 			navigator.camera.getPicture(
 				this.onSuccess.bind(this),
 				this.onPictureError.bind(this),
@@ -182,7 +199,7 @@ define(function(require){
 			if(!this.$el.hasClass('scrolling') || !this.$el.hasClass('end-reached')){
 				var offset = Math.abs($(e.currentTarget).offset().top);
 				var wheight = $(window).height();
-				var height = $(e.currentTarget).outerHeight();
+				var height = $(e.currentTarget).height();
 
 				if(offset + wheight - 150 > height){
 					this.$el.addClass('scrolling');

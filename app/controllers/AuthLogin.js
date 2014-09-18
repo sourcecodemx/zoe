@@ -19,13 +19,9 @@ define(function(require){
 			Controller.prototype.initialize.apply(this, arguments);
 
 			this.messageListener();
-
-			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: ' '
-			});
+			
 			steroids.view.navigationBar.update({
-				title: this.title,
-				backButton: this.backButton
+				title: this.title
 			});
 
 			return this.render();
@@ -40,8 +36,7 @@ define(function(require){
 		onLayerWillChange: function(event){
 			if(event && event.target && (event.target.webview.id === 'authLoginView')){
 				steroids.view.navigationBar.update({
-					title: this.title,
-					backButton: this.backButton
+					title: this.title
 				});
 			}
 		},
@@ -49,6 +44,11 @@ define(function(require){
 			try{
 				if(e && e.preventDefault){
 					e.preventDefault();
+				}
+
+				if(!this.online){
+					this.offlineError();
+					return;
 				}
 
 				var u = this.dom.username.val();

@@ -10,7 +10,7 @@ define(function(require){
 		events: {
 			'click .back-button': 'back'
 		},
-		title: 'Cambiar Contrasena',
+		title: 'Cambiar Contraseña',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
@@ -47,13 +47,18 @@ define(function(require){
 					e.preventDefault();
 				}
 
+				if(!this.online){
+					this.offlineError();
+					return;
+				}
+
 				var password = this.dom.password.val();
 				var confirmation = this.dom.passwordConfirmation.val();
 
 				if(!password || !confirmation){
-					throw new Error('Por favor introduce tu nueva contrasena y su confirmacion.');
+					throw new Error('Por favor introduce tu nueva contraseña y su confirmacion.');
 				}else if(password !== confirmation){
-					throw new Error('La contrasena no parece conincidir con la confirmacion.');
+					throw new Error('La contraseña no parece conincidir con la confirmacion.');
 				}
 
 				ActivityIndicator.show('Guardando');
@@ -64,7 +69,7 @@ define(function(require){
 		},
 		onSuccess: function(){
 			ActivityIndicator.hide();
-			ActivityIndicator.show('Tu contrasena ha sido actualizada.');
+			ActivityIndicator.show('Tu contraseña ha sido actualizada.');
 			setTimeout(ActivityIndicator.hide.bind(window), 2000);
 		},
 		onMessage: function(event){

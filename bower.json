@@ -16,10 +16,9 @@
     "lodash": "~2.4.1",
     "parse-1.2.19.min": "http://www.parsecdn.com/js/parse-1.2.19.min.js",
     "aspect.js": "*",
-    "jquery": "~2.1.1",
-    "gsap": "~1.13.1",
-    "mapbox.js": "~2.0.1",
     "cryptojslib": "~3.1.2",
-    "steroids-js": "~3.5.1"
+    "steroids-js": "~3.5.1",
+    "pusher": "~2.2.3",
+    "jquery": "~2.1.1"
   }
 }

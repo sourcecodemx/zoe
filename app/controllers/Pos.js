@@ -53,18 +53,9 @@ define(function(require){
 			});
 			steroids.view.navigationBar.show();
 
-			this.infowindow = new InfoBox({
-				content: '',
-				maxWidth: 280,
-				pixelOffset: new google.maps.Size(-140, 0),
-				zIndex: null,
-				boxStyle: {
-					background: 'url("http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif") no-repeat',
-					opacity: 0.75,
-					width: '280px'
-				},
-				closeBoxMargin: '12px 4px 2px 2px',
-			});
+			if(this.online){
+				this._createInfoWindow();
+			}
 
 			return this.render();
 		},
@@ -121,11 +112,15 @@ define(function(require){
 			}
 		},
 		onShow: function(){
-			navigator.geolocation.getCurrentPosition(
-				this.onGeolocation.bind(this),
-				this.onGeolocationError.bind(this),
-				config.GEO.DEFAULT
-			);
+			if(this.online){
+				navigator.geolocation.getCurrentPosition(
+					this.onGeolocation.bind(this),
+					this.onGeolocationError.bind(this),
+					config.GEO.DEFAULT
+				);
+			}else{
+				this.onContentError({message: 'No es posible cargar el mapa.'});
+			}
 		},
 		onCenterChange: function(){
 			if((this.map.getZoom() < 12) || this.loading){
@@ -148,14 +143,19 @@ define(function(require){
 			this.currentCenter = position;
 		},
 		onRightButton: function(){
-			this.freestyle = false;
+			if(this.online){
+				this.freestyle = false;
 			
-			this.currentCenter = this.map.getCenter();
-			navigator.geolocation.getCurrentPosition(
-				this.onGeolocation.bind(this),
-				this.onGeolocationError.bind(this),
-				config.GEO.DEFAULT
-			);
+				this.currentCenter = this.map.getCenter();
+				navigator.geolocation.getCurrentPosition(
+					this.onGeolocation.bind(this),
+					this.onGeolocationError.bind(this),
+					config.GEO.DEFAULT
+				);
+			}else{
+				this.offlineError();
+			}
+			
 		},
 		onGeolocation: function(position){
 			this.position = position;
@@ -227,6 +227,25 @@ define(function(require){
 				this.onError(null, data.error);
 				break;
 			}
+		},
+		onOnline: function(){
+			Controller.prototype.onOnline.call(this);
+
+			this._createInfoWindow();
+		},
+		_createInfoWindow: function(){
+			this.infowindow = new InfoBox({
+				content: '',
+				maxWidth: 280,
+				pixelOffset: new google.maps.Size(-140, 0),
+				zIndex: null,
+				boxStyle: {
+					background: 'url("http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif") no-repeat',
+					opacity: 0.75,
+					width: '280px'
+				},
+				closeBoxMargin: '12px 4px 2px 2px',
+			});
 		}
 	});
 });

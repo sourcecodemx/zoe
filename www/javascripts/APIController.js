@@ -1,4 +1,4 @@
-/* global define, Parse, steroids */
+/* global define, Parse, steroids, Pusher, Zoe */
 define(function(require){
 	'use strict';
 
@@ -13,6 +13,9 @@ define(function(require){
 	var User   = require('user');
 	//Configuration
 	var config = require('config');
+	//Require Pusher library
+	require('pusher');
+
 	//API Controller
 	var Controller = function(){
 		window.addEventListener('message', this.onMessage.bind(this));
@@ -20,6 +23,27 @@ define(function(require){
 		this.images = new Images();
 		this.blog   = new Blog();
 		this.user   = User.current();
+
+		Pusher.log = function(message) {
+			if (window.console && window.console.log) {
+				window.console.log(message);
+			}
+		};
+
+		var pusher = new Pusher(config.PUSHER.KEY);
+		var channel = pusher.subscribe('main');
+		//Subscribe to main channel
+		channel.bind('main', function(data) {
+			var message = data;
+			var lastReceived = Zoe.storage.getItem('last-received-message');
+
+			if(!lastReceived){
+				//Set last-received-message to expire in 60 minutes
+				Zoe.storage.setItem('last-received-message', true, 1000*60*60);
+				navigator.notification.vibrate();
+				navigator.notification.alert(message, $.noop, 'Zoe Mensajes');
+			}
+		});
 
 		return this;
 	};
@@ -196,14 +220,36 @@ define(function(require){
 					});
 				break;
 			case 'user:forgot:request':
-				User.requestPasswordReset(data.email, {
-					success: function() {
-						window.postMessage({message: 'user:forgot:success'});
-					},
-					error: function(error) {
-						window.postMessage({message: 'user:forgot:error', error: error});
-					}
+				var forgotModel = Parse.Object.extend({className: '_User'});
+				var forgotQuery = new Parse.Query(forgotModel);
+				//Check if user is not a FB user
+				forgotQuery.equalTo('email', data.email);
+				forgotQuery.first({
+					success: function(user){
+						if(user && user.get('facebook')){
+							window.postMessage({message: 'user:forgot:error', error: {message: 'Ese correo esta registrado como usuario de Facebook, puedes iniciar sesion automaticamente desde la pantalla de inicio usando el boton de Facebook.'}});
+						}else{
+							User.requestPasswordReset(data.email, {
+								success: function() {
+									window.postMessage({message: 'user:forgot:success'});
+								},
+								error: function(error) {
+									switch(error.code){
+									case 205:
+										error.message = 'No existe usuario para el correo ' + data.email;
+										break;
+									}
+
+									window.postMessage({message: 'user:forgot:error', error: error});
+								}
+							});
+						}
+					}.bind(this),
+					error: function(e){
+						window.postMessage({message: 'user:forgot:error', error: e});
+					}.bind(this)
 				});
+				
 				break;
 			/**
 			*

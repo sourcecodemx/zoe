@@ -1,4 +1,4 @@
-/* globals define, steroids, CryptoJS, facebookConnectPlugin, _, ActivityIndicator, Parse */
+/* globals define, steroids, CryptoJS, facebookConnectPlugin, _, ActivityIndicator, Parse, alert */
 define(function(require){
 	'use strict';
 
@@ -36,6 +36,7 @@ define(function(require){
 			this.weightView = new steroids.views.WebView({location: 'http://localhost/views/Auth/weight.html',id: 'signupWeightView'});
 			this.weightView.preload();
 
+			//Nivigationbar
 			steroids.view.navigationBar.update({
 				title: ''
 			});
@@ -76,20 +77,26 @@ define(function(require){
 
 			window.postMessage({message: 'user:fblogin:success'});
 		},
-		onFBError: function(){
+		onFBError: function(response){
 			ActivityIndicator.hide();
+			steroids.logger.log(response);
+			alert(JSON.stringify(response));
 			setTimeout(function(){
 				navigator.notification.alert('No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.', $.noop, 'Ups!');
 			}, 1);
 		},
-		onError: function(model, error){
-			steroids.logger.log(error);
+		onError: function(){
+			ActivityIndicator.hide();
 			Controller.prototype.onError.apply(this, Array.prototype.slice.call(arguments));
 		},
 		facebook: function(){
-			ActivityIndicator.show('Autenticando');
-
+			if(!this.online){
+				this.offlineError();
+				return;
+			}
+			
 			var me = function(){
+				ActivityIndicator.show('Autenticando');
 				facebookConnectPlugin.api(
 					'/me',
 					config.FB.DEFAULT_PERMISSION,
@@ -108,6 +115,9 @@ define(function(require){
 						this.onFBError.bind(this)
 					);
 				}
+			}.bind(this), function(){
+				ActivityIndicator.hide();
+				navigator.notification.alert('No hemos podido iniciar sesion con Facebook.');
 			}.bind(this));
 		},
 		onMessage: function(event){

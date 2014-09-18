@@ -50,6 +50,11 @@ define(function(require){
 					e.preventDefault();
 				}
 
+				if(!this.online){
+					this.offlineError();
+					return;
+				}
+
 				var name = this.dom.name.val();
 
 				if(!name || !name.length){

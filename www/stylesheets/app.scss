@@ -16,6 +16,10 @@
 @import 'views/pos';
 @import 'views/store';
 
+//Import offline
+@import 'http://localhost/stylesheets/offline/offline-language-spanish-indicator.css';
+@import 'http://localhost/stylesheets/offline/offline-theme-dark.css';
+
 html,
 body,
 .ionic-body {

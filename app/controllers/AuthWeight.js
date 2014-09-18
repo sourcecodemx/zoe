@@ -43,6 +43,11 @@ define(function(require){
 					e.preventDefault();
 				}
 
+				if(!this.online){
+					this.offlineError();
+					return;
+				}
+
 				var w = parseInt(this.dom.weight.val(), 10);
 
 				if(!w){

@@ -9,8 +9,8 @@ define(function(require){
 	var Day = Backbone.Model.extend();
 	var DayView = Detachable.extend({
 		className: 'item item-icon-left item-dark',
-		showFx: 'slideDown',
-		hideFx: 'slideUp',
+		showFx: 'fadeIn',
+		hideFx: 'fadeOut',
 		template: require('http://localhost/javascripts/templates/stats_item.js'),
 		events: {
 			'click': 'setLabel'

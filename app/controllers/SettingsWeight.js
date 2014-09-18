@@ -46,6 +46,11 @@ define(function(require){
 					e.preventDefault();
 				}
 
+				if(!this.online){
+					this.offlineError();
+					return;
+				}
+
 				var weight = parseInt(this.dom.weight.val(), 10);
 
 				if(!weight){

@@ -25,6 +25,7 @@ define(function(require){
 			return events;
 		})(),
 		consumption: 0,
+		wasOffline: false,
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
@@ -43,7 +44,7 @@ define(function(require){
 			this.data.goal =  this.model.getGoal() + ' litros';
 			this.data.username = this.model.get('firstName') ? this.model.get('firstName') : this.model.get('username');
 
-			//Nivigationbar
+			//Navigationbar
 			var leftButton = new steroids.buttons.NavigationBarButton();
 			leftButton.imagePath = '/images/menu@2x.png';
 			leftButton.onTap = this.onLeftButton.bind(this);
@@ -65,8 +66,7 @@ define(function(require){
 
 			//Listen for messages
 			window.addEventListener('message', this.onMessage.bind(this));
-			//Update current journal
-			this.updateJournal();
+
 			//Listen for deletion of last consumption
 			Backbone.on('journal:deletelast', this.updateJournal, this);
 			Backbone.on('home:reload', this.reload, this);
@@ -109,8 +109,19 @@ define(function(require){
 			//Fake buttons
 			this.dom.settings = this.$el.find('#settings');
 			this.dom.weight = this.$el.find('#weight');
+
+			if(this.online){
+				//Update current journal
+				this.updateJournal();
+			}else{
+				this._updateConsumptionUI(0);
+			}
 		},
 		onRightButton: function(){
+			if(!this.online){
+				this.onError(null, {message: 'Es necesario contar con una conexion a internet para poder usar el panel de configuracion.'});
+				return;
+			}
 			//Hide menu (if visible)
 			if(this.dom.menu && this.dom.menu.position().top === 0){
 				this.toggleMenu();
@@ -120,6 +131,11 @@ define(function(require){
 			this.dom.settings.trigger('click');
 		},
 		track: function(){
+			if(!this.online){
+				this.offlineError();
+				return;
+			}
+
 			if(!this.model.get('weight')){
 				navigator.notification.confirm(
 					'Necesitas definir tu peso para poder capturar consumo',
@@ -172,6 +188,10 @@ define(function(require){
 			}
 		},
 		share: function(){
+			if(!this.online){
+				this.offlineError();
+				return;
+			}
 			//Ask to share message
 			window.plugins.socialsharing.share(
 				'Mi meta del dia son ' + this.model.getGoal() + ' litros, hoy he completado el ' + this.consumption + '% de mi hidratacion diaria.',
@@ -195,6 +215,11 @@ define(function(require){
 			media.play();
 		},
 		stats: function(){
+			if(!this.online){
+				this.offlineError();
+				return;
+			}
+
 			ActivityIndicator.show('Cargando Estadisticas');
 
 			this.model.getStats()
@@ -230,24 +255,11 @@ define(function(require){
 			var consumption = lastConsumption.get('consumption')/1000;
 			var goal = this.model.getGoal();
 			var percentage = Math.floor((consumption/goal)*100);
-			var current = parseInt(this.dom.percentage.text(), 10);
+			var currentText = this.dom.percentage.text();
+			var current = (currentText === '~') || _.isEmpty(currentText) ? 0 : parseInt(currentText, 10);
 			var total = current + percentage;
 
-			this.consumption = total;
-
-			this.dom.circle.circleProgress({
-				value: parseFloat(total/100, 10),
-				startAngle: -Math.PI/2,
-				thickness: 30,
-				size: 220,
-				animation: {
-					duration: 3000
-				},
-				fill: {
-					gradient: ['rgb(27,166,217)', 'rgb(95,189,49)']
-				}
-			});
-			this.dom.percentage.text(total);
+			this._updateConsumptionUI(total);
 
 			if(this.consumption >= 100){
 				setTimeout(function(){
@@ -266,21 +278,7 @@ define(function(require){
 				var goal = this.model.getGoal();
 				var total = Math.floor((liters/goal)*100) || 0;
 
-				this.dom.circle.circleProgress({
-					value: parseFloat(total/100, 10),
-					startAngle: -Math.PI/2,
-					thickness: 30,
-					size: 220,
-					//reversed: true,
-					animation: {
-						duration: 3000
-					},
-					fill: {
-						gradient: ['rgb(27,166,217)', 'rgb(95,189,49)']
-					}
-				});
-				this.dom.percentage.text(total);
-				this.consumption = total;
+				this._updateConsumptionUI(total);
 			}catch(e){
 				this.onError(null, e);
 			}
@@ -352,6 +350,39 @@ define(function(require){
 					navigator.notification.alert('El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.', _.noop, 'Hey!');
 					Backbone.trigger('home:reload');
 				}.bind(this), tillMidnight);
+			}
+		},
+		_updateConsumptionUI: function(total){
+			total = total || 0;
+			var totalLabel = total ? total : '~';
+
+			this.consumption = total;
+
+			this.dom.circle.circleProgress({
+				value: parseFloat(total/100, 10),
+				startAngle: -Math.PI/2,
+				thickness: 30,
+				size: 220,
+				animation: {
+					duration: 3000
+				},
+				fill: {
+					gradient: ['rgb(27,166,217)', 'rgb(95,189,49)']
+				}
+			});
+			this.dom.percentage.text(totalLabel);
+		},
+		onOffline: function(){
+			Controller.prototype.onOffline.call(this);
+
+			this.wasOffline = true;
+		},
+		onOnline: function(){
+			Controller.prototype.onOnline.call(this);
+
+			if(this.wasOffline){
+				this.wasOffline = false;
+				this.updateJournal();
 			}
 		}
 	});

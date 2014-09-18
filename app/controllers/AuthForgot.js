@@ -17,7 +17,7 @@ define(function(require){
 		events: {
 			'submit form': 'submit'
 		},
-		title: 'Recuperar Contrasena',
+		title: 'Recuperar Contraseña',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
 
@@ -26,6 +26,7 @@ define(function(require){
 			this.backButton = new steroids.buttons.NavigationBarButton({
 				title: ''
 			});
+
 			steroids.view.navigationBar.update({
 				title: this.title,
 				backButton: this.backButton
@@ -53,6 +54,11 @@ define(function(require){
 					e.preventDefault();
 				}
 
+				if(!this.online){
+					this.offlineError();
+					return;
+				}
+
 				var email = this.dom.email.val();
 
 				if(_.isEmpty(email)){
@@ -67,7 +73,7 @@ define(function(require){
 		},
 		onSuccess: function(){
 			ActivityIndicator.hide();
-			navigator.notification.alert('Se ha enviado un mensaje de recuperacion de contrasena a la direccion de correo especificada.', $.noop, 'Listo!');
+			navigator.notification.alert('Se ha enviado un mensaje de recuperacion de contraseña a la direccion de correo especificada.', $.noop, 'Listo!');
 		},
 		onMessage: function(event){
 			var data = event.data;

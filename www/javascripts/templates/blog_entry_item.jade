@@ -1,5 +1,8 @@
 .item.item-image
-	img(src='http://localhost/images/blog_placeholder.jpg')
+	if(data.image && data.image.url)
+		img(src=data.image.url)
+	else
+		img(src='http://localhost/images/blog_placeholder.jpg')
 .item.item-body
 	h2.positive #{data.title}
 	p.calm #{data.description}

@@ -43,6 +43,11 @@ define(function(require){
 			}
 		},
 		info: function(){
+			if(!this.online){
+				this.onError(null, {message: 'Es necesario contar con una conexion a internet para poder pedir informacion.'});
+				return;
+			}
+
 			steroids.modal.show({
 				view: this.views.information,
 				navigationBar: true

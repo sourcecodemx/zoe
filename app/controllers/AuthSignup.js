@@ -29,13 +29,9 @@ define(function(require){
 			this.signupPasswordView.preload();
 			
 			this.messageListener();
-
-			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: ''
-			});
+			
 			steroids.view.navigationBar.update({
-				title: this.title,
-				backButton: this.backButton
+				title: this.title
 			});
 
 			return this.render();
@@ -50,8 +46,7 @@ define(function(require){
 		onLayerWillChange: function(event){
 			if(event && event.target && (event.target.webview.id === 'authNewView')){
 				steroids.view.navigationBar.update({
-					title: this.title,
-					backButton: this.backButton
+					title: this.title
 				});
 			}
 		},
@@ -64,6 +59,11 @@ define(function(require){
 			try{
 				if(e && e.preventDefault){
 					e.preventDefault();
+				}
+
+				if(!this.online){
+					this.offlineError();
+					return;
 				}
 
 				var data = {username: this.dom.username.val(), email: this.dom.email.val()};

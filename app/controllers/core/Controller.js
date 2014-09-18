@@ -26,18 +26,28 @@ define(function(require){
 			'click [child]': 'showView'
 		},
 		mobile: true,
+		online: true,
 		initialize: function(){
 			//Call base initialize
 			Detachable.prototype.initialize.apply(this, arguments);
+
+			document.addEventListener("online", this.onOnline.bind(this), false);
+        	document.addEventListener("offline", this.onOffline.bind(this), false);
+
+			Backbone.on('app:online', this.onOnline, this);
+        	Backbone.on('app:offline', this.onOffline, this);
 
             //Aspect
 			aspect.add(this, 'show', this.onBeforeShow.bind(this));
 			aspect.add(this, 'hide', this.onBeforeHide.bind(this));
 			aspect.add(this, 'submit', this.onBeforeSubmit.bind(this), 'before');
 			aspect.add(this, 'back', this.reset.bind(this), 'after');
+			aspect.add(this, 'show', this._checkConnection.bind(this), 'before');
 
 			steroids.layers.on('willchange', this.onLayerWillChange.bind(this));
 			steroids.layers.on('didchange', this.onLayerChange.bind(this));
+
+        	this._checkConnection();
 
 			return this;
 		},
@@ -213,6 +223,24 @@ define(function(require){
 		onContentError: function(error){
 			ActivityIndicator.hide();
 			this.dom.content.html(this.errorTemplate({message: error.message}));
+		},
+		onOnline: function(){
+			this.online = true;
+			this.$el.find('#offline').removeClass('offline-ui-down');
+		},
+		onOffline: function(){
+			this.online = false;
+			this.$el.find('#offline').addClass('offline-ui-down');
+		},
+		offlineError: function(){
+			this.onError(null, {message: '¡No hay conexión a internet! :('});
+		},
+		_checkConnection: function(){
+        	if(navigator.onLine){
+				Backbone.trigger('app:online');
+			}else{
+				Backbone.trigger('app:offline');
+			}
 		}
 	});
 

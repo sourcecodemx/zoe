@@ -12,6 +12,7 @@
 	#goalArea {
 		position: relative;
 		margin: $padding-large-vertical 0;
+		min-height: 220px;
 		
 		#track {
 			position: absolute;

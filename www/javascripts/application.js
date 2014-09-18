@@ -6,9 +6,9 @@ require.config({
 		backbone:    'http://localhost/components/backbone/backbone',
 		functional:  'http://localhost/components/aspect.js/src/functional',
 		jquery:      'http://localhost/components/jquery/dist/jquery.min',
-		jquerygsap:  'http://localhost/components/gsap/src/minified/jquery.gsap.min',
 		underscore:  'http://localhost/components/lodash/dist/lodash.min',
 		parse:       'http://localhost/components/parse-1.2.19.min/index',
+		pusher:      'http://localhost/components/pusher/dist/pusher.min',
 
 		templates:   'http://localhost/javascripts/templates',
 		jade:        'http://localhost/javascripts/templates/jade',

@@ -28,6 +28,7 @@ define(function(require){
 			this.backButton = new steroids.buttons.NavigationBarButton({
 				title: ''
 			});
+
 			steroids.view.navigationBar.update({
 				title: this.title,
 				backButton: this.backButton
@@ -56,6 +57,11 @@ define(function(require){
 			try{
 				if(e && e.preventDefault){
 					e.preventDefault();
+				}
+
+				if(!this.online){
+					this.offlineError();
+					return;
 				}
 
 				var prefilledData = Zoe.storage.getItem('signup_prefill');

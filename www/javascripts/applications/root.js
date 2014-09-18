@@ -8,6 +8,7 @@ require.config({
 		jquery:      'http://localhost/components/jquery/dist/jquery.min',
 		underscore:  'http://localhost/components/lodash/dist/lodash.min',
 		progressCircle: 'http://localhost/javascripts/progressCircle',
+		offline:     'http://localhost/javascripts/offline',
 
 		templates:   'http://localhost/javascripts/templates',
 		jade:        'http://localhost/javascripts/templates/jade',

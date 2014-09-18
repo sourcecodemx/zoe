@@ -7,6 +7,9 @@ define('config', function(){
 			ID: 'Li087ST1O7bYBGKxhFQhWwlKnPRy4jJ2575mz7C3',
 			JSKEY: 'ex5SBIHB9bNN9ELyx1ZRFoqiWVfrl5SIukRct2zt'
 		},
+		PUSHER: {
+			KEY: 'f0f806e6c0165a801fb1'
+		},
 		FB: {
 			DEFAULT_PERMISSION: ['email', 'read_stream'],
 			BROADCAST_PERMISSION: [],
@@ -18,8 +21,8 @@ define('config', function(){
 				allowEdit: true,
 				encodingType: Camera.EncodingType.JPEG,
 				destinationType: Camera.DestinationType.DATA_URL,
-				targetWidth: 600,
-				targetHeight: 600
+				targetWidth: 500,
+				targetHeight: 500
 			}
 		},
 		GEO: {

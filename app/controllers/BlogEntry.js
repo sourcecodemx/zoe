@@ -36,8 +36,11 @@ define(function(require){
 			this.render();
 		},
 		update: function(data){
+			//Hero image URL
+			var src = data.image && data.image.url ? data.image.url : 'http://localhost/images/blog_placeholder.jpg';
+
 			this.dom.title.html(_.escape(data.title));
-			this.dom.img.attr('src', 'http://localhost/images/blog_placeholder.jpg');
+			this.dom.img.attr('src', src);
 
 			this.dom.content.html(data.contentEncoded);
 			this.dom.source.attr('href', data.link);
@@ -49,6 +52,11 @@ define(function(require){
 		},
 		openExternalURL: function(e){
 			try{
+				if(!this.online){
+					this.offlineError();
+					return;
+				}
+				
 				var href = $(e.currentTarget).attr('href');
 				var decomposed = href.split('/');
 
@@ -74,7 +82,7 @@ define(function(require){
 				});
 			}
 
-			if((event.source.webview.id === 'blogEntryView') && (event.target.webview.id = 'blogView')){
+			if(event && event.source && (event.source.webview.id === 'blogEntryView') && (event.target.webview.id = 'blogView')){
 				this.hide();
 			}
 		},

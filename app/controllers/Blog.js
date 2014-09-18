@@ -55,13 +55,21 @@ define(function(require){
 			this.dom.content = this.$el.find('#entries');
 			this.dom.entryButton = this.$el.find('#entry');
 
-			window.postMessage({message: 'blog:fetch'});
+			if(this.online){
+				window.postMessage({message: 'blog:fetch'});
+			}else{
+				this.onContentError({message: 'No hay conexion a internet.'});
+			}
+			
 		},
 		onRightButton: function(){
-			ActivityIndicator.show('Cargando');
-
-			this.removeAll();
-			window.postMessage({message: 'blog:fetch'});
+			if(this.online){
+				ActivityIndicator.show('Cargando');
+				this.removeAll();
+				window.postMessage({message: 'blog:fetch'});
+			}else{
+				this.offlineError();
+			}
 		},
 		onLayerWillChange: function(event){
 			if(event && event.target && event.target.webview.id === 'blogView'){
@@ -71,12 +79,22 @@ define(function(require){
 			}
 		},
 		addAll: function(){
-			this.collection.each(this.addOne.bind(this));
+			if(!this.dom.content.find('.entry').length){
+				this.dom.content.empty();
+			}
 
-			//Call show on all images
-			_.invoke(this.entries, Entry.prototype.show);
+			if(this.collection.length){
+				this.collection.each(this.addOne.bind(this));
 
-			ActivityIndicator.hide();
+				//Call show on all images
+				_.invoke(this.entries, Entry.prototype.show);
+			}else{
+				this.onContentError({message: 'No hay publicaciones en el blog.'});
+			}
+
+			setTimeout(function(){
+				ActivityIndicator.hide();
+			}, 1);
 		},
 		removeAll: function(){
 			_.invoke(this.entries, Entry.prototype.destroy);
@@ -116,9 +134,9 @@ define(function(require){
 	});
 
 	var Entry = Detachable.extend({
-		showFx: 'slideDown',
+		showFx: 'fadeIn',
 		hideFx: 'fadeOut',
-		className: 'card list',
+		className: 'card list entry',
 		template: require('http://localhost/javascripts/templates/blog_entry_item.js'),
 		events: {
 			'click': 'entry'

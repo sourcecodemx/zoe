@@ -49,6 +49,11 @@ define(function(require){
 					e.preventDefault();
 				}
 
+				if(!this.online){
+					this.offlineError();
+					return;
+				}
+
 				var email = this.dom.email.val();
 
 				if(!email || !email.length){
