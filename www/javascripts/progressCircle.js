@@ -117,7 +117,7 @@ define('progressCircle', ['jquery'], function($){
                 reversedAnimation = options.reversedAnimation,
                 arcFill;
 
-            if (typeof parseFloat(options.thickness) === "number")
+            if ($.isNumeric(options.thickness))
                 thickness = options.thickness;
 
             // Prepare canvas
