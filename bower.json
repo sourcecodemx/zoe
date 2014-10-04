@@ -1,0 +1,24 @@
+{
+  "name": "zoe",
+  "version": "0.0.1",
+  "authors": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "src/components",
+    "src/spec",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "backbone": "~1.1.2",
+    "requirejs": "~2.1.14",
+    "lodash": "~2.4.1",
+    "parse-1.2.19.min": "http://www.parsecdn.com/js/parse-1.2.19.min.js",
+    "aspect.js": "*",
+    "cryptojslib": "~3.1.2",
+    "steroids-js": "~3.5.1",
+    "pusher": "~2.2.3",
+    "jquery": "~2.1.1"
+  }
+}

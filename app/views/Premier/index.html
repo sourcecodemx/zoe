@@ -1,0 +1,13 @@
+<script>
+  
+  window.setupEvent = new Event('setup');
+
+  var onSetup = function(){
+    require(['http://localhost/controllers/Premier.js'], function(C){
+      (new C()).show();
+    });
+  }
+
+  // Listen for the event.
+  window.addEventListener('setup', onSetup, false);
+</script>

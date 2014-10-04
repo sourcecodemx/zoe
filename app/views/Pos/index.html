@@ -1,0 +1,13 @@
+<script>
+  
+  window.setupEvent = new Event('setup');
+
+  var onSetup = function(){
+    require(['http://localhost/controllers/Pos.js'], function(C){
+      window.view = (new C()).show();
+    });
+  }
+
+  // Listen for the event.
+  window.addEventListener('setup', onSetup, false);
+</script>
