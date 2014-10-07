@@ -1,12 +1,12 @@
-/* globals define, steroids, ActivityIndicator  */
+/* globals define, steroids, forge  */
 define(function(require){
 	'use strict';
 
-	var Controller      = require('http://localhost/controllers/core/Controller.js');
+	var Controller      = require('Controller');
 
 	return Controller.extend({
 		id: 'signup-weight-page',
-		template: require('http://localhost/javascripts/templates/signup_weight.js'),
+		template: require('templates/signup_weight'),
 		title: 'Configuracion',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
@@ -56,7 +56,7 @@ define(function(require){
 					throw new Error('El peso debe ser un numero, por favor intente de nuevo.');
 				}
 
-				ActivityIndicator.show('Guardando');
+				forge.notification.showLoading('Guardando');
 				window.postMessage({message: 'user:weight:save', weight: w});
 			}catch(e){
 				this.onError(null, e);
@@ -65,7 +65,7 @@ define(function(require){
 		back: function(){
 			this.reset();
 
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 
 			steroids.layers.popAll();
 		},

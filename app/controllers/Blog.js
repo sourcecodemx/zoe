@@ -1,96 +1,90 @@
-/* globals define, _, steroids, ActivityIndicator, Backbone, Zoe */
+/* globals define, _, forge, Backbone */
 define(function(require){
 	'use strict';
 
-	var RootController = require('http://localhost/controllers/core/Root.js');
-	var Detachable     = require('http://localhost/controllers/core/Detachable.js');
-	var Blog           = require('http://localhost/collections/BlogSimple.js');
-	var config         = require('config');
+	var Controller  = require('Root');
+	var Detachable  = require('Detachable');
+	var Blog        = require('collections/Blog');
+	var config      = require('config');
 
-	var Index = RootController.extend({
+	var Index = Controller.extend({
 		id: 'blog-page',
-		template: require('http://localhost/javascripts/templates/blog.js'),
+		template: require('templates/blog'),
 		title: 'Blog',
 		events: (function () {
-			var events = _.extend({}, RootController.prototype.events, {
-				'touchmove #entries': 'checkPosition',
-				'touchend #entries': 'onTouchEnd'
+			var events = _.extend({}, Controller.prototype.events, {
+				'drag #entries': 'checkPosition',
+				'release #entries': 'onTouchEnd'
 			});
 
 			return events;
 		})(),
 		page: 0,
 		initialize: function(){
-			RootController.prototype.initialize.apply(this, arguments);
-
-			//TODO: Improve preload for child views
-			this.views.entry = new steroids.views.WebView({location: 'http://localhost/views/Blog/entry.html', id: 'blogEntryView'});
-			this.views.entry.preload({}, {
-				onSuccess: function(){
-					Zoe.storage.setItem('blogEntry-preloaded', true);
-				}
-			});
-
-			window.addEventListener('message', this.onMessage.bind(this));
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
 			this.collection = new Blog();
 			this.entries = {};
 
 			this.listenTo(this.collection, 'reset', this.addAll.bind(this));
 
-			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/menu@2x.png';
-			leftButton.onTap = this.onLeftButton.bind(this);
-			
-			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/reload@2x.png';
-			rightButton.onTap = this.onRightButton.bind(this);
-
-			steroids.view.navigationBar.update({
-				title: this.title,
-				buttons: {
-					left: [leftButton],
-					right: [rightButton]
-				}
-			});
-			steroids.view.navigationBar.show();
-
 			Backbone.on('blog:entry:show', this.onEntry, this);
 
 			return this.render();
 		},
 		onRender: function(){
-			RootController.prototype.onRender.call(this);
+			Controller.prototype.onRender.call(this);
 
 			this.dom.content = this.$el.find('#entries');
 			this.dom.entryButton = this.$el.find('#entry');
 			this.dom.indicator = this.$el.find('.ion-infinite-scroll');
 
 			if(this.online){
-				window.postMessage({message: 'blog:fetch'});
+				this.getEntries();
 			}else{
 				this.onContentError({message: 'No hay conexion a internet.'});
 			}
-			
+		},
+		getEntries: function(){
+			forge.notification.showLoading('Cargando');
+			//Paginate
+			if(this.page >= 0){
+				this.collection.query.skip(this.page*config.BLOG.LIMIT);
+			}
+
+			this.collection.fetch({
+				success: function(){
+					this.page++;
+					//Remove scrolling class
+					if(this.$el.hasClass('scrolling')){
+						this.$el.removeClass('active scrolling');
+						this.dom.indicator.removeClass('active');
+					}
+					//Once we get to the end of the blog, display the no-more-entries legend
+					if(this.collection.length < config.BLOG.LIMIT){
+						this.$el.addClass('end-reached');
+						this.dom.content.after('<div id="end" class="padding-large text-center">No hay mas entradas.</div>');
+					}
+				}.bind(this),
+				error: function(collection, error){
+					if(this.dom.content.find('.entry').length){
+						this.onError(null, error);
+					}else{
+						this.onContentError(error);
+					}
+				}.bind(this)
+			});
 		},
 		onRightButton: function(){
 			if(this.online){
-				ActivityIndicator.show('Cargando');
 				this.removeAll();
 				//Reset pagination
 				this.page = 0;
 				$('#end').remove();
 				this.$el.removeClass('end-reached');
-				window.postMessage({message: 'blog:fetch', page: this.page});
+				this.getEntries();
 			}else{
 				this.offlineError();
-			}
-		},
-		onLayerWillChange: function(event){
-			if(event && event.target && event.target.webview.id === 'blogView'){
-				steroids.view.navigationBar.update({
-					title: this.title
-				});
 			}
 		},
 		addAll: function(){
@@ -108,7 +102,7 @@ define(function(require){
 			}
 
 			setTimeout(function(){
-				ActivityIndicator.hide();
+				forge.notification.hideLoading();
 			}, 1);
 		},
 		removeAll: function(){
@@ -128,42 +122,24 @@ define(function(require){
 
 			return this;
 		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'blog:fetch:success':
-				this.page++;
-				this.collection.reset(data.entries);
-				//Remove scrolling class
-				if(this.$el.hasClass('scrolling')){
-					this.$el.removeClass('active scrolling');
-					this.dom.indicator.removeClass('active');
-				}
-				//Once we get to the end of the blog, display the no-more-entries legend
-				if(data.entries.length < config.BLOG.LIMIT){
-					this.$el.addClass('end-reached');
-					this.dom.content.after('<div id="end" class="padding-large text-center">No hay mas entradas.</div>');
-				}
-				break;
-			case 'blog:fetch:error':
-				console.log('blog:fetch:error', this.dom.content.find('.entry').length);
-				if(this.dom.content.find('.entry').length){
-					this.onError(null, data.error);
-				}else{
-					this.onContentError(data.error);
-				}
-				break;
-			}
-		},
-		onEntry: function(data){
-			window.postMessage({message: 'blog:entry:show', entry: data});
-			this.dom.entryButton.trigger('click');
+		onEntry: function(/*data*/){
+			//window.postMessage({message: 'blog:entry:show', entry: data});
+			//this.dom.entryButton.trigger('click');
 		},
 		onTouchEnd: function(){
 			if(this.$el.hasClass('scrolling')){
 				this.$el.addClass('active');
-				window.postMessage({message: 'blog:fetch', page: this.page});
+				this.getEntries();
 			}
+		},
+		onShow: function(){
+			Controller.prototype.onShow.call(this);
+
+			forge.topbar.addButton({
+				icon: 'images/reload@2x.png',
+				position: 'right',
+				prerendered: true
+			}, this.onRightButton.bind(this));
 		}
 	});
 
@@ -171,7 +147,7 @@ define(function(require){
 		showFx: 'fadeIn',
 		hideFx: 'fadeOut',
 		className: 'card list entry',
-		template: require('http://localhost/javascripts/templates/blog_entry_item.js'),
+		template: require('templates/blog_entry_item'),
 		events: {
 			'click': 'entry'
 		},

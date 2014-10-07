@@ -1,13 +1,13 @@
-/* globals define, steroids, Zoe, ActivityIndicator  */
+/* globals define, steroids, Zoe, forge  */
 define(function(require){
 	'use strict';
 
-	var Controller = require('http://localhost/controllers/core/Controller.js');
+	var Controller = require('Controller');
 	var config = require('config');
 
 	return Controller.extend({
 		id: 'settings-name-page',
-		template: require('http://localhost/javascripts/templates/settings_name.js'),
+		template: require('templates/settings_name'),
 		title: 'Cambiar Nombre',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
@@ -63,16 +63,16 @@ define(function(require){
 					throw new Error('Ese es tu nombre de usuario actual, no hay necesidad de guardarlo de nuevo.');
 				}
 
-				ActivityIndicator.show('Guardando');
+				forge.notification.showLoading('Guardando');
 				window.postMessage({message: 'user:name:save', name: name});
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
 		onSuccess: function(){
-			ActivityIndicator.hide();
-			ActivityIndicator.show('Tu nombre de usuario se ha actualizado.');
-			setTimeout(ActivityIndicator.hide.bind(window), 2000);
+			forge.notification.hideLoading();
+			forge.notification.showLoading('Tu nombre de usuario se ha actualizado.');
+			setTimeout(forge.notification.hideLoading.bind(window), 2000);
 		},
 		onMessage: function(event){
 			switch(event.data.message){

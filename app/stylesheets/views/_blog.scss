@@ -1,0 +1,29 @@
+#blog-page {
+	.item-body {
+		@extend .text-center;
+	}
+
+	.item-image {
+		border: transparent;
+		border-bottom: 4px solid $energized;
+		max-height: $padding-large-vertical*15;
+	}
+
+	.title {
+		margin: 0;
+	}
+}
+
+#blog-entry-page {
+	-webkit-user-select: all;
+	
+	#hero {
+		border-bottom: 4px solid $energized;
+	}
+
+	a {
+		color: white;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+}

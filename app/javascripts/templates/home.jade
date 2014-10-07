@@ -1,0 +1,28 @@
+include ./offline.jade
+include ./menu.jade
+
+.scroll-content
+	.page-content
+		.padding-top#homeGreeting
+			.h4.text-center ¡Hola 
+				span#username #{data.username}!
+			.h4.text-center Tu meta del dia son 
+				span#goal #{data.goal}
+
+		.text-center
+			button.button.button-clear#stats(type='button')
+
+		.text-center#goalArea
+			#circle
+			#track(type='button')
+
+		.text-center.h3
+			span#percentage
+			span %
+
+		.text-center
+			button.button.button-energized#share Compartir
+
+.hide
+	button#settings(type='button', data-view='Settings/index', child)
+	button#weight(type='button', data-view='Settings/weight', child)

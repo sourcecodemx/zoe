@@ -1,8 +1,8 @@
-/* globals define, steroids, _, ActivityIndicator */
+/* globals define, steroids, _, forge */
 define(function(require){
 	'use strict';
 
-	var Controller      = require('http://localhost/controllers/core/Controller.js');
+	var Controller      = require('Controller');
 
 	/**
 	* Signup Controller
@@ -13,7 +13,7 @@ define(function(require){
 	*/
 	return Controller.extend({
 		id: 'auth-forgot-password-page',
-		template: require('http://localhost/javascripts/templates/auth_forgot_password.js'),
+		template: require('templates/auth_forgot_password'),
 		events: {
 			'submit form': 'submit'
 		},
@@ -65,15 +65,15 @@ define(function(require){
 					throw new Error('Por favor ingresa tus correo electronico.');
 				}
 
-				ActivityIndicator.show('Enviando');
+				forge.notification.showLoading('Enviando');
 				window.postMessage({message: 'user:forgot:request', email: email});
 			}catch(e){
 				Controller.prototype.onError.call(this, null, e);
 			}
 		},
 		onSuccess: function(){
-			ActivityIndicator.hide();
-			navigator.notification.alert('Se ha enviado un mensaje de recuperacion de contraseña a la direccion de correo especificada.', $.noop, 'Listo!');
+			forge.notification.hideLoading();
+			forge.notification.alert('Listo!', 'Se ha enviado un mensaje de recuperacion de contraseña a la direccion de correo especificada.');
 		},
 		onMessage: function(event){
 			var data = event.data;

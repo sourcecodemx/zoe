@@ -1,0 +1,26 @@
+#menu {
+	position: fixed;
+	width: 100%;
+	background: $dark;
+	z-index: $z-index-bar+1;
+	box-shadow: 0 3px 2px $dark;
+	top: -100%;
+	margin-top: $padding-large-vertical*2;
+
+	ul {
+		li {
+			border-bottom: 1px solid rgba(255,255,255,0.03);
+
+			&:last-child {
+				border-bottom: 0;
+			}
+
+			button {
+				display: block;
+				width: 100%;
+				margin: 0 auto;
+				font-weight: bold;
+			}
+		}
+	}
+}

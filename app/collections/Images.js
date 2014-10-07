@@ -1,5 +1,5 @@
 /* globals define, Parse */
-define(['http://localhost/models/File.js', 'config'], function(Model, config){
+define(['models/File', 'config'], function(Model, config){
 	'use strict';
 	
 	return Parse.Collection.extend({

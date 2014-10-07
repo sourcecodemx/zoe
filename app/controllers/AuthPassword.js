@@ -1,9 +1,9 @@
-/* globals define, steroids, Zoe, _,  ActivityIndicator  */
+/* globals define, steroids, Zoe, _,  forge  */
 define(function(require){
 	'use strict';
 
-	var Signup     = require('http://localhost/controllers/Auth.js');
-	var Controller = require('http://localhost/controllers/core/Controller.js');
+	var Signup     = require('Auth');
+	var Controller = require('Controller');
 
 	/**
 	* Signup2 Controller
@@ -14,7 +14,7 @@ define(function(require){
 	*/
 	return Signup.extend({
 		id: 'signup-password-page',
-		template: require('http://localhost/javascripts/templates/signup_password.js'),
+		template: require('templates/signup_password'),
 		backButton: true,
 		title: '2. Crear cuenta',
 		initialize: function(){
@@ -69,7 +69,7 @@ define(function(require){
 				var confirmation = this.dom.passwordConfirmation.val();
 
 				if(!_.isEmpty(prefilledData) && !_.isEmpty(password) && !_.isEmpty(confirmation) && (password === confirmation)){
-					ActivityIndicator.show('Creando Cuenta');
+					forge.notification.showLoading('Creando Cuenta');
 
 					//Add password to the object
 					prefilledData.password = password;
@@ -109,7 +109,7 @@ define(function(require){
 					view: this.weightView
 				});
 				//Hide loading indicator
-				ActivityIndicator.hide();
+				forge.notification.hideLoading();
 			}.bind(this), 1);
 		},
 		onMessage: function(event){

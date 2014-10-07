@@ -1,4 +1,4 @@
-/* globals define, steroids, _, Parse, ActivityIndicator, Media, Backbone  */
+/* globals define, _, Parse, forge, Backbone, topBarTint, buttonTint, User  */
 define(function(require){
 	'use strict';
 
@@ -6,9 +6,10 @@ define(function(require){
 	require('jquery');
 	require('progressCircle');
 
-	var Controller = require('http://localhost/controllers/core/Root.js');
-	var HTMLModal  = require('http://localhost/ui/Modal.js');
-	var template = require('http://localhost/javascripts/templates/home.js');
+	var Controller = require('Root');
+	var HTMLModal  = require('HTMLModal');
+	var template = require('templates/home');
+	var Journal = require('models/Journal');
 	
 	var Index = Controller.extend({
 		id: 'home-page',
@@ -17,55 +18,33 @@ define(function(require){
 		showFb: 'fadeIn',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
-				'click #track': 'track',
-				'click #share': 'share',
-				'click #stats': 'stats'
+				'tap #track': 'track',
+				'tap #share': 'share',
+				'tap #stats': 'stats'
 			});
 
 			return events;
 		})(),
 		consumption: 0,
 		wasOffline: false,
+		title: '',
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-
+			//Initialize main class
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
+			//Set user
 			this.model = Parse.User.current();
-
 			//Listen for model changes
 			this.listenTo(this.model, 'change:weight', this.onWeightChange, this);
 			this.listenTo(this.model, 'change:username', this.onUsernameChange, this);
 			this.listenTo(this.model, 'change:lastConsumption', this.onConsumptionChange, this);
 
 			//Create stats view
-			this.views.stats = new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsIndexView'});
-			this.views.stats.preload();
+			//this.views.stats = new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsIndexView'});
+			//this.views.stats.preload();
 
 			//get goal
 			this.data.goal =  this.model.getGoal() + ' litros';
 			this.data.username = this.model.get('firstName') ? this.model.get('firstName') : this.model.get('username');
-
-			//Navigationbar
-			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/menu@2x.png';
-			leftButton.onTap = this.onLeftButton.bind(this);
-			leftButton.imageAsOriginal = false;
-			
-			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/settings@2x.png';
-			rightButton.onTap = this.onRightButton.bind(this);
-			rightButton.imageAsOriginal = false;
-
-			steroids.view.navigationBar.update({
-				titleImagePath: '/images/logo@2x.png',
-				buttons: {
-					left: [leftButton],
-					right: [rightButton]
-				}
-			});
-			steroids.view.navigationBar.show();
-
-			//Listen for messages
-			window.addEventListener('message', this.onMessage.bind(this));
 
 			//Listen for deletion of last consumption
 			Backbone.on('journal:deletelast', this.updateJournal, this);
@@ -95,7 +74,7 @@ define(function(require){
 			this.updateJournal();
 		},
 		updateJournal: function(){
-			ActivityIndicator.show('Actualizando Consumo');
+			forge.notification.showLoading('Actualizando Consumo');
 			//Get Journal data
 			this.model.getJournal()
 				.then(this.onJournal.bind(this))
@@ -111,6 +90,7 @@ define(function(require){
 			//Fake buttons
 			this.dom.settings = this.$el.find('#settings');
 			this.dom.weight = this.$el.find('#weight');
+			this.dom.autio = this.$el.find('#audio');
 
 			if(this.online){
 				//Update current journal
@@ -118,6 +98,17 @@ define(function(require){
 			}else{
 				this._updateConsumptionUI(0);
 			}
+		},
+		onShow: function(){
+			Controller.prototype.onShow.call(this);
+			//Configure home buttons and title
+			forge.topbar.setTitleImage('images/logo@2x.png');
+			forge.topbar.addButton({
+				icon: 'images/settings@2x.png',
+				position: 'right',
+				prerendered: true
+			}, this.onRightButton.bind(this));
+			forge.topbar.show();
 		},
 		onRightButton: function(){
 			if(!this.online){
@@ -139,11 +130,12 @@ define(function(require){
 			}
 
 			if(!this.model.get('weight')){
-				navigator.notification.confirm(
+				forge.notification.confirm(
+					'Hey!',	
 					'Necesitas definir tu peso para poder capturar consumo',
-					this.onWeightConfirmation.bind(this),
-					'Hey!',
-					['Hacerlo', 'Despues']
+					'Hacerlo',
+					'Despues',
+					this.onWeightConfirmation.bind(this)
 				);
 			}else{
 				if(!this.modal){
@@ -152,37 +144,25 @@ define(function(require){
 				//Callback hell!
 				if(this.consumption && this.consumption >= 100){
 					setTimeout(function(){
-						navigator.notification.confirm(
+						forge.notification.confirm(
+							'Hey',
 							'Ya has logrado tu meta diaria, la sobrehidrtacion no es buena.',
-							function(index){
-								switch(index){
-								case 1:
-									if(!this.hyperhidratationView){
-										this.hyperhidratationView = new steroids.views.WebView({
-											location: 'http://es.wikipedia.org/wiki/Hiperhidrataci%C3%B3n',
-											id: 'hyperhidratationView'
-										});
-										this.hyperhidratationView.preload({}, {
-											onSuccess: function(){
-												steroids.layers.push({
-													view: this.hyperhidratationView,
-													navigationBar: true
-												});
-											}.bind(this)
-										});
-									}else{
-										steroids.layers.push({
-											view: this.hyperhidratationView,
-											navigationBar: true
-										});
-									}
+							'Leer mas',
+							'OK',
+							function(readMore){
+								switch(readMore){
+								case true:
+									forge.tabs.openWithOptions({
+										url: 'http://es.wikipedia.org/wiki/Hiperhidrataci%C3%B3n',
+										tint: topBarTint,
+										buttonIcon: 'images/close@2x.png',
+										buttonTint: buttonTint
+									});
 									break;
-								case 2:
+								case false:
 									this.modal.show();
 								}
-							}.bind(this),
-							'Hey',
-							['Leer mas', 'Ok']);
+							}.bind(this));
 					}.bind(this), 1);
 				}else {
 					this.modal.show();
@@ -202,19 +182,16 @@ define(function(require){
 				'http://zoewater.com.mx');
 		},
 		playAudio: function(url) {
-			// Play the audio file at url
-			var media = new Media(url,
-				// success callback
-				function () {
-					console.log('playAudio():Audio Success');
-				},
-				// error callback
-				function (err) {
-					console.log('playAudio():Audio Error: ' + err);
-				}
-			);
-			// Play audio
-			media.play();
+			if(!this.player){
+				forge.file.getLocal(url, function(file){
+					forge.media.createAudioPlayer(file, function(player){
+						this.player = player;
+						player.play();
+					}.bind(this));
+				}.bind(this));
+			}else{
+				this.player.play();
+			}
 		},
 		stats: function(){
 			if(!this.online){
@@ -222,21 +199,22 @@ define(function(require){
 				return;
 			}
 
-			ActivityIndicator.show('Cargando Estadisticas');
+			forge.notification.showLoading('Cargando Estadisticas');
 
 			this.model.getStats()
 				.then(function(computed){
-					ActivityIndicator.hide();
+					forge.notification.hideLoading();
 					
-					window.postMessage({message: 'stats:fetch:success', stats: computed, goal: this.model.getGoal()});
-					
+					//window.postMessage({message: 'stats:fetch:success', stats: computed, goal: this.model.getGoal()});
+					//TODO
+					/*
 					steroids.modal.show({
 						view: this.views.stats,
 						navigationBar: true
-					});
+					});*/
 				}.bind(this))
 				.fail(function(error){
-					ActivityIndicator.hide();
+					forge.notification.hideLoading();
 					this.onError(null, error);
 				}.bind(this));
 		},
@@ -249,11 +227,9 @@ define(function(require){
 		onUsernameChange: function(){
 			this.dom.username.text(this.model.get('username'));
 		},
-		onWeightConfirmation: function(index){
-			switch(index){
-			case 1:
+		onWeightConfirmation: function(y){
+			if(y){
 				this.dom.weight.trigger('click');
-				break;
 			}
 		},
 		onWeightChange: function(){
@@ -271,16 +247,16 @@ define(function(require){
 
 			if(this.consumption >= 100){
 				setTimeout(function(){
-					navigator.notification.alert('Lograste tu meta de hoy', $.noop, 'Felicidades');
+					forge.notification.alert('Felicidades', 'Lograste tu meta de hoy');
 				}, 1);
 			}
 
-			this.playAudio('http://localhost/audio/confirmation.wav');
+			this.playAudio('audio/confirmation.wav');
 			
 		},
 		onJournal: function(milltrs){
 			try{
-				ActivityIndicator.hide();
+				forge.notification.hideLoading();
 
 				var liters = parseFloat((milltrs/1000).toFixed(2), 10);
 				var goal = this.model.getGoal();
@@ -293,7 +269,7 @@ define(function(require){
 			
 		},
 		onJournalError: function(error){
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 			this.onError(null, error);
 		},
 		onDestroy: function(){
@@ -338,9 +314,7 @@ define(function(require){
 			if(now < noonWatcher){
 				this.noonWatcher = setTimeout(function(){
 					if(this.consumption < 50){
-						navigator.notification.vibrate();
-						navigator.notification.beep(1);
-						navigator.notification.alert('Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(', _.noop, 'Hey!');
+						forge.notification.alert('Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(');
 					}
 				}.bind(this), noonWatcher - now);
 			}
@@ -348,19 +322,15 @@ define(function(require){
 			if(now < afternoonWatcher){
 				this.afternoonWatcher = setTimeout(function(){
 					if(this.consumption < 75){
-						navigator.notification.vibrate();
-						navigator.notification.beep(1);
-						navigator.notification.alert('Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(', _.noop, 'Hey!');
+						forge.notification.alert('Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(');
 					}
 				}.bind(this), afternoonWatcher - now);
 			}
 			//Reload home page layout after midnight
 			if(tillMidnight > 1000*60){
 				this.midnightWatcher = setTimeout(function(){
-					this.playAudio('http://localhost/audio/confirmation.wav');
-					navigator.notification.vibrate();
-					navigator.notification.beep(1);
-					navigator.notification.alert('El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.', _.noop, 'Hey!');
+					this.playAudio('audio/confirmation.wav');
+					forge.notification.alert('Hey!', 'El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.');
 					Backbone.trigger('home:reload');
 				}.bind(this), tillMidnight);
 			}
@@ -390,32 +360,51 @@ define(function(require){
 	var CheckModal = HTMLModal.extend({
 		events: (function () {
 			var events = _.extend({}, HTMLModal.prototype.events, {
-				'click .check': 'save',
-				'click #deleteLast': 'deleteLast'
+				'tap .check': 'save',
+				'tap #deleteLast': 'deleteLast'
 			});
 
 			return events;
 		})(),
-		template: require('http://localhost/javascripts/templates/home_modal_check.js'),
+		template: require('templates/home_modal_check'),
 		initialize: function(){
 			HTMLModal.prototype.initialize.apply(this, arguments);
-
-			window.addEventListener('message', this.onMessage.bind(this));
 
 			return this;
 		},
 		save: function(e){
 			try{
 				var value = $(e.currentTarget).attr('data-value');
+				var type = parseInt(value, 10);
+				var consumption = new Journal({consumption: type});
 
-				ActivityIndicator.show('Guardando Consumo');
-				window.postMessage({message: 'user:consumption:save', type: value});
+				forge.notification.showLoading('Guardando Consumo');
+
+				//Save selected consumption
+				consumption.save()
+					.then(function(){
+						var user = User.current();
+						var journals = user.relation('journal');
+
+						journals.add(consumption);
+						user.set('lastConsumption', consumption);
+
+						user
+							.save()
+							.then(function(){
+								this.onSuccess();
+							}.bind(this), function(error){
+								this.onError(null, error);
+							}.bind(this));
+					}.bind(this), function(error){
+						this.onError(null, error);
+					}.bind(this));
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
 		deleteLast: function(){
-			var user = Parse.User.current();
+			var user = User.current();
 			var lastConsumption = user.get('lastConsumption');
 
 			if(lastConsumption && lastConsumption.id){
@@ -450,30 +439,19 @@ define(function(require){
 			}
 		},
 		onSuccess: function(){
-			ActivityIndicator.hide();
-			ActivityIndicator.show('Consumo Guardado');
+			forge.notification.hideLoading();
+			forge.notification.showLoading('Consumo Guardado');
 			setTimeout(function(){
-				ActivityIndicator.hide();
+				forge.notification.hideLoading();
 				Backbone.trigger('user:consumption:successs');
 			}, 2000);
 			this.hide();
 		},
 		onError: function(model, error){
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 			setTimeout(function(){
-				navigator.notification.alert(this.message, $.noop, 'Ups!');
+				forge.notification.alert('Ups!', this.message);
 			}.bind(error), 1);
-		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'user:consumption:success':
-				this.onSuccess();
-				break;
-			case 'user:consumption:error':
-				this.onError(null, data.error);
-				break;
-			}
 		}
 	});
 

@@ -1,0 +1,19 @@
+include ./offline.jade
+.scroll-content
+	.page-content
+		form.row
+			.col
+				.padding
+					.list
+						label.item.item-input
+							input#username(type='text', placeholder="Usuario", autocomplete="off", autocapitalize="off")
+							
+					.list
+						label.item.item-input
+							input#password(type='password', placeholder="Contraseña")
+
+					.text-center
+						button(type='submit').button.button-outline.button-light Siguiente
+					br
+					.text-center
+						button#forgot.button.button-clear(type='button', data-view='Auth/forgot', child) ¿Olvidaste tu usuario o contraseña?

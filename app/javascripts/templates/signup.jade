@@ -1,0 +1,23 @@
+include ./offline.jade
+include ./button_submit_outline.jade
+
+.scroll-content
+	.page-content
+		form.row
+			.col
+				.padding
+					.list
+						label.item.item-input
+							input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off")
+							
+					.list
+						label.item.item-input
+							input#email(type='email', placeholder="Correo electronico")
+					
+					+submitButton('Siguiente')
+
+					br
+					.text-center
+						| Al crear tu cuenta confirmas que has leido y 
+						a#tos(data-view='TOS/index', child, modal)
+							strong Aceptas los terminos de uso

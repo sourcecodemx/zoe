@@ -1,0 +1,11 @@
+include ./offline.jade
+include ./menu.jade
+
+.scroll-content
+	.page-content
+		#entries
+
+	include ./ion_infinite_scroll.jade
+
+.hide
+	button#entry(type='button', data-view='Blog/entry', child)

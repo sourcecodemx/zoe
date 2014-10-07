@@ -1,14 +1,14 @@
-/* globals define, steroids, Zoe, ActivityIndicator */
+/* globals define, steroids, Zoe, forge */
 define(function(require){
 	'use strict';
 
-	var Controller = require('http://localhost/controllers/core/Controller.js');
-	var AuthWeight = require('http://localhost/controllers/AuthWeight.js');
+	var Controller = require('Controller');
+	var AuthWeight = require('AuthWeight');
 	var config = require('config');
 
 	return AuthWeight.extend({
 		id: 'settings-weight-page',
-		template: require('http://localhost/javascripts/templates/settings_weight.js'),
+		template: require('templates/settings_weight'),
 		title: 'Cambiar Peso',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
@@ -61,16 +61,16 @@ define(function(require){
 					throw new Error('Ese es tu peso actual, no hay necesidad de guardarlo de nuevo.');
 				}
 
-				ActivityIndicator.show('Guardando');
+				forge.notification.showLoading('Guardando');
 				window.postMessage({message: 'user:weight:save', weight: weight});
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
 		onSuccess: function(){
-			ActivityIndicator.hide();
-			ActivityIndicator.show('Tu peso ha sido actualizado.');
-			setTimeout(ActivityIndicator.hide.bind(window), 2000);
+			forge.notification.hideLoading();
+			forge.notification.showLoading('Tu peso ha sido actualizado.');
+			setTimeout(forge.notification.hideLoading.bind(window), 2000);
 		},
 		onMessage: function(event){
 			switch(event.data.message){

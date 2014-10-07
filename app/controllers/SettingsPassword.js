@@ -1,12 +1,12 @@
-/* globals define, steroids, ActivityIndicator  */
+/* globals define, steroids, forge  */
 define(function(require){
 	'use strict';
 
-	var Controller = require('http://localhost/controllers/core/Controller.js');
+	var Controller = require('Controller');
 
 	return Controller.extend({
 		id: 'settings-password-page',
-		template: require('http://localhost/javascripts/templates/settings_password.js'),
+		template: require('templates/settings_password'),
 		events: {
 			'click .back-button': 'back'
 		},
@@ -61,16 +61,16 @@ define(function(require){
 					throw new Error('La contraseña no parece conincidir con la confirmacion.');
 				}
 
-				ActivityIndicator.show('Guardando');
+				forge.notification.showLoading('Guardando');
 				window.postMessage({message: 'user:password:save', password: password});
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
 		onSuccess: function(){
-			ActivityIndicator.hide();
-			ActivityIndicator.show('Tu contraseña ha sido actualizada.');
-			setTimeout(ActivityIndicator.hide.bind(window), 2000);
+			forge.notification.hideLoading();
+			forge.notification.showLoading('Tu contraseña ha sido actualizada.');
+			setTimeout(forge.notification.hideLoading.bind(window), 2000);
 		},
 		onMessage: function(event){
 			switch(event.data.message){

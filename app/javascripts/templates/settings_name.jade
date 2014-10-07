@@ -1,0 +1,12 @@
+include ./button_submit_outline.jade
+
+.scroll-content
+	.page-content
+		form.row
+			.col
+				.padding
+					.list
+						label.item.item-input
+							input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off", value="#{data.username}")
+					
+					+submitButton()

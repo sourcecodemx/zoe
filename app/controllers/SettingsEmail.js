@@ -1,13 +1,13 @@
-/* globals define, steroids, Zoe, ActivityIndicator  */
+/* globals define, steroids, Zoe, forge  */
 define(function(require){
 	'use strict';
 
-	var Controller = require('http://localhost/controllers/core/Controller.js');
+	var Controller = require('Controller');
 	var config = require('config');
 	
 	return Controller.extend({
 		id: 'settings-email-page',
-		template: require('http://localhost/javascripts/templates/settings_email.js'),
+		template: require('templates/settings_email'),
 		title: 'Cambiar Correo',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
@@ -62,16 +62,16 @@ define(function(require){
 					throw new Error('Ese es tu correo actual, no hay necesidad de guardarlo de nuevo.');
 				}
 
-				ActivityIndicator.show('Guardando');
+				forge.notification.showLoading('Guardando');
 				window.postMessage({message: 'user:email:save', email: email});
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
 		onSuccess: function(){
-			ActivityIndicator.hide();
-			ActivityIndicator.show('Tu correo ha sido actualizado.');
-			setTimeout(ActivityIndicator.hide.bind(window), 2000);
+			forge.notification.hideLoading();
+			forge.notification.showLoading('Tu correo ha sido actualizado.');
+			setTimeout(forge.notification.hideLoading.bind(window), 2000);
 		},
 		onMessage: function(event){
 			switch(event.data.message){

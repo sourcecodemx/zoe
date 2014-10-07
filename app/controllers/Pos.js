@@ -1,20 +1,21 @@
-/* globals define, _, google, steroids, Backbone, ActivityIndicator, InfoBox */
+/* globals define, _, google, forge, Backbone */
 define(function(require){
 	'use strict';
 
-	var Controller = require('http://localhost/controllers/core/Root.js');
+	var Controller = require('Root');
 	var config = require('config');
 
 	var Place = Backbone.Model.extend({
 		idAttribute: 'objectId'
 	});
+
 	var Places = Backbone.Collection.extend({
 		model: Place
 	});
 
 	return Controller.extend({
 		id: 'pos-page',
-		template: require('http://localhost/javascripts/templates/pos.js'),
+		template: require('templates/pos'),
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 
@@ -34,25 +35,6 @@ define(function(require){
 
 			window.addEventListener('message', this.onMessage.bind(this));
 
-			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/menu@2x.png';
-			leftButton.onTap = this.onLeftButton.bind(this);
-			leftButton.imageAsOriginal = false;
-			
-			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/location@2x.png';
-			rightButton.onTap = this.onRightButton.bind(this);
-			rightButton.imageAsOriginal = false;
-
-			steroids.view.navigationBar.update({
-				title: this.title,
-				buttons: {
-					left: [leftButton],
-					right: [rightButton]
-				}
-			});
-			steroids.view.navigationBar.show();
-
 			if(this.online){
 				this._createInfoWindow();
 			}
@@ -62,7 +44,7 @@ define(function(require){
 		addAll: function(){
 			this.collection.each(this.addMarker.bind(this));
 
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 		},
 		addMarker: function(model){
 			var position = model.get('location');
@@ -82,7 +64,7 @@ define(function(require){
 				icon: image
 			});
 			
-			var content = require('http://localhost/javascripts/templates/pos_info_window.js')({data: model.toJSON()});
+			var content = require('templates/pos_info_window')({data: model.toJSON()});
 			google.maps.event.addListener(marker, 'click', function() {
 				box.setContent(content);
 				box.open(map, this);
@@ -106,21 +88,22 @@ define(function(require){
 			//Try creating the map
 			this._getMap();
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && event.target.webview.id === 'posView'){
-				steroids.view.navigationBar.update({
-					title: this.title
-				});
-			}
-		},
 		onShow: function(){
+			Controller.prototype.onShow.call(this);
+
+			forge.topbar.addButton({
+				icon: 'images/location@2x.png',
+				position: 'right',
+				prerendered: true
+			}, this.onRightButton.bind(this));
+
 			if(this.online){
-				/*ActivityIndicator.show('Cargando');
-				navigator.geolocation.getCurrentPosition(
+				forge.notification.showLoading('Cargando');
+				forge.geolocation.getCurrentPosition(
 					this.onGeolocation.bind(this),
 					this.onGeolocationError.bind(this),
 					config.GEO.DEFAULT
-				);*/
+				);
 			}else{
 				this.onContentError({message: 'No es posible cargar el mapa.'});
 			}
@@ -130,14 +113,14 @@ define(function(require){
 				return;
 			}
 
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 
 			var position = this._getMap().getCenter();
 			var distanceFromLastPosition = Math.ceil(google.maps.geometry.spherical.computeDistanceBetween(position, this.currentCenter)/1000);
 
 			//Fetch new data only if user has moved 10kms from their last position
 			if(distanceFromLastPosition >= 10){
-				ActivityIndicator.show('Cargando');
+				forge.notification.showLoading('Cargando');
 				var latlng = {latitude: position.lat(), longitude: position.lng()};
 				this.loading = true;
 				window.postMessage({message: 'pos:fetch', position: latlng});
@@ -148,7 +131,7 @@ define(function(require){
 		onRightButton: function(){
 			if(this.online){
 				this.freestyle = false;
-				navigator.geolocation.getCurrentPosition(
+				forge.geolocation.getCurrentPosition(
 					this.onGeolocation.bind(this),
 					this.onGeolocationError.bind(this),
 					config.GEO.DEFAULT
@@ -159,7 +142,7 @@ define(function(require){
 			
 		},
 		onGeolocation: function(position){
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 
 			this.position = position;
 			this.location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -183,7 +166,7 @@ define(function(require){
 			window.postMessage({message: 'pos:fetch', position: position.coords});
 		},
 		onGeolocationError: function(error){
-			steroids.logger.log(error, 'geolocation error');
+			forge.logging.info(error, 'geolocation error');
 
 			switch(error.code){
 			case 2:
@@ -210,13 +193,13 @@ define(function(require){
 			switch(data.message){
 			case 'pos:fetch:success':
 				this.loading = false;
-				ActivityIndicator.hide();
+				forge.notification.hideLoading();
 				/*
 				if(data.places.length){
 					this.removeAll();
 					this.collection.reset(data.places);
 				}else{
-					ActivityIndicator.hide();
+					forge.notification.hideLoading();
 					this.onError(null, {message: 'Al parecer no hay ningun punto de venta cercano a ti, intenta de nuevo.'});
 				}*/
 				break;
@@ -269,18 +252,20 @@ define(function(require){
 			return this.map;
 		},
 		_createInfoWindow: function(){
-			this.infowindow = new InfoBox({
-				content: '',
-				maxWidth: 280,
-				pixelOffset: new google.maps.Size(-140, 0),
-				zIndex: null,
-				boxStyle: {
-					background: 'url("http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif") no-repeat',
-					opacity: 0.75,
-					width: '280px'
-				},
-				closeBoxMargin: '12px 4px 2px 2px',
-			});
+			require(['infobox'], function(InfoBox){
+				this.infowindow = new InfoBox({
+					content: '',
+					maxWidth: 280,
+					pixelOffset: new google.maps.Size(-140, 0),
+					zIndex: null,
+					boxStyle: {
+						background: 'url("http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif") no-repeat',
+						opacity: 0.75,
+						width: '280px'
+					},
+					closeBoxMargin: '12px 4px 2px 2px'
+				});	
+			}.bind(this));
 		}
 	});
 });

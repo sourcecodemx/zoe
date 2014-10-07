@@ -1,33 +1,13 @@
-/* globals define, steroids, ActivityIndicator  */
+/* globals define, forge, Parse */
 define(function(require){
 	'use strict';
 
-	var Modal = require('http://localhost/controllers/core/Modal.js');
+	var Controller = require('Controller');
 
-	return Modal.extend({
-		template: require('http://localhost/javascripts/templates/premier_modal_information.js'),
+	return Controller.extend({
+		template: require('templates/premier_modal_information'),
 		id: 'premier-information-page',
 		title: 'Informacion',
-		initialize: function(){
-			Modal.prototype.initialize.apply(this, arguments);
-
-			window.addEventListener('message', this.onMessage.bind(this));
-
-			var leftButton = new steroids.buttons.NavigationBarButton();
-				
-			leftButton.imagePath = '/images/close@2x.png';
-			leftButton.onTap = this.onLeftButton.bind(this);
-
-			steroids.view.navigationBar.update({
-				title: this.title,
-				closeButton: leftButton,
-				buttons: {
-					left: [leftButton]
-				}
-			});
-
-			return this.render();
-		},
 		onRender: function(){
 			this.dom = {
 				form: this.$el.find('form'),
@@ -36,25 +16,28 @@ define(function(require){
 				phone: this.$el.find('#phone')
 			};
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && event.target.webview.id === 'premierInformationView'){
-				steroids.view.navigationBar.setAppearance({
-					tintColor: '#000000'
-				});
-
-				steroids.view.navigationBar.update({
-					title: this.title
-				});
-			}
-		},
 		onSuccess: function(){
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 			this.dom.form.trigger('reset');
-			navigator.notification.alert('Nos podremos en contacto contigo', $.noop, '¡Gracias!');
+			forge.notification.alert('¡Gracias!', 'Nos podremos en contacto contigo');
+		},
+		onShow: function(){
+			Controller.prototype.onShow.call(this);
+
+			if(forge.is.mobile()){
+				forge.topbar.setTint([0,0,0,255]);
+				forge.topbar.setTitle(this.title);
+				forge.topbar.removeButtons();
+				forge.topbar.addButton({
+					icon: 'images/close@2x.png',
+					position: 'left',
+					prerendered: true
+				}, this.hide.bind(this));	
+			}
 		},
 		submit: function(e){
 			try{
-				ActivityIndicator.show('Enviando');
+				forge.notification.showLoading('Enviando');
 
 				if(e && e.preventDefault){
 					e.preventDefault();
@@ -68,27 +51,12 @@ define(function(require){
 					throw new Error('Todos los campos son obligatorios, por favor intente de nuevo.');
 				}
 
-				window.postMessage({
-					message: 'premier:contact',
-					details: {
-						name: name,
-						email: email,
-						phone: phone
-					}
-				});
+				Parse.Cloud
+					.run('contact', {name: name, email: email, phone: phone})
+					.done(this.onSuccess.bind(this))
+					.fail(this.onError.bind(this));
 			}catch(e){
 				this.onError(null, e);
-			}
-		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'premier:contact:success':
-				this.onSuccess();
-				break;
-			case 'premier:contact:error':
-				this.onError(null, data.error);
-				break;
 			}
 		}
 	});

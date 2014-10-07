@@ -2,7 +2,7 @@
 define(function(require){
 	'use strict';
 
-	var Controller      = require('http://localhost/controllers/core/Controller.js');
+	var Controller      = require('Controller');
 
 	/**
 	* Signup Controller
@@ -13,7 +13,7 @@ define(function(require){
 	*/
 	return Controller.extend({
 		id: 'signup-page',
-		template: require('http://localhost/javascripts/templates/signup.js'),
+		template: require('templates/signup'),
 		events: {
 			'click #tos': 'showView',
 			'click .back-button': 'back',

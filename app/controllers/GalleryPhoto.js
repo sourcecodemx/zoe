@@ -2,12 +2,12 @@
 define(function(require){
 	'use strict';
 
-	var Controller = require('http://localhost/controllers/core/Controller.js');
+	var Controller = require('Controller');
 	var config = require('config');
 
 	return Controller.extend({
 		id: 'gallery-image-page',
-		template: require('http://localhost/javascripts/templates/gallery_image.js'),
+		template: require('templates/gallery_image'),
 		title: 'Foto',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {

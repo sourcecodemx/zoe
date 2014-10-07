@@ -2,16 +2,16 @@
 define(function(require){
 	'use strict';
 
-	var Detachable = require('http://localhost/controllers/core/Detachable.js');
-	var Modal = require('http://localhost/controllers/core/Modal.js');
-	var template = require('http://localhost/javascripts/templates/stats.js');
+	var Detachable = require('Detachable');
+	var Modal = require('Modal');
+	var template = require('templates/stats');
 
 	var Day = Backbone.Model.extend();
 	var DayView = Detachable.extend({
 		className: 'item item-icon-left item-dark',
 		showFx: 'fadeIn',
 		hideFx: 'fadeOut',
-		template: require('http://localhost/javascripts/templates/stats_item.js'),
+		template: require('templates/stats_item'),
 		events: {
 			'click': 'setLabel'
 		},
@@ -40,25 +40,25 @@ define(function(require){
 			switch(this.model.get('type')){
 			case 'today':
 				this.computedStatus = 'Hoy he ganado el ' + data.total + '% de mi hidratacion optima.';
-				this.computedLabel = require('http://localhost/javascripts/templates/stats_today.js')({data: data});
+				this.computedLabel = require('templates/stats_today')({data: data});
 				break;
 			case 'yesterday':
 				this.computedStatus = 'Ayer gane el ' + data.total + '% de mi hidratacion optima.';
-				this.computedLabel = require('http://localhost/javascripts/templates/stats_yesterday.js')({data: data});
+				this.computedLabel = require('templates/stats_yesterday')({data: data});
 				break;
 			case 'beforeyesterday':
 				this.computedStatus = 'Antier gane el ' + data.total + '% de mi hidratacion optima.';
-				this.computedLabel = require('http://localhost/javascripts/templates/stats_beforeyesterday.js')({data: data});
+				this.computedLabel = require('templates/stats_beforeyesterday')({data: data});
 				break;
 			case 'week':
 				data.total = data.total/7;
 				this.computedStatus = 'La semana pasada gane el ' + data.total + '% de mi hidratacion optima.';
-				this.computedLabel = require('http://localhost/javascripts/templates/stats_week.js')({data: data});
+				this.computedLabel = require('templates/stats_week')({data: data});
 				break;
 			case 'month':
 				data.total = data.total/30;
 				this.computedStatus = 'El mes pasado gane el ' + data.total + '% de mi hidratacion optima.';
-				this.computedLabel = require('http://localhost/javascripts/templates/stats_month.js')({data: data});
+				this.computedLabel = require('templates/stats_month')({data: data});
 				break;
 			}
 

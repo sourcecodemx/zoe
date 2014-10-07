@@ -1,107 +1,112 @@
-/* globals define, _, steroids, Camera, Backbone, window, ActivityIndicator  */
+/* globals define, _, Backbone, forge, Parse, File, User  */
 define(function(require){
 	'use strict';
 
-	//require('swipe');
-
-	var RootController = require('http://localhost/controllers/core/Root.js');
-	var Detachable     = require('http://localhost/controllers/core/Detachable.js');
-	var HTMLModal      = require('http://localhost/ui/Modal.js');
-	var Images         = require('http://localhost/collections/ImagesSimple.js');
+	var Controller     = require('Root');
+	var Detachable     = require('Detachable');
+	var HTMLModal      = require('HTMLModal');
+	var Images         = require('collections/Images');
 	var config         = require('config');
+	var File           = require('models/File');
 
-	var Index = RootController.extend({
+	var Gallery = Controller.extend({
 		id: 'gallery-page',
-		template: require('http://localhost/javascripts/templates/gallery.js'),
+		template: require('templates/gallery'),
 		title: 'Galeria',
 		events: (function () {
-			var events = _.extend({}, RootController.prototype.events, {
-				'click #take': 'takePicture',
-				'click #grab': 'grabPicture',
-				'touchmove #pics': 'checkPosition',
-				'touchend #pics': 'onTouchEnd'
+			var events = _.extend({}, Controller.prototype.events, {
+				'tap #take': 'takePicture',
+				'tap #grab': 'grabPicture',
+				'drag #pics': 'checkPosition',
+				'release #pics': 'onTouchEnd'
 			});
 
 			return events;
 		})(),
 		page: 0,
 		initialize: function(){
-			RootController.prototype.initialize.apply(this, arguments);
-
-			window.addEventListener('message', this.onMessage.bind(this));
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
 			//Initialize collection
 			this.collection = new Images();
 			this.images = {};
 
-			//TODO: Improve preload for child views
-			this.views.pic = new steroids.views.WebView({location: 'http://localhost/views/Gallery/picture.html', id: 'galleryImageView'});
-			this.views.pic.preload();
-
 			//Create upload modal
 			this.uploadModal = new UploadModal({collection: this.collection});
 
 			//Listen for images collection
-			this.listenTo(this.collection, 'reset', this.addAll, this);
-			this.listenTo(this.collection, 'prepend', this.prependOne, this);
+			this.listenTo(this.collection, 'reset', this.addAll.bind(this));
+			this.listenTo(this.collection, 'error', this.onError.bind(this));
+			this.listenTo(this.collection, 'prepend', this.prependOne.bind(this));
 
 			//Open picture view
 			Backbone.on('gallery:image:show', this.showPicture, this);
 
-			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/menu@2x.png';
-			leftButton.onTap = this.onLeftButton.bind(this);
-			leftButton.imageAsOriginal = false;
-			
-			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/reload@2x.png';
-			rightButton.onTap = this.onRightButton.bind(this);
-			rightButton.imageAsOriginal = false;
-
-			steroids.view.navigationBar.update({
-				title: this.title,
-				buttons: {
-					left: [leftButton],
-					right: [rightButton]
-				}
-			});
-			steroids.view.navigationBar.show();
-
 			return this.render();
 		},
 		onRender: function(){
-			RootController.prototype.onRender.call(this);
+			Controller.prototype.onRender.call(this);
 			
 			//Pics container
 			this.dom.content = this.$el.find('#pics');
 			this.dom.indicator = this.$el.find('.ion-infinite-scroll');
 
 			if(this.online){
-				ActivityIndicator.show('Cargando');
-				window.postMessage({message: 'gallery:fetch'});
+				this.getImages();
 			}else{
 				this.onContentError({message: 'No hay conexion a internet.'});
 			}
 		},
+		onShow: function(){
+			Controller.prototype.onShow.call(this);
+			
+			forge.topbar.addButton({
+				icon: 'images/reload@2x.png',
+				position: 'right',
+				prerendered: true
+			}, this.onRightButton.bind(this));
+		},
 		onRightButton: function(){
 			if(this.online){
-				ActivityIndicator.show('Cargando');
 				this.removeAll();
 				//Reset pagination
 				this.page = 0;
 				$('#end').remove();
 				this.$el.removeClass('end-reached');
-				window.postMessage({message: 'gallery:fetch', page: this.page});
+				this.getImages();
 			}else{
 				this.offlineError();
 			}
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && event.target.webview.id === 'galleryView'){
-				steroids.view.navigationBar.update({
-					title: this.title
-				});
+		getImages: function(){
+			forge.notification.showLoading('Cargando');
+			//Paginate
+			if(this.page >= 0){
+				this.collection.query.skip(this.page*config.GALLERY.LIMIT);
 			}
+
+			this.collection.fetch({
+				success: function(){
+					this.page++;
+					//Remove scrolling class
+					if(this.$el.hasClass('scrolling')){
+						this.$el.removeClass('active scrolling');
+						this.dom.indicator.removeClass('active');
+					}
+					//Once we get to the end of the gallery, display the no-more-photos legend
+					if(this.images.length < config.GALLERY.LIMIT){
+						this.$el.addClass('end-reached');
+						this.dom.content.after('<div id="end" class="padding-large text-center">No hay mas fotografias.</div>');
+					}
+				}.bind(this),
+				error: function(collection, error){
+					if(this.dom.content.find('.pic').length){
+						this.onError(null, error);
+					}else{
+						this.onContentError(error);
+					}
+				}.bind(this)
+			});
 		},
 		addAll: function(){
 			if(!this.dom.content.find('.pic').length){
@@ -118,7 +123,7 @@ define(function(require){
 			}
 
 			setTimeout(function(){
-				ActivityIndicator.hide();
+				forge.notification.hideLoading();
 			}, 1);
 		},
 		addOne: function(model){
@@ -148,7 +153,8 @@ define(function(require){
 			});
 			this.images = {};
 		},
-		showPicture: function(data){
+		showPicture: function(/*data*/){
+			/*
 			//Let the view know it can load the image
 			window.postMessage({
 				message: 'gallery:image:show',
@@ -165,6 +171,7 @@ define(function(require){
 					view: this.views.pic
 				});
 			}.bind(this), 1);
+			*/
 		},
 		takePicture: function(){
 			if(!this.online){
@@ -172,11 +179,12 @@ define(function(require){
 				return;
 			}
 
+			/*
 			navigator.camera.getPicture(
 				this.onSuccess.bind(this),
 				this.onPictureError.bind(this),
 				config.CAMERA.DEFAULT
-			);
+			);*/
 		},
 		grabPicture: function(){
 			if(!this.online){
@@ -184,6 +192,7 @@ define(function(require){
 				return;
 			}
 
+			/*
 			navigator.camera.getPicture(
 				this.onSuccess.bind(this),
 				this.onPictureError.bind(this),
@@ -192,40 +201,17 @@ define(function(require){
 					config.CAMERA.DEFAULT,
 					{ sourceType : Camera.PictureSourceType.PHOTOLIBRARY }
 				)
-			);
+			);*/
 		},
 		onSuccess: function(imageData) {
-			console.log('success', imageData);
 			this.uploadModal.update(imageData).show();
 		},
 		onPictureError: function(message) {
-			console.log(message, 'picture error');
-			//this.onError(null, {message: message});
+			this.onError(null, {message: message});
 		},
 		onMessage: function(event){
 			var data = event.data;
 			switch(data.message){
-			case 'gallery:fetch:success':
-				this.page++;
-				this.collection.reset(data.images);
-				//Remove scrolling class
-				if(this.$el.hasClass('scrolling')){
-					this.$el.removeClass('active scrolling');
-					this.dom.indicator.removeClass('active');
-				}
-				//Once we get to the end of the gallery, display the no-more-photos legend
-				if(data.images.length < config.GALLERY.LIMIT){
-					this.$el.addClass('end-reached');
-					this.dom.content.after('<div id="end" class="padding-large text-center">No hay mas fotografias.</div>');
-				}
-				break;
-			case 'gallery:fetch:error':
-				if(this.dom.content.find('.pic').length){
-					this.onError(null, data.error);
-				}else{
-					this.onContentError(data.error);
-				}
-				break;
 			case 'gallery:image:upvote:success':
 			case 'gallery:image:downvote:success':
 				this.collection.get(data.id).set('likes', data.likes);
@@ -235,13 +221,13 @@ define(function(require){
 		onTouchEnd: function(){
 			if(this.$el.hasClass('scrolling')){
 				this.$el.addClass('active');
-				window.postMessage({message: 'gallery:fetch', page: this.page});
+				this.getImages();
 			}
 		}
 	});
 
 	var PicItem = Detachable.extend({
-		template: require('http://localhost/javascripts/templates/gallery_image_item.js'),
+		template: require('templates/gallery_image_item'),
 		className: 'padding pic',
 		showFx: 'fadeIn',
 		hideFx: 'fadeOut',
@@ -255,11 +241,13 @@ define(function(require){
 				throw new Error('Gallery.PickItem requires a Backbone Model');
 			}
 
-			this.render();
+			return this.render();
 		},
 		render: function(){
+			var model = this.model.toJSON();
 			//If no thumbnail then go with the original image
-			var url = this.model.get('thumbnail') ? this.model.get('thumbnail').url : this.model.get('image').url;
+			var url = model.thumbnail ? model.thumbnail.url : model.image.url;
+
 			//Render & show
 			this.$el.append(this.template({image: {url: url}}));
 			this.$el.hide();
@@ -277,32 +265,50 @@ define(function(require){
 	
 
 	var UploadModal = HTMLModal.extend({
-		template: require('http://localhost/javascripts/templates/gallery_modal_upload.js'),
+		template: require('templates/gallery_modal_upload'),
 		events: {
 			'click #save': 'save',
 			'click button[data-dismiss]': 'hide'
-		},
-		initialize: function(){
-			HTMLModal.prototype.initialize.apply(this, arguments);
-
-			window.addEventListener('message', this.onMessage.bind(this));
 		},
 		onRender: function(){
 			this.dom.image = this.$el.find('#image');
 		},
 		save: function(){
 			if(this.base64Data.length > 0){
-				ActivityIndicator.show('Guardando');
-				window.postMessage({message: 'gallery:image:save', image: this.base64Data});
+				forge.notification.showLoading('Guardando');
+
+				var img = new Parse.File('foto.jpg', { base64: this.base64Data });
+				var file = new File({image: img});
+
+				file.save().then(
+					function(){
+						var user = User.current();
+						var images = user.relation('images');
+						//Add image to relation;
+						images.add(file);
+						this.images.add(file);
+						//Save user relation
+						user
+							.save()
+							.then(function(){
+								return file.fetch();
+							})
+							.then(
+								this.onSave.bind(this),
+								this.onError.bind(this)
+							);
+					}.bind(this),
+					this.onError.bind(this)
+				);
 			}
 		},
 		update: function(data){
 			this.img = new Image();
 
-			ActivityIndicator.show('Cargando imagen');
+			forge.notification.showLoading('Cargando imagen');
 
 			this.img.onload = function(){
-				ActivityIndicator.hide();
+				forge.notification.hideLoading();
 				this.dom.image.append($(this.img).addClass('full-image rounded'));
 			}.bind(this);
 
@@ -325,34 +331,24 @@ define(function(require){
 		onShow: function(){
 			HTMLModal.prototype.onShow.call(this);
 
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 		},
 		onSave: function(file){
 			try{
-				ActivityIndicator.hide();
+				forge.notification.hideLoading();
 				setTimeout(function(){
-					ActivityIndicator.show('Imagen Guardada');
+					forge.notification.showLoading('Imagen Guardada');
 				}, 1);
 
-				_.delay(ActivityIndicator.hide, 1000);
+				_.delay(forge.notification.hideLoading, 1000);
 
 				this.collection.prepend(file);
 				this.hide();
 			}catch(e){
 				this.onError(null, e);
 			}
-		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'gallery:image:success':
-				this.onSave(data.image);
-				break;
-			case 'gallery:image:error':
-				this.onError(null, data.error);
-			}
 		}
 	});
 
-	return Index;
+	return Gallery;
 });

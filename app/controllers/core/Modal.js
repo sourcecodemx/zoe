@@ -1,8 +1,8 @@
-/* globals define, Timeline, _, Zoe, aspect */
+/* globals define, steroids */
 define(function(require){
 	'use strict';
 
-	var Controller = require('http://localhost/controllers/core/Controller.js');
+	var Controller = require('Controller');
 
 	return Controller.extend({
 		showFx: 'fadeIn',
@@ -13,7 +13,7 @@ define(function(require){
 			'submit': 'submit'
 		},
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 		},
 		onShow: function(){
 			steroids.view.removeLoading();

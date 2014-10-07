@@ -2,8 +2,8 @@
 define(function(require){
 	'use strict';
 	
-	var template   = require('http://localhost/javascripts/templates/modal.js');
-	var Detachable = require('http://localhost/controllers/core/Detachable.js');
+	var template   = require('templates/modal');
+	var Detachable = require('Detachable');
 
 	//Slideshow
 	var Modal = Detachable.extend({
@@ -13,9 +13,9 @@ define(function(require){
 		showFx: 'fadeIn',
 		hideFx: 'fadeOut',
 		events: {
-			'click .close': 'hide',
-			'click .modal-backdrop': 'hide',
-			'click button[data-dismiss]': 'hide'
+			'tap .close': 'hide',
+			'tap .modal-backdrop': 'hide',
+			'tap button[data-dismiss]': 'hide'
 		},
 		config: {
 			header: null,
@@ -44,6 +44,8 @@ define(function(require){
 			this.dom.body = this.$el.find('.modal-body');
 			this.dom.header = this.$el.find('.modal-header');
 			this.dom.footer = this.$el.find('.modal-footer');
+
+			this.$el.hammer();
 
 			return this;
 		},

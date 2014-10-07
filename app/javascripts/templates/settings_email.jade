@@ -1,0 +1,12 @@
+include ./button_submit_outline.jade
+
+.scroll-content
+	.page-content
+		form.row
+			.col
+				.padding
+					.list
+						label.item.item-input
+							input#email(type='email', placeholder="Correo electronico", value="#{data.email}")
+					
+					+submitButton()

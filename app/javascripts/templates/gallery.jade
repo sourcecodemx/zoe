@@ -1,0 +1,17 @@
+include ./offline.jade
+include ./menu.jade
+
+.scroll-content.has-tabs
+	.page-content
+		#pics.clearfix
+
+	include ./ion_infinite_scroll.jade
+
+.tabs.tabs-dark.tabs-icon-top
+	a.tab-item#take
+		i.icon.ion-ios7-camera-outline
+		| Tomar Foto
+
+	a.tab-item#grab
+		i.icon.ion-ios7-photos-outline
+		| Subir Foto

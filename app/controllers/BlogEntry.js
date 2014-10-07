@@ -2,11 +2,11 @@
 define(function(require){
 	'use strict';
 
-	var Controller = require('http://localhost/controllers/core/Controller.js');
+	var Controller = require('Controller');
 
 	return Controller.extend({
 		id: 'blog-entry-page',
-		template: require('http://localhost/javascripts/templates/blog_entry.js'),
+		template: require('templates/blog_entry'),
 		title: 'Blog',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {

@@ -1,11 +1,12 @@
-/* globals define, steroids, _, ActivityIndicator  */
+/* globals define, steroids, _, forge  */
 define(function(require){
 	'use strict';
 
-	var Controller      = require('http://localhost/controllers/core/Controller.js');
+	var Controller      = require('Controller');
 
 	//Require crypto library
-	require('http://localhost/components/cryptojslib/rollups/sha3.js');
+	require('sha3');
+
 	/**
 	* Login Controller
 	* 
@@ -13,7 +14,7 @@ define(function(require){
 	*/
 	return Controller.extend({
 		id: 'login-page',
-		template: require('http://localhost/javascripts/templates/login.js'),
+		template: require('templates/login'),
 		title: 'Ingresa a tu cuenta',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, arguments);
@@ -58,14 +59,14 @@ define(function(require){
 					throw new Error('Por favor ingresa tus credenciales.');
 				}
 
-				ActivityIndicator.show('Autenticando');
+				forge.notification.showLoading('Autenticando');
 				window.postMessage({message: 'user:login', user: {username: u.toLowerCase(), password: p}});
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
 		onSuccess: function(){
-			ActivityIndicator.hide();
+			forge.notification.hideLoading();
 			//Go back to the top most view
 			steroids.layers.popAll();
 			//Hide loading indicator

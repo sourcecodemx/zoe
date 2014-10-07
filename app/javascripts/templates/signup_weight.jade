@@ -1,0 +1,17 @@
+include ./button_submit_outline.jade
+
+.scroll-content
+	.page-content
+		p.padding.text-center
+			| Para generar tu consumo ideal,
+			br
+			| necesitamos conocer tu peso en kilos.
+
+		form.row
+			.col
+				.padding
+					.list#settings-weight
+						label.item.item-input
+							input#weight.text-center(type='tel', placeholder="00.00", autocomplete="off", autocapitalize="off")
+					
+					+submitButton('Listo')
