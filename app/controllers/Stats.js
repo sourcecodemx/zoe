@@ -39,25 +39,25 @@ define(function(require){
 
 			switch(this.model.get('type')){
 			case 'today':
-				this.computedStatus = 'Hoy he ganado el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'Hoy he logrado el ' + data.total + '% de mi hidratacion alacalina.';
 				this.computedLabel = require('http://localhost/javascripts/templates/stats_today.js')({data: data});
 				break;
 			case 'yesterday':
-				this.computedStatus = 'Ayer gane el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'Ayer logre el ' + data.total + '% de mi hidratacion alacalina.';
 				this.computedLabel = require('http://localhost/javascripts/templates/stats_yesterday.js')({data: data});
 				break;
 			case 'beforeyesterday':
-				this.computedStatus = 'Antier gane el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'Antier logre el ' + data.total + '% de mi hidratacion alacalina.';
 				this.computedLabel = require('http://localhost/javascripts/templates/stats_beforeyesterday.js')({data: data});
 				break;
 			case 'week':
 				data.total = data.total/7;
-				this.computedStatus = 'La semana pasada gane el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'La ultima semana logre el ' + data.total + '% de mi hidratacion alacalina.';
 				this.computedLabel = require('http://localhost/javascripts/templates/stats_week.js')({data: data});
 				break;
 			case 'month':
 				data.total = data.total/30;
-				this.computedStatus = 'El mes pasado gane el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'El ultimo mes logre el ' + data.total + '% de mi hidratacion alacalina.';
 				this.computedLabel = require('http://localhost/javascripts/templates/stats_month.js')({data: data});
 				break;
 			}
@@ -148,7 +148,7 @@ define(function(require){
 				this.currentStatus,
 				null,
 				null,
-				'http://zoewater.com.mx');
+				'http://zoewater.mx');
 		},
 		setLabel: function(label, status){
 			this.currentStatus = status;
