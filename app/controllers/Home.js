@@ -93,7 +93,7 @@ define(function(require){
 			this.updateJournal();
 		},
 		updateJournal: function(){
-			ActivityIndicator.show('Actualizando Consumo');
+			ActivityIndicator.show('Actualizando tu Consumo');
 			//Get Journal data
 			this.model.getJournal()
 				.then(this.onJournal.bind(this))
@@ -119,7 +119,7 @@ define(function(require){
 		},
 		onRightButton: function(){
 			if(!this.online){
-				this.onError(null, {message: 'Es necesario contar con una conexion a internet para poder usar el panel de configuracion.'});
+				this.onError(null, {message: 'Necesitas de una conexion a internet para poder usar el panel de configuracion.'});
 				return;
 			}
 			//Hide menu (if visible)
@@ -138,7 +138,7 @@ define(function(require){
 
 			if(!this.model.get('weight')){
 				navigator.notification.confirm(
-					'Necesitas definir tu peso para poder capturar consumo',
+					'Necesitas escribir tu peso para generar tu consumo',
 					this.onWeightConfirmation.bind(this),
 					'Hey!',
 					['Hacerlo', 'Despues']
@@ -194,10 +194,10 @@ define(function(require){
 			}
 			//Ask to share message
 			window.plugins.socialsharing.share(
-				'Mi meta del dia son ' + this.model.getGoal() + ' litros, hoy he completado el ' + this.consumption + '% de mi hidratacion diaria.',
+				'Mi meta del día son ' + this.model.getGoal() + ' litros, hoy he completado el ' + this.consumption + '% de mi hidratacion alcalina.',
 				null,
 				null,
-				'http://zoewater.com.mx');
+				'http://zoewater.mx');
 		},
 		playAudio: function(url) {
 			// Play the audio file at url
@@ -408,7 +408,7 @@ define(function(require){
 			try{
 				var value = $(e.currentTarget).attr('data-value');
 
-				ActivityIndicator.show('Guardando Consumo');
+				ActivityIndicator.show('Guardando tu Consumo');
 				window.postMessage({message: 'user:consumption:save', type: value});
 			}catch(e){
 				this.onError(null, e);
