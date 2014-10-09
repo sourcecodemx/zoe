@@ -16,6 +16,10 @@
 
 #blog-entry-page {
 	-webkit-user-select: all;
+
+	.page-content {
+		background: $stable;
+	}
 	
 	#hero {
 		border-bottom: 4px solid $energized;

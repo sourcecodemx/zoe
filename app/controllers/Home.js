@@ -1,4 +1,4 @@
-/* globals define, _, Parse, forge, Backbone, topBarTint, buttonTint, User  */
+/* globals define, _, forge, Backbone, topBarTint, buttonTint, User, aspect  */
 define(function(require){
 	'use strict';
 
@@ -10,6 +10,8 @@ define(function(require){
 	var HTMLModal  = require('HTMLModal');
 	var template = require('templates/home');
 	var Journal = require('models/Journal');
+	var Stats = require('Stats');
+	var Settings = require('Settings');
 	
 	var Index = Controller.extend({
 		id: 'home-page',
@@ -31,16 +33,17 @@ define(function(require){
 		initialize: function(){
 			//Initialize main class
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
-			//Set user
-			this.model = Parse.User.current();
-			//Listen for model changes
-			this.listenTo(this.model, 'change:weight', this.onWeightChange, this);
-			this.listenTo(this.model, 'change:username', this.onUsernameChange, this);
-			this.listenTo(this.model, 'change:lastConsumption', this.onConsumptionChange, this);
 
-			//Create stats view
-			//this.views.stats = new steroids.views.WebView({location: 'http://localhost/views/Stats/index.html', id: 'statsIndexView'});
-			//this.views.stats.preload();
+			this.model = User.current();
+
+			console.log(this.model, User.current());
+
+			//Listen for model changes
+			if(this.model){
+				this.listenTo(this.model, 'change:weight', this.onWeightChange, this);
+				this.listenTo(this.model, 'change:username', this.onUsernameChange, this);
+				this.listenTo(this.model, 'change:lastConsumption', this.onConsumptionChange, this);
+			}
 
 			//get goal
 			this.data.goal =  this.model.getGoal() + ' litros';
@@ -54,6 +57,8 @@ define(function(require){
 
 			//Setup drink and midnight watchers
 			this._setupWatchers();
+
+			aspect.add(this, ['bounceInLeft', 'bounceInRight'], this.onShow.bind(this), 'after');
 
 			return this.render();
 		},
@@ -83,6 +88,7 @@ define(function(require){
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
 
+			this.dom.content = this.$el.find('.page-content');
 			this.dom.username = this.$el.find('#username');
 			this.dom.percentage = this.$el.find('#percentage');
 			this.dom.goal = this.$el.find('#goal');
@@ -102,6 +108,26 @@ define(function(require){
 		onShow: function(){
 			Controller.prototype.onShow.call(this);
 			//Configure home buttons and title
+			this.setupButtons();
+		},
+		onRightButton: function(){
+			if(!this.online){
+				this.onError(null, {message: 'Es necesario contar con una conexion a internet para poder usar el panel de configuracion.'});
+				return;
+			}
+
+			this.hideMenu();
+			this.bounceOutLeft();
+
+			if(this.views.settings){
+				this.views.settings.show();
+			}else{
+				this.views.settings = new Settings().show();
+			}
+
+			this.listenToOnce(this.views.settings, 'hide', this.bounceInLeft.bind(this));
+		},
+		setupButtons: function(){
 			forge.topbar.setTitleImage('images/logo@2x.png');
 			forge.topbar.addButton({
 				icon: 'images/settings@2x.png',
@@ -109,19 +135,6 @@ define(function(require){
 				prerendered: true
 			}, this.onRightButton.bind(this));
 			forge.topbar.show();
-		},
-		onRightButton: function(){
-			if(!this.online){
-				this.onError(null, {message: 'Es necesario contar con una conexion a internet para poder usar el panel de configuracion.'});
-				return;
-			}
-			//Hide menu (if visible)
-			if(this.dom.menu && this.dom.menu.position().top === 0){
-				this.toggleMenu();
-			}
-			//Use DOM defined attributes
-
-			this.dom.settings.trigger('click');
 		},
 		track: function(){
 			if(!this.online){
@@ -204,14 +217,16 @@ define(function(require){
 			this.model.getStats()
 				.then(function(computed){
 					forge.notification.hideLoading();
-					
-					//window.postMessage({message: 'stats:fetch:success', stats: computed, goal: this.model.getGoal()});
-					//TODO
-					/*
-					steroids.modal.show({
-						view: this.views.stats,
-						navigationBar: true
-					});*/
+					//Create and show stats modal
+					if(this.views.stats){
+						this.views.stats.update(computed).show();
+					}else{
+						this.views.stats = new Stats({
+							days: computed
+						}).show();
+					}
+					//Reconfigure navigation bar
+					this.listenToOnce(this.views.stats, 'hide', this.onShow.bind(this));
 				}.bind(this))
 				.fail(function(error){
 					forge.notification.hideLoading();
@@ -234,6 +249,7 @@ define(function(require){
 		},
 		onWeightChange: function(){
 			this.dom.goal.text(this.model.getGoal());
+			this.updateJournal();
 		},
 		onConsumptionChange: function(model, lastConsumption){
 			var consumption = lastConsumption.get('consumption')/1000;
@@ -331,7 +347,7 @@ define(function(require){
 				this.midnightWatcher = setTimeout(function(){
 					this.playAudio('audio/confirmation.wav');
 					forge.notification.alert('Hey!', 'El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.');
-					Backbone.trigger('home:reload');
+					Backbone.history.navigate('#', {trigger: true});
 				}.bind(this), tillMidnight);
 			}
 		},
@@ -431,7 +447,7 @@ define(function(require){
 			this.dom.deleteLast = this.$el.find('#deleteLast');
 		},
 		onShow: function(){
-			var user = Parse.User.current();
+			var user = User.current();
 			var lastConsumption = user.get('lastConsumption');
 
 			if(lastConsumption && lastConsumption.id){
@@ -449,9 +465,7 @@ define(function(require){
 		},
 		onError: function(model, error){
 			forge.notification.hideLoading();
-			setTimeout(function(){
-				forge.notification.alert('Ups!', this.message);
-			}.bind(error), 1);
+			Controller.prototype.onError.call(this, null, error);
 		}
 	});
 

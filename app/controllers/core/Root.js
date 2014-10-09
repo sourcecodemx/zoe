@@ -23,16 +23,14 @@ define(function(require){
 		onShow: function(){
 			Controller.prototype.onShow.call(this);
 
-			if(forge.is.mobile()){
-				forge.topbar.setTint(topBarTint);
-				forge.topbar.setTitle(this.title);
-				forge.topbar.removeButtons();
-				forge.topbar.addButton({
-					icon: 'images/menu@2x.png',
-					position: 'left',
-					prerendered: true
-				}, this.toggleMenu.bind(this));
-			}
+			forge.topbar.setTint(topBarTint);
+			forge.topbar.setTitle(this.title);
+			forge.topbar.removeButtons();
+			forge.topbar.addButton({
+				icon: 'images/menu@2x.png',
+				position: 'left',
+				prerendered: true
+			}, this.toggleMenu.bind(this));
 		},
 		onHide: function(){
 			this.hideMenu();
@@ -49,14 +47,11 @@ define(function(require){
 
 				var $target = $(e.currentTarget);
 				var page = $target.attr('data-view');
-
+				
 				Backbone.history.navigate(page, {trigger: true});
 			}catch(e){
 				console.log(e, e.stack);
 			}
-		},
-		home: function(){
-			//steroids.layers.replace({view: this.views.home});
 		},
 		toggleMenu: function(){
 			var $el = this.dom.menu;

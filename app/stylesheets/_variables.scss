@@ -42,11 +42,8 @@ $card-border-radius:              4px !default;
 //Font
 $font-family-sans-serif:          robotolight, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif !default;
 
-//ionicons variables
-$ionicons-font-path: 'stylesheets/ionic/fonts' !default;
-
 //App variables
 $border-calm: 1px solid transparentize(white, 0.97);
 
 //Ionicons
-$ionicons-font-path: 'fonts' !default;
+$ionicons-font-path: 'ionic/fonts' !default;

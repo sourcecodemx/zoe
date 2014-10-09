@@ -1,57 +1,47 @@
-/* globals define, steroids, Zoe, _,  forge  */
+/* globals define, _, forge, User, Zoe, Backbone, aspect */
 define(function(require){
 	'use strict';
 
-	var Signup     = require('Auth');
-	var Controller = require('Controller');
+	var Controller  = require('Controller');
+	var TOS = require('TOS');
 
 	/**
-	* Signup2 Controller
+	* Login Controller
 	* 
-	* Takes care of capturing password and password confirmation
-	* tries to create a Parse user, if everything goes smooth
-	* takes the user to the weight setup screen
+	* Takes care of authenticating users with a Parse account
 	*/
-	return Signup.extend({
+	return Controller.extend({
 		id: 'signup-password-page',
 		template: require('templates/signup_password'),
-		backButton: true,
 		title: '2. Crear cuenta',
+		events: (function () {
+			var events = _.extend({}, Controller.prototype.events, {
+				'tap #authTos': 'tos'
+			});
+
+			return events;
+		})(),
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-			//Create weight view
-			this.weightView = new steroids.views.WebView({location: 'http://localhost/views/Auth/weight.html',id: 'signupWeightView'});
-			this.tosView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/tos.html', id: 'tos'});
-			//Preload view (TOS is preloaded by default)
-			this.weightView.preload();
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
-			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: ''
-			});
+			aspect.add(this, ['bounceInLeft', 'bounceInRight'], this.setupButtons.bind(this), 'after');
 
-			steroids.view.navigationBar.update({
-				title: this.title,
-				backButton: this.backButton
-			});
-
-			this.messageListener();
-
-			this.render();
+			return this.render();
 		},
 		onRender: function(){
 			this.dom = {
 				password: this.$el.find('#password'),
 				passwordConfirmation: this.$el.find('#passwordConfirmation'),
-				form: this.$el.find('form')
+				form: this.$el.find('form'),
+				content: this.$el.find('.page-content')
 			};
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'signupPasswordView')){
-				steroids.view.navigationBar.update({
-					title: this.title,
-					backButton: this.backButton
-				});
-			}
+		onShow: function(){
+			this.bounceInRight();
+		},
+		hide: function(){
+			this.bounceOutRight();
+			this.trigger('hide');
 		},
 		submit: function(e){
 			try{
@@ -74,8 +64,15 @@ define(function(require){
 					//Add password to the object
 					prefilledData.password = password;
 
-					//Atempt saving the user
-					window.postMessage({message: 'user:signup', user: prefilledData});
+					var user = new User();
+					user.set('username', prefilledData.username);
+					user.set('email', prefilledData.email);
+					user.set('password', prefilledData.password);
+
+					user.signUp(null, {
+						success: this.onSuccess.bind(this),
+						error: this.onError.bind(this)
+					});
 				}else{
 					if(_.isEmpty(prefilledData)){
 
@@ -92,35 +89,34 @@ define(function(require){
 					}
 				}
 			}catch(e){
-				this.onError(null, e);
-			}finally{
-
+				Controller.prototype.onError.call(this, null, e);
 			}
+		},
+		setupButtons: function(){
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				position: 'left',
+				icon: 'images/back@2x.png',
+				prerendered: true
+			}, this.hide.bind(this));
+		},
+		tos: function(){
+			if(this.views.tos){
+				this.views.tos.show();
+			}else{
+				this.views.tos = new TOS().show();
+			}
+
+			this.listenToOnce(this.views.tos, 'hide', this.setupButtons.bind(this));
 		},
 		onSuccess: function(){
-			//Remove prefilled data
-			Zoe.storage.removeItem('signup_prefill');
-
+			forge.notification.hideLoading();
+			//Reset form
 			this.reset();
-
-			setTimeout(function(){
-				//Push weight view
-				steroids.layers.push({
-					view: this.weightView
-				});
-				//Hide loading indicator
-				forge.notification.hideLoading();
-			}.bind(this), 1);
-		},
-		onMessage: function(event){
-			switch(event.data.message){
-			case 'user:signup:success':
-				this.onSuccess();
-				break;
-			case 'user:signup:error':
-				this.onError(null, event.data.error);
-				break;
-			}
+			this.bounceOutRight();
+			Zoe.storage.removeItem('signup_prefill');
+			Backbone.history.navigate('#home/bounceInLeft', {trigger: true});
 		}
 	});
 });

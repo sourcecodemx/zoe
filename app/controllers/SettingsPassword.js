@@ -1,4 +1,4 @@
-/* globals define, steroids, forge  */
+/* globals define, User, forge  */
 define(function(require){
 	'use strict';
 
@@ -7,39 +7,35 @@ define(function(require){
 	return Controller.extend({
 		id: 'settings-password-page',
 		template: require('templates/settings_password'),
-		events: {
-			'click .back-button': 'back'
-		},
 		title: 'Cambiar Contraseña',
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-
-			window.addEventListener('message', this.onMessage.bind(this));
-
-			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: ''
-			});
-
-			steroids.view.navigationBar.update({
-				title: this.title,
-				backButton: this.backButton
-			});
-
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
+			
 			this.render();
-		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'settingsPasswordView')){
-				steroids.view.navigationBar.update({
-					title: this.title,
-					backButton: this.backButton
-				});
-			}
 		},
 		onRender: function(){
 			this.dom = {
 				password: this.$el.find('#password'),
-				passwordConfirmation: this.$el.find('#passwordConfirmation')
+				passwordConfirmation: this.$el.find('#passwordConfirmation'),
+				content: this.$el.find('.page-content')
 			};
+		},
+		onShow: function(){
+			this.setupButtons();
+			this.bounceInRight();
+		},
+		hide: function(){
+			this.bounceOutRight();
+			this.trigger('hide');
+		},
+		setupButtons: function(){
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				position: 'left',
+				icon: 'images/back@2x.png',
+				prerendered: true
+			}, this.hide.bind(this));
 		},
 		submit: function(e){
 			try{
@@ -62,7 +58,10 @@ define(function(require){
 				}
 
 				forge.notification.showLoading('Guardando');
-				window.postMessage({message: 'user:password:save', password: password});
+				User.current()
+					.save('password', password)
+					.then(this.onSuccess.bind(this))
+					.fail(this.onError.bind(this));
 			}catch(e){
 				this.onError(null, e);
 			}
@@ -71,15 +70,6 @@ define(function(require){
 			forge.notification.hideLoading();
 			forge.notification.showLoading('Tu contraseña ha sido actualizada.');
 			setTimeout(forge.notification.hideLoading.bind(window), 2000);
-		},
-		onMessage: function(event){
-			switch(event.data.message){
-			case 'user:password:success':
-				this.onSuccess();
-				break;
-			case 'user:password:error':
-				this.onError(null, event.data.error);
-			}
 		}
 	});
 });

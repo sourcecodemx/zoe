@@ -89,7 +89,7 @@ require.config({
 			deps: ['parse']
 		},
 		Router: {
-			deps: ['backbone', 'parse']
+			deps: ['backbone', 'parse', 'config']
 		}
 	}
 });

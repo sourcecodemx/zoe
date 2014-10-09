@@ -1,4 +1,4 @@
-/* globals define, steroids, forge  */
+/* globals define, forge  */
 define(function(require){
 	'use strict';
 
@@ -9,18 +9,8 @@ define(function(require){
 		template: require('templates/signup_weight'),
 		title: 'Configuracion',
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
-			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: ''
-			});
-			steroids.view.navigationBar.update({
-				title: this.title,
-				backButton: null,
-				overrideBackButton: true
-			});
-
-			this.messageListener();
 			this.render();
 		},
 		onRender: function(){
@@ -28,14 +18,6 @@ define(function(require){
 				weight: this.$el.find('#weight'),
 				form: this.$el.find('form')
 			};
-		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'signupWeightView')){
-				steroids.view.navigationBar.update({
-					title: this.title,
-					backButton: this.backButton
-				});
-			}
 		},
 		submit: function(e){
 			try{
@@ -57,7 +39,7 @@ define(function(require){
 				}
 
 				forge.notification.showLoading('Guardando');
-				window.postMessage({message: 'user:weight:save', weight: w});
+				//window.postMessage({message: 'user:weight:save', weight: w});
 			}catch(e){
 				this.onError(null, e);
 			}
@@ -66,17 +48,6 @@ define(function(require){
 			this.reset();
 
 			forge.notification.hideLoading();
-
-			steroids.layers.popAll();
-		},
-		onMessage: function(event){
-			switch(event.data.message){
-			case 'user:weight:success':
-				this.back();
-				break;
-			case 'user:weight:error':
-				this.onError(null, event.data.error);
-			}
 		}
 	});
 });

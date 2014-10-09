@@ -1,12 +1,10 @@
-/* globals define, steroids, _, forge  */
+/* globals define, _, forge, User, Backbone */
 define(function(require){
 	'use strict';
 
-	var Controller      = require('Controller');
-
-	//Require crypto library
-	require('sha3');
-
+	var Controller  = require('Controller');
+	var Forgot      = require('AuthForgot');
+	
 	/**
 	* Login Controller
 	* 
@@ -16,14 +14,15 @@ define(function(require){
 		id: 'login-page',
 		template: require('templates/login'),
 		title: 'Ingresa a tu cuenta',
-		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-
-			this.messageListener();
-			
-			steroids.view.navigationBar.update({
-				title: this.title
+		events: (function () {
+			var events = _.extend({}, Controller.prototype.events, {
+				'tap #forgot': 'forgot'
 			});
+
+			return events;
+		})(),
+		initialize: function(){
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
 			return this.render();
 		},
@@ -31,15 +30,17 @@ define(function(require){
 			this.dom = {
 				username: this.$el.find('#username'),
 				password: this.$el.find('#password'),
-				form: this.$el.find('form')
+				form: this.$el.find('form'),
+				content: this.$el.find('.page-content')
 			};
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'authLoginView')){
-				steroids.view.navigationBar.update({
-					title: this.title
-				});
-			}
+		onShow: function(){
+			this.bounceInRight();
+			this.setupButtons();
+		},
+		hide: function(){
+			this.bounceOutRight();
+			this.trigger('hide');
 		},
 		submit: function(e){
 			try{
@@ -60,27 +61,41 @@ define(function(require){
 				}
 
 				forge.notification.showLoading('Autenticando');
-				window.postMessage({message: 'user:login', user: {username: u.toLowerCase(), password: p}});
+				User.logIn(u.toLowerCase(), p)
+					.then(this.onSuccess.bind(this))
+					.fail(this.onError.bind(this));
 			}catch(e){
 				this.onError(null, e);
 			}
 		},
+		onError: function(error){
+			Controller.prototype.onError.call(this, null, error);
+		},
 		onSuccess: function(){
 			forge.notification.hideLoading();
-			//Go back to the top most view
-			steroids.layers.popAll();
-			//Hide loading indicator
 			//Reset form
 			this.reset();
+			this.bounceOutRight();
+			Backbone.history.navigate('#home/bounceInLeft', {trigger: true});
 		},
-		onMessage: function(event){
-			switch(event.data.message){
-			case 'user:login:success':
-				this.onSuccess();
-				break;
-			case 'user:login:error':
-				this.onError(null, event.data.error);
+		setupButtons: function(){
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				position: 'left',
+				icon: 'images/back@2x.png',
+				prerendered: true
+			}, this.hide.bind(this));
+			forge.topbar.show();
+		},
+		forgot: function(){
+			if(this.views.forgot){
+				this.views.forgot.show();
+			}else{
+				this.views.forgot = new Forgot().show();
 			}
+
+			this.listenToOnce(this.views.forgot, 'hide', this.setupButtons.bind(this));
 		}
 	});
 });

@@ -1,52 +1,42 @@
-/* globals define, steroids, _, forge */
+/* globals define, _, forge, Parse, User */
 define(function(require){
 	'use strict';
 
-	var Controller      = require('Controller');
+	var Controller = require('Controller');
 
-	/**
-	* Signup Controller
-	* 
-	* Takes care of capturing the username and email
-	* saves data to localstorage and move the user to the next
-	* screen if eveything is in place
-	*/
 	return Controller.extend({
 		id: 'auth-forgot-password-page',
 		template: require('templates/auth_forgot_password'),
-		events: {
-			'submit form': 'submit'
-		},
 		title: 'Recuperar Contraseña',
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-
-			window.addEventListener('message', this.onMessage.bind(this));
-
-			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: ''
-			});
-
-			steroids.view.navigationBar.update({
-				title: this.title,
-				backButton: this.backButton
-			});
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
 			return this.render();
 		},
-		onRender: function(){
-			this.dom = {
-				email: this.$el.find('#email'),
-				form: this.$el.find('form')
-			};
+		update: function(days){
+			this.collection.reset(days);
+
+			return this;
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'authForgotView')){
-				steroids.view.navigationBar.update({
-					title: this.title,
-					backButton: this.backButton
-				});
-			}
+		hide: function(){
+			this.bounceOutDown();
+			this.trigger('hide');
+			_.delay(this._detach.bind(this), 1000);
+		},
+		onRender: function(){
+			this.dom.content = this.$el.find('.page-content');
+			this.dom.email = this.$el.find('#forgotEmail');
+		},
+		onShow: function(){
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				icon: 'images/close@2x.png',
+				position: 'left',
+				prerendered: true
+			}, this.hide.bind(this));
+
+			this.bounceInUp();
 		},
 		submit: function(e){
 			try{
@@ -62,11 +52,40 @@ define(function(require){
 				var email = this.dom.email.val();
 
 				if(_.isEmpty(email)){
-					throw new Error('Por favor ingresa tus correo electronico.');
+					throw new Error('Por favor ingresa tu correo electronico.');
 				}
 
 				forge.notification.showLoading('Enviando');
-				window.postMessage({message: 'user:forgot:request', email: email});
+
+				//Send forgot password email
+				var forgotModel = Parse.Object.extend({className: '_User'});
+				var forgotQuery = new Parse.Query(forgotModel);
+
+				//Check if user is not a FB user
+				forgotQuery.equalTo('email', email);
+				forgotQuery.first({
+					success: function(user){
+						if(user && user.get('facebook')){
+							this.onError(null, {message: 'Ese correo esta registrado como usuario de Facebook, puedes iniciar sesion automaticamente desde la pantalla de inicio usando el boton de Facebook.'});
+						}else{
+							User.requestPasswordReset(email, {
+								success: this.onSuccess.bind(this),
+								error: function(error) {
+									switch(error.code){
+									case 205:
+										error.message = 'No existe usuario para el correo ' + email;
+										break;
+									}
+
+									this.onError(null, error);
+								}.bind(this)
+							});
+						}
+					}.bind(this),
+					error: function(e){
+						this.onError(null, e);
+					}.bind(this)
+				});
 			}catch(e){
 				Controller.prototype.onError.call(this, null, e);
 			}
@@ -74,17 +93,6 @@ define(function(require){
 		onSuccess: function(){
 			forge.notification.hideLoading();
 			forge.notification.alert('Listo!', 'Se ha enviado un mensaje de recuperacion de contraseña a la direccion de correo especificada.');
-		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'user:forgot:success':
-				this.onSuccess();
-				break;
-			case 'user:forgot:error':
-				this.onError(null, data.error);
-				break;
-			}
 		}
 	});
 });

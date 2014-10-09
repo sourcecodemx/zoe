@@ -1,44 +1,43 @@
-/* globals define, steroids, Zoe, forge */
+/* globals define, User, forge  */
 define(function(require){
 	'use strict';
 
 	var Controller = require('Controller');
-	var AuthWeight = require('AuthWeight');
-	var config = require('config');
 
-	return AuthWeight.extend({
+	return Controller.extend({
 		id: 'settings-weight-page',
 		template: require('templates/settings_weight'),
 		title: 'Cambiar Peso',
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-			
-			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: ''
-			});
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
-			steroids.view.navigationBar.update({
-				title: this.title,
-				backButton: this.backButton
-			});
-
-			this.messageListener();
-
-			//Get weight
-			var user = Zoe.storage.getItem('Parse/' + config.PARSE.ID + '/currentUser');
-			if(user){
-				this.data.weight = user.weight || 0;
-			}
+			//Get username
+			this.data.weight = User.current().get('weight') || 0;
 
 			this.render();
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'settingsWeightView')){
-				steroids.view.navigationBar.update({
-					title: this.title,
-					backButton: this.backButton
-				});
-			}
+		onRender: function(){
+			this.dom = {
+				weight: this.$el.find('#weight'),
+				content: this.$el.find('.page-content')
+			};
+		},
+		onShow: function(){
+			this.setupButtons();
+			this.bounceInRight();
+		},
+		hide: function(){
+			this.bounceOutRight();
+			this.trigger('hide');
+		},
+		setupButtons: function(){
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				position: 'left',
+				icon: 'images/back@2x.png',
+				prerendered: true
+			}, this.hide.bind(this));
 		},
 		submit: function(e){
 			try{
@@ -62,7 +61,11 @@ define(function(require){
 				}
 
 				forge.notification.showLoading('Guardando');
-				window.postMessage({message: 'user:weight:save', weight: weight});
+
+				User.current()
+					.save('weight', weight)
+					.then(this.onSuccess.bind(this))
+					.fail(this.onError.bind(this));
 			}catch(e){
 				this.onError(null, e);
 			}
@@ -71,15 +74,6 @@ define(function(require){
 			forge.notification.hideLoading();
 			forge.notification.showLoading('Tu peso ha sido actualizado.');
 			setTimeout(forge.notification.hideLoading.bind(window), 2000);
-		},
-		onMessage: function(event){
-			switch(event.data.message){
-			case 'user:weight:success':
-				this.onSuccess();
-				break;
-			case 'user:weight:error':
-				this.onError(null, event.data.error);
-			}
 		}
 	});
 });

@@ -1,4 +1,4 @@
-/* globals define, _ */
+/* globals define */
 define(function(require){
 	'use strict';
 
@@ -8,15 +8,8 @@ define(function(require){
 		id: 'store-page',
 		template: require('templates/store'),
 		title: 'Tienda',
-		events: (function () {
-			var events = _.extend({}, Controller.prototype.events, {
-
-			});
-
-			return events;
-		})(),
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
 			return this.render();
 		}

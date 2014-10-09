@@ -14,6 +14,7 @@
 @import 'views/premier';
 @import 'views/pos';
 @import 'views/store';
+@import 'views/tos';
 
 html,
 body,
@@ -34,6 +35,7 @@ body {
 	}
 	
 	.page-content {
+		background-color: $stable;
 		position: absolute;
 		top:0;
 		left:0;
@@ -76,10 +78,14 @@ body {
 #login-page,
 #signup-page,
 #weight-config-page,
-#signup-password-page {
-	background-image: url(../images/background-1.png);
-	background-repeat: no-repeat;
-	background-size: cover;
+#signup-password-page,
+#auth-forgot-password-page {
+	.page-content {
+		background-image: url(../images/background-1.png);
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-attachment: fixed;
+	}
 }
 
 #headerBrand {

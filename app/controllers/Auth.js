@@ -1,9 +1,11 @@
-/* globals define, CryptoJS, _, Parse, alert, forge, User */
+/* globals define, CryptoJS, _, Parse, forge, User, aspect */
 define(function(require) {
     'use strict';
 
     var Controller = require('Controller');
     var config = require('config');
+    var Signup = require('AuthSignup');
+    var Login = require('AuthLogin');
 
     //Require crypto library
     require('sha3');
@@ -18,20 +20,31 @@ define(function(require) {
      */
     return Controller.extend({
         id: 'index-page',
-        template: require('http://localhost/javascripts/templates/index.js'),
+        template: require('templates/index'),
         hideFx: 'fadeOut',
         showFb: 'fadeIn',
         events: (function() {
             var events = _.extend({}, Controller.prototype.events, {
-                'tap #facebook': 'facebook'
+                'tap #facebook': 'facebook',
+                'tap #authLogin': 'login',
+                'tap #authSignup': 'signup'
             });
 
             return events;
         })(),
+        initialize: function(){
+            Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
+
+            aspect.add(this, ['bounceInLeft', 'bounceInRight'], forge.topbar.hide, 'after');
+
+            return this.render();
+        },
         onRender: function() {
             this.dom.weight = this.$el.find('#weight');
+            this.dom.content = this.$el.find('.page-content');
         },
         onMe: function(response) {
+            console.log(response, 'on me');
             var data = {
                 email: response.email,
                 username: response.email.toLowerCase(),
@@ -80,11 +93,9 @@ define(function(require) {
             }
         },
         onFBError: function(response) {
+            console.log('on error', response);
             forge.notification.hideLoading();
-
-            setTimeout(function() {
-                navigator.notification.alert('No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.', $.noop, 'Ups!');
-            }, 1);
+            this.onError(null, {message: 'No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.'});
         },
         onError: function() {
             forge.notification.hideLoading();
@@ -96,21 +107,47 @@ define(function(require) {
                 return;
             }
 
-            var me = function() {
-                forge.notification.showLoading('Autenticando');
-                forge.facebook.api(
-                    '/me',
-                    config.FB.DEFAULT_PERMISSION,
-                    this.onMe.bind(this),
-                    this.onFBError.bind(this)
-                );
+            var me = function(response) {
+                try{
+                   console.log(response, 'me');
+                    forge.notification.showLoading('Autenticando');
+                    forge.facebook.api(
+                        '/me',
+                        config.FB.DEFAULT_PERMISSION,
+                        this.onMe.bind(this),
+                        this.onFBError.bind(this)
+                    ); 
+                }catch(e){
+                    console.log(e, e.message, e.stack);
+                }
+                
             }.bind(this);
 
-            var authorize = function(){
-            	forge.facebook.authorize(config.FB.DEFAULT_PERMISSION, 'all', me, this.onFBError.bind(this));
-            }.bind(this);
+            forge.facebook.authorize(config.FB.DEFAULT_PERMISSION, 'friends', me, this.onFBError.bind(this));
+        },
+        login: function(){
+            console.log('login');
+            this.bounceOutLeft();
 
-            if(forge.facebook.hasAuthorized(config.FB.DEFAULT_PERMISSION, 'all', me, authorize))
+            if(this.views.login){
+                this.views.login.show();
+            }else{
+                this.views.login = new Login().show();
+            }
+
+            this.listenToOnce(this.views.login, 'hide', this.bounceInLeft.bind(this));
+        },
+        signup: function(){
+            console.log('signup');
+            this.bounceOutLeft();
+
+            if(this.views.signup){
+                this.views.signup.show();
+            }else{
+                this.views.signup = new Signup().show();
+            }
+
+            this.listenToOnce(this.views.signup, 'hide', this.bounceInLeft.bind(this));
         }
     });
 });

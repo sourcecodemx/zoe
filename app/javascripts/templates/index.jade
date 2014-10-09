@@ -10,8 +10,8 @@ include ./offline.jade
 
 			.padding-large
 				button.button.button-block.button-positive#facebook(type='button') Registro con Facebook
-				button.button.button-block.button-stable(type='button', data-view='Auth/new', child) Registro con Mail
-				button.button.button-block.button-stable(type='button', data-view='Auth/login', child) Ya tengo cuenta
+				button.button.button-block.button-stable#authSignup(type='button', data-view='Auth/new', child) Registro con Mail
+				button.button.button-block.button-stable#authLogin(type='button', data-view='Auth/login', child) Ya tengo cuenta
 
 .hide
 	button#weight(type='button', data-view='Settings/weight', child)

@@ -9,21 +9,17 @@
   <link rel="stylesheet" href="stylesheets/offline/offline-language-spanish-indicator.css" />
   <link rel="stylesheet" href="stylesheets/offline/offline-theme-dark.css" />
   <link rel="stylesheet" href="stylesheets/font-face.css" />
+  <link rel='stylesheet' href="components/animate.css/animate.min.css" />
   
-  <script src="javascripts/onerror.js"></script>
-  <script src="javascripts/console.log.js"></script>
-
   <script src="javascripts/zoe.js"></script>
   <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA3NJBfy8jSTRtqab54gmzqiCaWzsB6Le4&libraries=geometry"></script>
   <script>
     window.topBarTint = [29,48,69,255];
     window.buttonTint = [255,255,255,255];
 
-    if(forge.is.mobile()){
-      forge.topbar.setTint(topBarTint);
-      forge.topbar.hide();
-      forge.topbar.setStatusBarStyle('light_content');
-    }
+    forge.topbar.setTint(topBarTint);
+    forge.topbar.hide();
+    forge.topbar.setStatusBarStyle('light_content');
   </script>
 </head>
 <body>

@@ -6,6 +6,7 @@ define(function(require){
 	var Detachable  = require('Detachable');
 	var Blog        = require('collections/Blog');
 	var config      = require('config');
+	var BlogEntry   = require('BlogEntry');
 
 	var Index = Controller.extend({
 		id: 'blog-page',
@@ -25,6 +26,7 @@ define(function(require){
 
 			this.collection = new Blog();
 			this.entries = {};
+			this.views.blog = new BlogEntry();
 
 			this.listenTo(this.collection, 'reset', this.addAll.bind(this));
 
@@ -35,7 +37,8 @@ define(function(require){
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
 
-			this.dom.content = this.$el.find('#entries');
+			this.dom.entries = this.$el.find('#entries');
+			this.dom.content = this.$el.find('.page-content');
 			this.dom.entryButton = this.$el.find('#entry');
 			this.dom.indicator = this.$el.find('.ion-infinite-scroll');
 
@@ -63,11 +66,11 @@ define(function(require){
 					//Once we get to the end of the blog, display the no-more-entries legend
 					if(this.collection.length < config.BLOG.LIMIT){
 						this.$el.addClass('end-reached');
-						this.dom.content.after('<div id="end" class="padding-large text-center">No hay mas entradas.</div>');
+						this.dom.entries.after('<div id="end" class="padding-large text-center">No hay mas entradas.</div>');
 					}
 				}.bind(this),
 				error: function(collection, error){
-					if(this.dom.content.find('.entry').length){
+					if(this.dom.entries.find('.entry').length){
 						this.onError(null, error);
 					}else{
 						this.onContentError(error);
@@ -88,8 +91,8 @@ define(function(require){
 			}
 		},
 		addAll: function(){
-			if(!this.dom.content.find('.entry').length){
-				this.dom.content.empty();
+			if(!this.dom.entries.find('.entry').length){
+				this.dom.entries.empty();
 			}
 
 			if(this.collection.length){
@@ -115,16 +118,32 @@ define(function(require){
 		addOne: function(model){
 			var view = new Entry({
 				model: model,
-				appendTo: this.dom.content
+				appendTo: this.dom.entries
 			});
 
 			this.entries[view.cid] = view;
 
 			return this;
 		},
-		onEntry: function(/*data*/){
-			//window.postMessage({message: 'blog:entry:show', entry: data});
-			//this.dom.entryButton.trigger('click');
+		bounceIn: function(){
+			Controller.prototype.onShow.call(this);
+			this.dom.content.removeClass('bounceOutLeft').addClass('bounceInLeft');
+			this.setupButtons();
+
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInLeft animated');
+			}.bind(this), 1000);
+
+			return this;
+		},
+		hide: function(){
+			Controller.prototype.hide.call(this);
+		},
+		onEntry: function(data){
+			this.dom.content.addClass('bounceOutLeft animated');
+			this.hideMenu();
+			this.views.blog.update(data).show();
+			this.listenToOnce(this.views.blog, 'hide', this.bounceIn.bind(this));
 		},
 		onTouchEnd: function(){
 			if(this.$el.hasClass('scrolling')){
@@ -135,6 +154,9 @@ define(function(require){
 		onShow: function(){
 			Controller.prototype.onShow.call(this);
 
+			this.setupButtons();
+		},
+		setupButtons: function(){
 			forge.topbar.addButton({
 				icon: 'images/reload@2x.png',
 				position: 'right',
@@ -149,7 +171,7 @@ define(function(require){
 		className: 'card list entry',
 		template: require('templates/blog_entry_item'),
 		events: {
-			'click': 'entry'
+			'tap': 'entry'
 		},
 		initialize: function(){
 			Detachable.prototype.initialize.apply(this, arguments);
@@ -159,6 +181,8 @@ define(function(require){
 		render: function(){
 			this.$el.html(this.template({data: this.model.toJSON()}));
 
+			this.$el.hammer();
+			
 			return this;
 		},
 		entry: function(){

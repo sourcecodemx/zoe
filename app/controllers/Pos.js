@@ -27,7 +27,7 @@ define(function(require){
 		markers: [],
 		loading: false,
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
 			this.collection = new Places();
 

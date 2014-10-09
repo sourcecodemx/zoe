@@ -37,6 +37,7 @@ define(['underscore', 'jquery', 'backbone', 'aspect'], function(_, $, Backbone, 
 		hide: function(){
 			try{
 				this.$el[this.hideFx](this._detach.bind(this));
+				this.trigger('hide');
 			}catch(e){
 				console.log('An error occurred while hiding the view', e, e.message, e.stack);
 			}
@@ -50,6 +51,7 @@ define(['underscore', 'jquery', 'backbone', 'aspect'], function(_, $, Backbone, 
 					this._append();
 				}
 				this.$el[this.showFx]();
+				this.trigger('show');
 			}catch(e){
 				console.log('An error occurred while showing the view', e, e.message, e.stack);
 			}

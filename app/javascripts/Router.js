@@ -11,17 +11,19 @@ define([
   var AppRouter = Backbone.Router.extend({
     currentView: null,
     routes: {
-      'home' : 'home',
-      'index': 'index',
-      'about': 'about',
-      'blog': 'blog',
-      'gallery': 'gallery',
-      'premier': 'premier',
-      'pos': 'pos',
-      'store': 'store',
+      'home'     : 'home',
+      'home/:b'  : 'home',  
+      'index'    : 'index',
+      'index/:b' : 'index',
+      'about'    : 'about',
+      'blog'     : 'blog',
+      'gallery'  : 'gallery',
+      'premier'  : 'premier',
+      'pos'      : 'pos',
+      'store'    : 'store',
 
       //Default Route
-      '*path': 'home'
+      '*path'    : 'index'
     },
 
     /**
@@ -65,15 +67,15 @@ define([
       // but a modal
       var pages = _
         .chain(routes)
-        .omit(function(v){return v === 'profile';})
+        //.omit(function(v){return v === 'profile';})
         .toArray()
         .value();
 
       //Will close current view if any
       var beforeAll = function(){
         if (this.currentView instanceof Backbone.View) {
+          console.log('close view', this.currentView.id);
           // For order page we will skip this handling
-          console.log(this.currentView.id, 'hide');
           this.currentView.hide();
           this.currentView = null;
         }
@@ -83,7 +85,7 @@ define([
 
       //Execute "beforeAll" function before all pages
       aspect.add(this, pages, beforeAll);
-
+      /*
       //Will be executed after all pages
       var afterAll = function(){
         console.log(this.currentView.id, 'show');
@@ -91,9 +93,9 @@ define([
       }.bind(this);
       //Execute after all pages
       aspect.add(this, routes, afterAll, 'after');
-      
+      */
       //Following pages require user to be logged in
-      var authPages = ['home', 'blog', 'gallery', 'pos', 'premier', 'settings', 'stats'];
+      var authPages = ['home'];
       var beforeAuth = function(){
         if(User.current()){
           return true;
@@ -105,7 +107,7 @@ define([
       aspect.add(this, authPages, beforeAuth);
 
       //Pages that won't be show if user is authenticated
-      var nonAuth = ['auth', 'forgot', 'login', 'password', 'signup', 'signupWeight'];
+      var nonAuth = ['index'];
       var beforeNonAuth = function(){
         if(User.current()){
           throw new Redirect('home');
@@ -127,20 +129,32 @@ define([
       });
     },
 
-    index: function () {
+    index: function (bounce) {
       if (!this.indexView) {
         this.indexView = new Page.Auth();
       }
 
-      this.currentView = this.indexView;
+      this.currentView = this.indexView.show();
+
+      switch(bounce){
+      case 'bounceInLeft':
+        this.currentView.bounceInLeft();
+        break;
+      }
     },
 
-    home: function () {
+    home: function (bounce) {
       if (!this.homeView) {
         this.homeView = new Page.Home();
       }
 
-      this.currentView = this.homeView;
+      this.currentView = this.homeView.show();
+
+      switch(bounce){
+      case 'bounceInLeft':
+        this.currentView.bounceInLeft();
+        break;
+      }
     },
 
     about: function () {
@@ -148,7 +162,7 @@ define([
         this.aboutView = new Page.About();
       }
 
-      this.currentView = this.aboutView;
+      this.currentView = this.aboutView.show();
     },
 
     blog: function () {
@@ -156,7 +170,7 @@ define([
         this.blogView = new Page.Blog();
       }
 
-      this.currentView = this.blogView;
+      this.currentView = this.blogView.show();
     },
 
     gallery: function () {
@@ -165,7 +179,7 @@ define([
           this.galleryView = new Page.Gallery();
         }
 
-        this.currentView = this.galleryView;
+        this.currentView = this.galleryView.show();
       }catch(e){
         console.log(e, e.stack, e.message);
       }
@@ -176,7 +190,7 @@ define([
         this.premierView = new Page.Premier();
       }
 
-      this.currentView = this.premierView;
+      this.currentView = this.premierView.show();
     },
 
     pos: function () {
@@ -184,7 +198,7 @@ define([
         this.posView = new Page.Pos();
       }
 
-      this.currentView = this.posView;
+      this.currentView = this.posView.show();
     },
 
     store: function () {
@@ -192,7 +206,7 @@ define([
         this.storeView = new Page.Store();
       }
 
-      this.currentView = this.storeView;
+      this.currentView = this.storeView.show();
     }
   });
 

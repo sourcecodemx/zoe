@@ -1,10 +1,9 @@
-/* globals define, steroids, Backbone, _ */
+/* globals define, Backbone, _, forge */
 define(function(require){
 	'use strict';
 
 	var Detachable = require('Detachable');
-	var Modal = require('Modal');
-	var template = require('templates/stats');
+	var Controller = require('Controller');
 
 	var Day = Backbone.Model.extend();
 	var DayView = Detachable.extend({
@@ -13,7 +12,7 @@ define(function(require){
 		hideFx: 'fadeOut',
 		template: require('templates/stats_item'),
 		events: {
-			'click': 'setLabel'
+			'tap': 'setLabel'
 		},
 		computedLabel: '',
 		computedStatus: '',
@@ -51,12 +50,12 @@ define(function(require){
 				this.computedLabel = require('templates/stats_beforeyesterday')({data: data});
 				break;
 			case 'week':
-				data.total = data.total/7;
+				data.total = parseInt(Math.floor(data.total/7), 10);
 				this.computedStatus = 'La semana pasada gane el ' + data.total + '% de mi hidratacion optima.';
 				this.computedLabel = require('templates/stats_week')({data: data});
 				break;
 			case 'month':
-				data.total = data.total/30;
+				data.total = parseInt(Math.floor(data.total/30), 10);
 				this.computedStatus = 'El mes pasado gane el ' + data.total + '% de mi hidratacion optima.';
 				this.computedLabel = require('templates/stats_month')({data: data});
 				break;
@@ -66,53 +65,71 @@ define(function(require){
 			return;
 		}
 	});
+
+	var template = require('templates/stats');
 	var Days = Backbone.Collection.extend({
 		model: Day
 	});
 
-	return Modal.extend({
+	return Controller.extend({
 		id: 'stats-page',
 		template: template,
 		title: 'Estadisticas',
 		currentLabel: '',
-		initialize: function(){
-			Modal.prototype.initialize.apply(this, arguments);
-
-			window.addEventListener('message', this.onMessage.bind(this));
-
-			var rightButton = new steroids.buttons.NavigationBarButton();
-			rightButton.imagePath = '/images/share@2x.png';
-			rightButton.onTap = this.onRightButton.bind(this);
-
-			var leftButton = new steroids.buttons.NavigationBarButton();
-			leftButton.imagePath = '/images/close@2x.png';
-			leftButton.onTap = this.onLeftButton.bind(this);
+		initialize: function(options){
+			Controller.prototype.initialize.apply(this, arguments);
 
 			this.collection = new Days();
 
-			steroids.view.navigationBar.update({
-				title: this.title,
-				closeButton: leftButton,
-				buttons: {
-					left: [leftButton],
-					right: [rightButton]
-				}
-			});
+			if(options.days){
+				this.collection.reset(options.days);
+			}
 
-			this.listenTo(this.collection, 'reset', this.addAll, this);
 			Backbone.on('stats:setlabel', this.setLabel, this);
 
+			this.listenTo(this.collection, 'reset', this.addAll, this);
+
 			return this.render();
+		},
+		update: function(days){
+			this.collection.reset(days);
+
+			return this;
+		},
+		hide: function(){
+			this.bounceOutDown();
+			this.trigger('hide');
+			_.delay(this._detach.bind(this), 1000);
 		},
 		onRender: function(){
 			this.dom.items = this.$el.find('#history');
 			this.dom.status = this.$el.find('#status');
+			this.dom.content = this.$el.find('.page-content');
+		},
+		onShow: function(){
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				icon: 'images/close@2x.png',
+				position: 'left',
+				prerendered: true
+			}, this.hide.bind(this));
+			forge.topbar.addButton({
+				icon: 'images/share@2x.png',
+				position: 'right',
+				prerendered: true
+			}, this.onRightButton.bind(this));
+
+			this.bounceInUp();
+			this.addAll();
 		},
 		addAll: function(){
+			this.removeAll();
+
 			this.collection.each(this.addOne.bind(this));
 			_.invoke(this.views, DayView.prototype.show);
 			//Select first elements
-			this.dom.items.find('.item:first-child').trigger('click');
+			this.dom.items.find('.item:first-child').trigger('tap');
 		},
 		removeAll: function(){
 			_.each(this.views, function(v){
@@ -121,7 +138,6 @@ define(function(require){
 			});
 			this.views = {};
 			this.dom.status.empty();
-			//this.dom.items.empty();
 
 			return this;
 		},
@@ -131,13 +147,6 @@ define(function(require){
 				appendTo: this.dom.items
 			});
 			this.views[view.cid] = view;
-		},
-		onLayerWillChange: function(event){
-			if(event && event.target && event.target.webview.id === 'statsView'){
-				steroids.view.navigationBar.update({
-					title: this.title
-				});
-			}
 		},
 		onRightButton: function(){
 			if(!this.currentStatus){
@@ -153,16 +162,6 @@ define(function(require){
 		setLabel: function(label, status){
 			this.currentStatus = status;
 			this.dom.status.html(label);
-		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'stats:fetch:success':
-				this
-					.removeAll()
-					.collection.reset(data.stats);
-				break;
-			}
 		}
 	});
 });

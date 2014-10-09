@@ -1,8 +1,10 @@
 #stats-page {
-	background: url('images/stats_back.jpg') no-repeat center top;
-	background-position-y: $padding-large-vertical * 5;
-	background-size: cover;
-	background-color: white;
+	.page-content {
+		background: url('../images/stats_back.jpg') no-repeat center top;
+		background-position-y: $padding-large-vertical * 5;
+		background-size: cover;
+		background-color: white;
+	}
 
 	#history {
 		position: fixed;
@@ -11,7 +13,7 @@
 		padding: 0;
 
 		.icon {
-			background: url('images/gota.png') no-repeat;
+			background: url('../images/gota.png') no-repeat;
 			background-size: contain;
 			width: 20px;
 			background-position-y: 13px

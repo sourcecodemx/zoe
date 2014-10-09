@@ -1,38 +1,31 @@
-/* globals define, steroids, Zoe, _ */
+/* globals define, _, forge, Zoe, aspect */
 define(function(require){
 	'use strict';
 
-	var Controller      = require('Controller');
+	var Controller  = require('Controller');
+	var Password    = require('AuthPassword');
+	var TOS = require('TOS');
 
 	/**
-	* Signup Controller
+	* Login Controller
 	* 
-	* Takes care of capturing the username and email
-	* saves data to localstorage and move the user to the next
-	* screen if eveything is in place
+	* Takes care of authenticating users with a Parse account
 	*/
 	return Controller.extend({
 		id: 'signup-page',
 		template: require('templates/signup'),
-		events: {
-			'click #tos': 'showView',
-			'click .back-button': 'back',
-			'submit form': 'submit'
-		},
 		title: '1. Crear cuenta',
-		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-
-			this.tosView =  new steroids.views.WebView({location: 'http://localhost/views/Auth/tos.html', id: 'tos'});
-			this.signupPasswordView = new steroids.views.WebView({location: 'http://localhost/views/Auth/new_password.html', id: 'signupPassword'});
-
-			this.signupPasswordView.preload();
-			
-			this.messageListener();
-			
-			steroids.view.navigationBar.update({
-				title: this.title
+		events: (function () {
+			var events = _.extend({}, Controller.prototype.events, {
+				'tap #authTos': 'tos'
 			});
+
+			return events;
+		})(),
+		initialize: function(){
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
+
+            aspect.add(this, ['bounceInLeft', 'bounceInRight'], this.setupButtons.bind(this), 'after');
 
 			return this.render();
 		},
@@ -40,20 +33,16 @@ define(function(require){
 			this.dom = {
 				username: this.$el.find('#username'),
 				email: this.$el.find('#email'),
-				form: this.$el.find('form')
+				form: this.$el.find('form'),
+				content: this.$el.find('.page-content')
 			};
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'authNewView')){
-				steroids.view.navigationBar.update({
-					title: this.title
-				});
-			}
+		onShow: function(){
+			this.bounceInRight();
 		},
-		tos: function(){
-			setTimeout(function(){
-				steroids.modal.show(this.tosView);
-			}.bind(this), 1);
+		hide: function(){
+			this.bounceOutRight();
+			this.trigger('hide');
 		},
 		submit: function(e){
 			try{
@@ -74,22 +63,37 @@ define(function(require){
 
 				//Save items for the next step, will last for 10 minutes
 				Zoe.storage.setItem('signup_prefill', data, ((new Date())*1) + 10*60*1000);
-				//Take user to the next screen (password setup)
-				setTimeout(function(){
-					steroids.layers.push({
-						view: this.signupPasswordView
-					});
-				}.bind(this), 1);
+				
+				if(this.views.authPassword){
+					this.views.authPassword.show();
+				}else{
+					this.views.authPassword = new Password().show();
+				}
+
+				this.bounceOutLeft();
+				this.listenToOnce(this.views.authPassword, 'hide', this.bounceInLeft.bind(this));
 			}catch(e){
 				Controller.prototype.onError.call(this, null, e);
 			}
 		},
-		onMessage: function(event){
-			switch(event.data.message){
-			case 'user:saved:signup':
-				this.reset();
-				break;
+		setupButtons: function(){
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				position: 'left',
+				icon: 'images/back@2x.png',
+				prerendered: true
+			}, this.hide.bind(this));
+			forge.topbar.show();
+		},
+		tos: function(){
+			if(this.views.tos){
+				this.views.tos.show();
+			}else{
+				this.views.tos = new TOS().show();
 			}
+
+			this.listenToOnce(this.views.tos, 'hide', this.setupButtons.bind(this));
 		}
 	});
 });

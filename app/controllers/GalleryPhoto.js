@@ -1,9 +1,9 @@
-/* globals define, _, steroids, Zoe */
+/* globals define, _, forge, User */
 define(function(require){
 	'use strict';
 
 	var Controller = require('Controller');
-	var config = require('config');
+	var Photo = require('models/File');
 
 	return Controller.extend({
 		id: 'gallery-image-page',
@@ -11,27 +11,18 @@ define(function(require){
 		title: 'Foto',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
-				'click #like.upvote': 'upvote',
-				'click #like.downvote': 'downvote'
+				'tap #like.upvote': 'upvote',
+				'tap #like.downvote': 'downvote'
 			});
 
 			return events;
 		})(),
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
-			//Add message listener
-			this.messageListener();
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
+			this.model = new Photo();
+			
 			this._createImage();
-
-			this.backButton = new steroids.buttons.NavigationBarButton({
-				title: ''
-			});
-
-			steroids.view.navigationBar.update({
-				title: this.title,
-				backButton: this.backButton
-			});
 
 			return this.render();
 		},
@@ -41,87 +32,99 @@ define(function(require){
 				likeIcon: this.$el.find('#like i'),
 				likes: this.$el.find('#likes'),
 				image: this.$el.find('#image'),
-				refresher: this.$el.find('.block-refresher')
+				refresher: this.$el.find('.block-refresher'),
+				content: this.$el.find('.page-content')
 			};
 
 			this.dom.refresher.addClass('active');
 		},
-		onLayerWillChange: function(event){
-			if(event && event.target && (event.target.webview.id === 'galleryImageView')){
-				steroids.view.navigationBar.update({
-					title: this.title,
-					backButton: this.backButton
-				});
-			}
-		},
-
-		onLayerChange: function(event){
-			if(event && event.source && (event.source.webview.id === 'galleryImageView')){
-				this.clear().render();
-			}
-		},
 		onImageLoaded: function(){
 			this.dom.refresher.removeClass('active');
-			this.dom.image.append($(this.image).hide().fadeIn());
-			this.dom.image.addClass('loaded');
+			this.dom.image.append(this.image);
+			this.dom.image.addClass('loaded animated flipInX');
 		},
-		onMessage: function(event){
-			Controller.prototype.onMessage.call(this, event);
+		hide: function(){
+			this.dom.content.addClass('bounceOutRight animated');
+			this.trigger('hide');
+			_.delay(this._detach.bind(this), 1000);
 
-			var data = event.data;
+			this.model.stopListening(this.model);
+		},
+		onShow: function(){
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				position: 'left',
+				icon: 'images/back@2x.png',
+				prerendered: true
+			}, this.hide.bind(this));
 
-			switch(data.message){
-			case 'gallery:image:show':
-				try{
-					var user = Zoe.storage.getItem('Parse/' + config.PARSE.ID + '/currentUser');
-					var isLiked = user.likedImages ? user.likedImages.some(function(val){return val === data.picture.id;}) : false;
+			this.dom.content.removeClass('bounceOutRight').addClass('bounceInRight');
 
-					this.currentPicture = data.picture;
-					this.image.src = data.picture.url;
-					this.dom.likes.text(data.picture.likes);
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInRight animated');
+			}.bind(this), 1000);
+		},
+		update: function(model){
+			try{
+				var user = User.current().toJSON();
+				var isLiked = user.likedImages ? user.likedImages.some(function(val){return val === model.id;}) : false;
+				var data = model.toJSON();
 
-					if(isLiked){
-						this.dom.likeIcon.removeClass('ion-ios7-heart-outline').addClass('ion-ios7-heart');
-						this.dom.likeButton.removeClass('upvote').addClass('downvote');
-					}
-				}catch(e){
-					this.onError(null, e);
+				this.model = model;
+				this.image.src = data.image.url;
+				this.dom.likes.text(data.likes || 0);
+
+				if(isLiked){
+					this.dom.likeIcon.removeClass('ion-ios7-heart-outline').addClass('ion-ios7-heart');
+					this.dom.likeButton.removeClass('upvote').addClass('downvote');
+				}else{
+					this.dom.likeIcon.addClass('ion-ios7-heart-outline').removeClass('ion-ios7-heart');
+					this.dom.likeButton.addClass('upvote').removeClass('downvote');
 				}
-				break;
-			case 'gallery:image:upvote:success':
-			case 'gallery:image:downvote:success':
-			case 'gallery:image:vote:error':
-				this.dom.likeButton.removeAttr('disabled');
-				break;
+
+				this.listenTo(this.model, 'change:likes', this.updateLikes, this);
+			}catch(e){
+				console.log(e, e.stack, e.message);
 			}
+
+			return this;
+		},
+		updateLikes: function(model){
+			this.dom.likes.text(model.get('likes'));
 		},
 		upvote: function(){
 			if(this.dom.likeButton.attr('disabled')){
 				return;
 			}
 
-			var currLikes = parseInt(this.currentPicture.likes, 10) + 1;
-			this.currentPicture.likes = currLikes;
-
 			this.dom.likeIcon.removeClass('ion-ios7-heart-outline').addClass('ion-ios7-heart');
-			this.dom.likeButton.removeClass('upvote').addClass('downvote').attr('disabled', true);
-
-			this.dom.likes.text(currLikes);
-			window.postMessage({message: 'gallery:image:upvote', id: this.currentPicture.id});
+			this.dom.likeButton.removeClass('upvote').addClass('downvote').prop('disabled', true);
+			this.model
+				.increment('likes')
+				.save()
+					.then(function(){
+						this.dom.likeButton.removeAttr('disabled');
+						return User.current().addUnique('likedImages', this.model.id).save();
+					}.bind(this));
 		},
 		downvote: function(){
-			if(this.dom.likeButton.attr('disabled') || (parseInt(this.currentPicture.likes, 10) === 0)){
+			var currentLikes = this.model.get('likes');
+			
+			if(this.dom.likeButton.attr('disabled') || (parseInt(currentLikes, 10) === 0)){
 				return;
 			}
 
-			var currLikes = parseInt(this.currentPicture.likes, 10) - 1;
-			this.currentPicture.likes = currLikes;
-
 			this.dom.likeIcon.addClass('ion-ios7-heart-outline').removeClass('ion-ios7-heart');
-			this.dom.likeButton.addClass('upvote').removeClass('downvote').attr('disabled', true);
-
-			this.dom.likes.text(currLikes);
-			window.postMessage({message: 'gallery:image:downvote', id: this.currentPicture.id});
+			this.dom.likeButton.addClass('upvote').removeClass('downvote').prop('disabled', true);
+			this.model
+				.increment('likes', -1)
+				.save()
+					.then(function(){
+						this.dom.likeButton.removeAttr('disabled');
+						return User.current().remove('likedImages', this.model.id).save();
+					}.bind(this));
+			
 		},
 		clear: function(){
 			// Controller.prototype.back.call(this);

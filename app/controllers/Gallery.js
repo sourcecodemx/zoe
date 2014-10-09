@@ -1,4 +1,4 @@
-/* globals define, _, Backbone, forge, Parse, File, User  */
+/* globals define, _, Backbone, forge, Parse, User  */
 define(function(require){
 	'use strict';
 
@@ -8,6 +8,7 @@ define(function(require){
 	var Images         = require('collections/Images');
 	var config         = require('config');
 	var File           = require('models/File');
+	var Photo          = require('GalleryPhoto');
 
 	var Gallery = Controller.extend({
 		id: 'gallery-page',
@@ -30,6 +31,7 @@ define(function(require){
 			//Initialize collection
 			this.collection = new Images();
 			this.images = {};
+			this.views.photo = new Photo();
 
 			//Create upload modal
 			this.uploadModal = new UploadModal({collection: this.collection});
@@ -39,44 +41,10 @@ define(function(require){
 			this.listenTo(this.collection, 'error', this.onError.bind(this));
 			this.listenTo(this.collection, 'prepend', this.prependOne.bind(this));
 
-			//Open picture view
-			Backbone.on('gallery:image:show', this.showPicture, this);
+			Backbone.on('gallery:image:show', this.onPicture, this);
+			Backbone.on('gallery:image:prepend', this.onImageSaved, this);
 
 			return this.render();
-		},
-		onRender: function(){
-			Controller.prototype.onRender.call(this);
-			
-			//Pics container
-			this.dom.content = this.$el.find('#pics');
-			this.dom.indicator = this.$el.find('.ion-infinite-scroll');
-
-			if(this.online){
-				this.getImages();
-			}else{
-				this.onContentError({message: 'No hay conexion a internet.'});
-			}
-		},
-		onShow: function(){
-			Controller.prototype.onShow.call(this);
-			
-			forge.topbar.addButton({
-				icon: 'images/reload@2x.png',
-				position: 'right',
-				prerendered: true
-			}, this.onRightButton.bind(this));
-		},
-		onRightButton: function(){
-			if(this.online){
-				this.removeAll();
-				//Reset pagination
-				this.page = 0;
-				$('#end').remove();
-				this.$el.removeClass('end-reached');
-				this.getImages();
-			}else{
-				this.offlineError();
-			}
 		},
 		getImages: function(){
 			forge.notification.showLoading('Cargando');
@@ -108,9 +76,48 @@ define(function(require){
 				}.bind(this)
 			});
 		},
+		onRender: function(){
+			Controller.prototype.onRender.call(this);
+			
+			//Pics container
+			this.dom.pics = this.$el.find('#pics');
+			this.dom.content = this.$el.find('.page-content');
+			this.dom.indicator = this.$el.find('.ion-infinite-scroll');
+			this.dom.tabs = this.$el.find('#tabs');
+
+			if(this.online){
+				this.getImages();
+			}else{
+				this.onContentError({message: 'No hay conexion a internet.'});
+			}
+		},
+		onShow: function(){
+			Controller.prototype.onShow.call(this);
+			
+			this.setupButtons();
+		},
+		setupButtons: function(){
+			forge.topbar.addButton({
+				icon: 'images/reload@2x.png',
+				position: 'right',
+				prerendered: true
+			}, this.onRightButton.bind(this));
+		},
+		onRightButton: function(){
+			if(this.online){
+				this.removeAll();
+				//Reset pagination
+				this.page = 0;
+				$('#end').remove();
+				this.$el.removeClass('end-reached');
+				this.getImages();
+			}else{
+				this.offlineError();
+			}
+		},
 		addAll: function(){
-			if(!this.dom.content.find('.pic').length){
-				this.dom.content.empty();
+			if(!this.dom.pics.find('.pic').length){
+				this.dom.pics.empty();
 			}
 
 			if(this.collection.length){
@@ -122,25 +129,21 @@ define(function(require){
 				this.onContentError({message: 'No hay imagenes en la galeria.'});
 			}
 
-			setTimeout(function(){
-				forge.notification.hideLoading();
-			}, 1);
+			forge.notification.hideLoading();
 		},
 		addOne: function(model){
 			//Create image view
 			var view = new PicItem({
 				model: model,
-				appendTo: this.dom.content
+				appendTo: this.dom.pics
 			});
 			//Cache image reference
 			this.images[view.cid] = view;
-
-			return this;
 		},
 		prependOne: function(model){
 			var view = new PicItem({
 				model: model,
-				appendTo: this.dom.content,
+				appendTo: this.dom.pics,
 				prepend: true
 			}).show();
 
@@ -153,25 +156,28 @@ define(function(require){
 			});
 			this.images = {};
 		},
-		showPicture: function(/*data*/){
-			/*
-			//Let the view know it can load the image
-			window.postMessage({
-				message: 'gallery:image:show',
-				picture: {
-					id: data.objectId,
-					url: data.image.url,
-					thumbnail: data.thumbnail ? data.thumbnail.url : '',
-					likes: data.likes || 0
-				}
-			});
-			//Push view
-			setTimeout(function(){
-				steroids.layers.push({
-					view: this.views.pic
-				});
-			}.bind(this), 1);
-			*/
+		bounceIn: function(){
+			Controller.prototype.onShow.call(this);
+			this.dom.content.removeClass('bounceOutLeft').addClass('bounceInLeft');
+
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInLeft animated');
+			}.bind(this), 1000);
+
+			this.dom.tabs.show();
+			this.setupButtons();
+
+			return this;
+		},
+		onImageSaved: function(file){
+			this.collection.prepend(file);
+		},
+		onPicture: function(model){
+			this.dom.content.addClass('bounceOutLeft animated');
+			this.hideMenu();
+			this.views.photo.update(model).show();
+			this.listenToOnce(this.views.photo, 'hide', this.bounceIn.bind(this));
+			this.dom.tabs.hide();
 		},
 		takePicture: function(){
 			if(!this.online){
@@ -179,12 +185,10 @@ define(function(require){
 				return;
 			}
 
-			/*
-			navigator.camera.getPicture(
-				this.onSuccess.bind(this),
-				this.onPictureError.bind(this),
-				config.CAMERA.DEFAULT
-			);*/
+			forge.file.getImage(config.CAMERA.DEFAULT, function(file){
+				forge.file.base64(file, this.onSuccess.bind(this), this.onPictureError.bind(this));
+			}.bind(this));
+
 		},
 		grabPicture: function(){
 			if(!this.online){
@@ -192,31 +196,15 @@ define(function(require){
 				return;
 			}
 
-			/*
-			navigator.camera.getPicture(
-				this.onSuccess.bind(this),
-				this.onPictureError.bind(this),
-				_.extend(
-					{},
-					config.CAMERA.DEFAULT,
-					{ sourceType : Camera.PictureSourceType.PHOTOLIBRARY }
-				)
-			);*/
+			forge.file.getImage(config.CAMERA.GALLERY, function(file){
+				forge.file.base64(file, this.onSuccess.bind(this), this.onPictureError.bind(this));
+			}.bind(this));
 		},
 		onSuccess: function(imageData) {
 			this.uploadModal.update(imageData).show();
 		},
 		onPictureError: function(message) {
 			this.onError(null, {message: message});
-		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'gallery:image:upvote:success':
-			case 'gallery:image:downvote:success':
-				this.collection.get(data.id).set('likes', data.likes);
-				break;
-			}
 		},
 		onTouchEnd: function(){
 			if(this.$el.hasClass('scrolling')){
@@ -232,7 +220,7 @@ define(function(require){
 		showFx: 'fadeIn',
 		hideFx: 'fadeOut',
 		events: {
-			'click': 'pic'
+			'tap': 'pic'
 		},
 		initialize: function(options){
 			Detachable.prototype.initialize.apply(this, arguments);
@@ -252,10 +240,12 @@ define(function(require){
 			this.$el.append(this.template({image: {url: url}}));
 			this.$el.hide();
 
+			this.$el.hammer();
+
 			return this.$el;
 		},
 		pic: function(){
-			Backbone.trigger('gallery:image:show', this.model.toJSON());
+			Backbone.trigger('gallery:image:show', this.model);
 		},
 		onClose: function(){
 			this.model = null;
@@ -267,8 +257,8 @@ define(function(require){
 	var UploadModal = HTMLModal.extend({
 		template: require('templates/gallery_modal_upload'),
 		events: {
-			'click #save': 'save',
-			'click button[data-dismiss]': 'hide'
+			'tap #save': 'save',
+			'tap button[data-dismiss]': 'hide'
 		},
 		onRender: function(){
 			this.dom.image = this.$el.find('#image');
@@ -279,27 +269,26 @@ define(function(require){
 
 				var img = new Parse.File('foto.jpg', { base64: this.base64Data });
 				var file = new File({image: img});
+				var onSave = function(){
+					var user = User.current();
+					var images = user.relation('images');
+					//Add image to relation;
+					images.add(file);
+					//Save image to user relation
+					user
+						.save()
+						.then(function(){
+							return file.fetch();
+						})
+						.then(function(f){
+							this.onSave(f);
+						}.bind(this),function(error){
+							this.onError(null, error);
+						}.bind(this));
+				}.bind(this);
 
-				file.save().then(
-					function(){
-						var user = User.current();
-						var images = user.relation('images');
-						//Add image to relation;
-						images.add(file);
-						this.images.add(file);
-						//Save user relation
-						user
-							.save()
-							.then(function(){
-								return file.fetch();
-							})
-							.then(
-								this.onSave.bind(this),
-								this.onError.bind(this)
-							);
-					}.bind(this),
-					this.onError.bind(this)
-				);
+				//Save file
+				file.save().then(onSave).fail(this.onError.bind(this));
 			}
 		},
 		update: function(data){
@@ -309,7 +298,7 @@ define(function(require){
 
 			this.img.onload = function(){
 				forge.notification.hideLoading();
-				this.dom.image.append($(this.img).addClass('full-image rounded'));
+				this.dom.image.append($(this.img).addClass('rounded'));
 			}.bind(this);
 
 			this.base64Data = data;
@@ -336,13 +325,11 @@ define(function(require){
 		onSave: function(file){
 			try{
 				forge.notification.hideLoading();
-				setTimeout(function(){
-					forge.notification.showLoading('Imagen Guardada');
-				}, 1);
+				forge.notification.showLoading('Imagen Guardada');
 
-				_.delay(forge.notification.hideLoading, 1000);
+				_.delay(forge.notification.hideLoading, 2000);
 
-				this.collection.prepend(file);
+				Backbone.trigger('gallery:image:prepend', file);
 				this.hide();
 			}catch(e){
 				this.onError(null, e);

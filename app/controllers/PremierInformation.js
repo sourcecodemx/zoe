@@ -1,19 +1,31 @@
-/* globals define, forge, Parse */
+/* globals define, _, forge, Parse */
 define(function(require){
 	'use strict';
 
 	var Controller = require('Controller');
+	var template = require('templates/premier_modal_information');
 
 	return Controller.extend({
-		template: require('templates/premier_modal_information'),
 		id: 'premier-information-page',
+		template: template,
 		title: 'Informacion',
+		initialize: function(){
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
+
+			return this.render();
+		},
+		hide: function(){
+			this.dom.content.removeClass('bounseInUp').addClass('bounceOutDown');
+			this.trigger('hide');
+			_.delay(this._detach.bind(this), 1000);
+		},
 		onRender: function(){
 			this.dom = {
 				form: this.$el.find('form'),
 				name: this.$el.find('#name'),
 				email: this.$el.find('#email'),
-				phone: this.$el.find('#phone')
+				phone: this.$el.find('#phone'),
+				content: this.$el.find('.page-content')
 			};
 		},
 		onSuccess: function(){
@@ -22,18 +34,16 @@ define(function(require){
 			forge.notification.alert('¡Gracias!', 'Nos podremos en contacto contigo');
 		},
 		onShow: function(){
-			Controller.prototype.onShow.call(this);
+			forge.topbar.setTint([0,0,0,255]);
+			forge.topbar.setTitle(this.title);
+			forge.topbar.removeButtons();
+			forge.topbar.addButton({
+				icon: 'images/close@2x.png',
+				position: 'left',
+				prerendered: true
+			}, this.hide.bind(this));
 
-			if(forge.is.mobile()){
-				forge.topbar.setTint([0,0,0,255]);
-				forge.topbar.setTitle(this.title);
-				forge.topbar.removeButtons();
-				forge.topbar.addButton({
-					icon: 'images/close@2x.png',
-					position: 'left',
-					prerendered: true
-				}, this.hide.bind(this));	
-			}
+			this.dom.content.removeClass('bounceOutDown').addClass('bounceInUp');
 		},
 		submit: function(e){
 			try{

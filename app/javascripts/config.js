@@ -11,19 +11,12 @@ define('config', function(){
 			KEY: 'f0f806e6c0165a801fb1'
 		},
 		FB: {
-			DEFAULT_PERMISSION: ['email', 'read_stream'],
-			BROADCAST_PERMISSION: [],
+			DEFAULT_PERMISSION: ['email'],
 			APP_NAME: 'Zoe Water Movil'
 		},
 		CAMERA: {
-			DEFAULT: {
-				quality: 80,
-				allowEdit: true,
-				//encodingType: Camera.EncodingType.JPEG,
-				//destinationType: Camera.DestinationType.DATA_URL,
-				targetWidth: 500,
-				targetHeight: 500
-			}
+			DEFAULT: {width: 500, height: 500, source: 'camera'},
+			GALLERY: {width: 500, height: 500, source: 'gallery'}
 		},
 		GEO: {
 			DEFAULT: { enableHighAccuracy: true },

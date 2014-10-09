@@ -1,4 +1,4 @@
-/* global define, Backbone, _, aspect, forge, Zoe */
+/* global define, Backbone, _, aspect, forge */
 define(function(require){
 	'use strict';
 
@@ -24,8 +24,7 @@ define(function(require){
 			'click #leftButton': 'onLeftButton',
 			'click #title': 'onTitle',
 			'click #rightButton': 'onRightButton',
-			'submit form': 'submit',
-			'click [child]': 'showView'
+			'submit form': 'submit'
 		},
 		mobile: true,
 		online: true,
@@ -49,7 +48,6 @@ define(function(require){
 			
 			return this;
 		},
-
 		submit: function(){},
 		reset: function(){
 			if(this.dom.form){
@@ -80,108 +78,10 @@ define(function(require){
 
 			return this;
 		},
-		showView: function(e){
-			try{
-				if(e && e.preventDefault){
-					e.preventDefault();
-				}
-
-				var $target = $(e.currentTarget);
-				var route = $target.attr('data-view');
-				var page = route.length ? route.split('/') : [];
-				var ismodal = $target[0].hasAttribute('modal');
-				
-				var push = function(){
-					//var conf = {view: this.view, navigationBar: true};
-					switch(ismodal){
-					case true:
-						//steroids.modal.show(conf);
-						break;
-					default:
-						//steroids.layers.push(conf);
-						break;
-					}
-				};
-				var preloaded = false;
-				var pageId;
-
-				//Determine if it is a local or external page
-				if(page && page.length){
-					if(page[0] === 'http:' || page[0] === 'https:'){
-						pageId = _.escape(route);
-
-						// Check preloaded status
-						preloaded = Zoe.storage.getItem(pageId + '-preloaded') ? true : false;
-						// Create webview object if view has been previously loaded (in some other page)
-						// or if it does not exists in the views object
-						if(preloaded || !this.views[page]){
-							//this.views[pageId] = new steroids.views.WebView({location: route, id: pageId + 'View'});
-						}
-					}else{
-						//Convert to standard name
-						pageId = (page.shift()).toLowerCase() + _.capitalize(page.shift());
-						//If there is more than two arguments, append all others in the same fashion
-						if(page.length){
-							pageId += page.map(_.capitalize).join('');
-						}
-
-						// Check preloaded status
-						preloaded = Zoe.storage.getItem(pageId + '-preloaded') ? true : false;
-						// or if it does not exists in the views object
-						if(preloaded || !this.views[page]){
-							//this.views[pageId] = new steroids.views.WebView({location: 'http://localhost/views/' + route + '.html', id: pageId + 'View'});
-						}
-					}
-				}
-
-				//if pageid has been set
-				if(pageId){
-					// If object has not been previously loaded then preload it
-					if(!preloaded){
-						forge.notification.showLoading('Cargando');
-						//Preload the view
-						this.views[pageId].preload({}, {
-							onSuccess: function(){
-								forge.notification.hideLoading();
-								//Save load status for other pages to check it
-								Zoe.storage.setItem(this.id + '-preloaded', true);
-								//Replace the thing
-								_.delay(this.push.bind({view: this.views[this.id]}), 1000);
-							}.bind({views: this.views, id: pageId, push: push}),
-							onFailure: function(){
-								forge.notification.hideLoading();
-								//Remove preload status
-								Zoe.storage.removeItem(this.id + '-preloaded');
-								//Delete view if it exists
-								if(this.views[this.id]){
-									delete this.views[this.id];
-								}
-								//Alert user
-								setTimeout(function(){
-									forge.notification.alert(
-										'Ups!',
-                                        'Ha ocurrido un error al cargar la vista, por favor intente de nuevo'
-                                    );
-								}, 1);
-							}.bind({views: this.views, id: pageId})
-						});
-					}else{
-						// If object has been previously loaded we just need to replace the current
-						// layer with the created WebView
-						setTimeout(push.bind({view: this.views[pageId]}), 1);
-					}
-				}else{
-					throw new Error('NO_DATA_VIEW_DEFINED');
-				}
-			}catch(e){
-				this.onError(null, e);
-			}
-		},
 		back: function(){
 			//setTimeout(function(){steroids.layers.pop();}, 1);
 		},
 		checkPosition: function(e){
-			console.log('check position', e);
 			if(this.$el.hasClass('scrolling')){
 				e.preventDefault();
 				e.stopPropagation();
@@ -189,8 +89,6 @@ define(function(require){
 				var offset = Math.abs($(e.currentTarget).offset().top);
 				var wheight = $(window).height();
 				var height = $(e.currentTarget).height();
-
-				console.log(offset, wheight, height, offset+wheight-150);
 
 				if(offset + wheight - 100 > height){
 					this.$el.addClass('scrolling');
@@ -227,7 +125,6 @@ define(function(require){
 		onTitle: function(){},
 		onMessage: function(){},
 		onError: function(model, error){
-			setTimeout(function(){console.log(model, error); forge.logging.info(model, JSON.stringify(error));}, 10000);
 			forge.notification.hideLoading();
 			_.delay(function(){
 				forge.notification.alert('Ups!', this.message);
@@ -240,6 +137,48 @@ define(function(require){
 		onShow: function(){
 			//forge.ui.enhanceAllInputs();
 			this._checkConnection();
+		},
+		bounceOutLeft: function(){
+			this.dom.content.addClass('bounceOutLeft animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceOutLeft animated').addClass('hide');
+				this.$el.hide();
+			}.bind(this), 1000);
+		},
+		bounceInLeft: function(){
+			this.$el.show();
+			this.dom.content.removeClass('hide').addClass('bounceInLeft animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInLeft animated');
+			}.bind(this), 1000);
+		},
+		bounceInRight: function(){
+			this.$el.show();
+			this.dom.content.removeClass('hide').addClass('bounceInRight animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInRight animated');
+			}.bind(this), 1000);
+		},
+		bounceOutRight: function(){
+			this.dom.content.addClass('bounceOutRight animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceOutRight animated').addClass('hide');
+				this.$el.hide();
+			}.bind(this), 1000);
+		},
+		bounceInUp: function(){
+			this.$el.show();
+			this.dom.content.removeClass('hide').addClass('bounceInUp animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInUp animated');
+			}.bind(this), 1000);
+		},
+		bounceOutDown: function(){
+			this.dom.content.addClass('bounceOutDown animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceOutDown animated').addClass('hide');
+				this.$el.hide();
+			}.bind(this), 1000);
 		},
 		onOnline: function(){
 			this.online = true;
@@ -258,8 +197,7 @@ define(function(require){
 			}else{
 				Backbone.trigger('app:offline');
 			}
-		},
-		_setup: function(){}//Extend with yours
+		}
 	});
 
 	return Controller;

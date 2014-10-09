@@ -3,6 +3,7 @@ define(function(require){
 	'use strict';
 
 	var Controller = require('Root');
+	var Modal = require('PremierInformation');
 
 	return Controller.extend({
 		id: 'premier-page',
@@ -10,13 +11,13 @@ define(function(require){
 		title: 'Zoé Water Premier',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
-				'click #information': 'info'
+				'tap #information': 'info'
 			});
 
 			return events;
 		})(),
 		initialize: function(){
-			Controller.prototype.initialize.apply(this, arguments);
+			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
 			return this.render();
 		},
@@ -25,7 +26,13 @@ define(function(require){
 				this.onError(null, {message: 'Es necesario contar con una conexion a internet para poder pedir informacion.'});
 				return;
 			}
-			//TODO: Open premier information view
+			if(this.views.information){
+				this.views.information.show();
+			}else{
+				this.views.information = new Modal().show();
+			}
+
+			this.listenToOnce(this.views.information, 'hide', this.onShow.bind(this));
 		}
 	});
 });
