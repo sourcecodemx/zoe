@@ -15,10 +15,9 @@
 }
 
 #blog-entry-page {
-	-webkit-user-select: all;
-
 	.page-content {
 		background: $stable;
+		@include user-select(all);
 	}
 	
 	#hero {

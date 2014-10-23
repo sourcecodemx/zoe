@@ -1,4 +1,4 @@
-/* globals require */
+/* globals require, define, forge */
 require.config({
 	paths: {
 		//Core libraries
@@ -12,7 +12,7 @@ require.config({
 		sha3:        '../components/cryptojslib/rollups/sha3',
 		hammerjs:    '../components/hammerjs/hammer.min',
 		jqueryhammer:'../components/jquery-hammerjs/jquery.hammer',
-		infobox:     '../javascripts/infobox',
+		async:       '../components/requirejs-plugins/src/async',
 
 		templates:   '../javascripts/templates',
 		models:      '../models',
@@ -24,12 +24,12 @@ require.config({
 		user:        '../javascripts/user',
 
 		//Base classes
-		APIController:'../javascripts/APIController',
 		Detachable:   '../controllers/core/Detachable',
 		Controller:   '../controllers/core/Controller',
 		Modal:        '../controllers/core/Modal',
 		Root:         '../controllers/core/Root',
 		HTMLModal:    '../ui/Modal',
+		ShareModal:   '../ui/ShareModal',
 		Router:       '../javascripts/Router',
 		Redirect:     '../javascripts/Redirect',
 
@@ -56,7 +56,8 @@ require.config({
 		SettingsWeight: '../controllers/SettingsWeight',
 		Stats:        '../controllers/Stats',
 		Store:        '../controllers/Store',
-		TOS:          '../controllers/TOS'
+		TOS:          '../controllers/TOS',
+		Header:       '../controllers/Header'
 	},
 	shim: {
 		aspect: {
@@ -85,13 +86,18 @@ require.config({
 		setup: {
 			deps: ['parse']
 		},
-		APIController: {
-			deps: ['parse']
-		},
 		Router: {
-			deps: ['backbone', 'parse', 'config']
+			deps: ['backbone', 'parse', 'config', 'setup']
 		}
 	}
+});
+
+// convert Google Maps into an AMD module
+define('gmaps', ['async!http://maps.googleapis.com/maps/api/js?key=AIzaSyA3NJBfy8jSTRtqab54gmzqiCaWzsB6Le4&libraries=geometry'],
+function(){
+	'use strict';
+    // return the gmaps namespace for brevity
+    return window.google.maps;
 });
 
 //Main require
@@ -99,8 +105,17 @@ require(
 	['setup', 'Router'],
 	function(setup, Router){
 		'use strict';
+		try{
+			window.App = new Router();
 
-		window.App = new Router();
-		window.App.start();
+			var onPush = function(data){
+				forge.parse.setBadgeNumber(0);
+			};
+			var onPushError = function(error){
+			};
+			forge.event.messagePushed.addListener(onPush, onPushError);
+		}catch(e){
+			forge.logging.critical(e, e.stack, e.message);
+		}
 	}
 );

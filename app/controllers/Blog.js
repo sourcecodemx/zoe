@@ -1,4 +1,4 @@
-/* globals define, _, forge, Backbone */
+/* globals define, _, forge, Backbone, Parse */
 define(function(require){
 	'use strict';
 
@@ -21,6 +21,7 @@ define(function(require){
 			return events;
 		})(),
 		page: 0,
+		totalPages: 0,
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
@@ -28,11 +29,26 @@ define(function(require){
 			this.entries = {};
 			this.views.blog = new BlogEntry();
 
+			//Listen for images collection
 			this.listenTo(this.collection, 'reset', this.addAll.bind(this));
+			this.listenTo(this.collection, 'error', this.onError.bind(this));
 
 			Backbone.on('blog:entry:show', this.onEntry, this);
 
 			return this.render();
+		},
+		countEntries: function(){
+			var model = Parse.Object.extend('Blog');
+			var query = new Parse.Query(model);
+
+			forge.notification.showLoading('Cargando');
+			query.count().then(function(count){
+				var totalPages = Math.ceil(count/config.BLOG.LIMIT);
+				if(totalPages){
+					this.totalPages = totalPages;
+					this.getEntries();
+				}
+			}.bind(this)).fail(this.onError.bind(this));
 		},
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
@@ -43,56 +59,46 @@ define(function(require){
 			this.dom.indicator = this.$el.find('.ion-infinite-scroll');
 
 			if(this.online){
-				this.getEntries();
+				this.countEntries();
 			}else{
 				this.onContentError({message: 'No hay conexion a internet.'});
 			}
 		},
 		getEntries: function(){
-			forge.notification.showLoading('Cargando');
 			//Paginate
 			if(this.page >= 0){
 				this.collection.query.skip(this.page*config.BLOG.LIMIT);
 			}
 
-			this.collection.fetch({
-				success: function(){
-					this.page++;
-					//Remove scrolling class
-					if(this.$el.hasClass('scrolling')){
-						this.$el.removeClass('active scrolling');
-						this.dom.indicator.removeClass('active');
-					}
-					//Once we get to the end of the blog, display the no-more-entries legend
-					if(this.collection.length < config.BLOG.LIMIT){
-						this.$el.addClass('end-reached');
-						this.dom.entries.after('<div id="end" class="padding-large text-center">No hay mas entradas.</div>');
-					}
-				}.bind(this),
-				error: function(collection, error){
-					if(this.dom.entries.find('.entry').length){
-						this.onError(null, error);
-					}else{
-						this.onContentError(error);
-					}
-				}.bind(this)
-			});
+			this.collection.fetch();
 		},
 		onRightButton: function(){
 			if(this.online){
 				this.removeAll();
 				//Reset pagination
 				this.page = 0;
-				$('#end').remove();
+				this.totalPages = 0;
+				$('#blogEnd').remove();
 				this.$el.removeClass('end-reached');
-				this.getEntries();
+				this.countEntries();
 			}else{
 				this.offlineError();
 			}
 		},
 		addAll: function(){
+			this.page++;
 			if(!this.dom.entries.find('.entry').length){
 				this.dom.entries.empty();
+			}
+
+			if(this.$el.hasClass('scrolling')){
+				this.$el.removeClass('active scrolling');
+				this.dom.indicator.removeClass('active');
+			}
+
+			if(this.page === this.totalPages){
+				this.$el.addClass('end-reached');
+				this.dom.entries.after('<div id="blogEnd" class="infinite-scroll-end">No hay mas entradas en el blog.</div>');
 			}
 
 			if(this.collection.length){
@@ -104,9 +110,7 @@ define(function(require){
 				this.onContentError({message: 'No hay publicaciones en el blog.'});
 			}
 
-			setTimeout(function(){
-				forge.notification.hideLoading();
-			}, 1);
+			forge.notification.hideLoading();
 		},
 		removeAll: function(){
 			_.invoke(this.entries, Entry.prototype.destroy);
@@ -141,7 +145,7 @@ define(function(require){
 		},
 		onEntry: function(data){
 			this.dom.content.addClass('bounceOutLeft animated');
-			this.hideMenu();
+			Backbone.trigger('header:hide');
 			this.views.blog.update(data).show();
 			this.listenToOnce(this.views.blog, 'hide', this.bounceIn.bind(this));
 		},
@@ -149,6 +153,13 @@ define(function(require){
 			if(this.$el.hasClass('scrolling')){
 				this.$el.addClass('active');
 				this.getEntries();
+			}
+		},
+		checkPosition: function(e){
+			if((this.totalPages <= 1) || (this.page === this.totalPages) || this.$el.hasClass('end-reached')) {
+				return false;
+			}else{
+				Controller.prototype.checkPosition.call(this, e);
 			}
 		},
 		onShow: function(){

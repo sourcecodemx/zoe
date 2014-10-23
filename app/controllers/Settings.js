@@ -84,10 +84,12 @@ define(function(require){
 		},
 		onShow: function(){
 			if(User.current().get('facebook')){
+				this.$el.addClass('settings-facebook');
 				this.dom.name.addClass('hide');
 				this.dom.email.addClass('hide');
 				this.dom.password.addClass('hide');
 			}else{
+				this.$el.removeClass('settings-facebook');
 				this.dom.name.removeClass('hide');
 				this.dom.email.removeClass('hide');
 				this.dom.password.removeClass('hide');
@@ -110,8 +112,8 @@ define(function(require){
 		},
 		signout: function(){
 			User.logOut();
-			Backbone.history.navigate('#index/bounceInLeft', {trigger: true});
 			this.bounceOutRight();
+			Backbone.trigger('user:logout');
 		},
 		setupButtons: function(){
 			forge.topbar.removeButtons();

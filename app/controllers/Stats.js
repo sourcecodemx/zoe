@@ -38,25 +38,25 @@ define(function(require){
 
 			switch(this.model.get('type')){
 			case 'today':
-				this.computedStatus = 'Hoy he ganado el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'Hoy he logrado el ' + data.total + '% de mi hidratación alcalina. #alcalinizate';
 				this.computedLabel = require('templates/stats_today')({data: data});
 				break;
 			case 'yesterday':
-				this.computedStatus = 'Ayer gane el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'Ayer logre el ' + data.total + '% de mi hidratacion alcalina. #alcalinizate';
 				this.computedLabel = require('templates/stats_yesterday')({data: data});
 				break;
 			case 'beforeyesterday':
-				this.computedStatus = 'Antier gane el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'Antier logre el ' + data.total + '% de mi hidratacion alcalina. #alcalinizate';
 				this.computedLabel = require('templates/stats_beforeyesterday')({data: data});
 				break;
 			case 'week':
 				data.total = parseInt(Math.floor(data.total/7), 10);
-				this.computedStatus = 'La semana pasada gane el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'La ultima semana logre el ' + data.total + '% de mi hidratacion alcalina. #alcalinizate';
 				this.computedLabel = require('templates/stats_week')({data: data});
 				break;
 			case 'month':
 				data.total = parseInt(Math.floor(data.total/30), 10);
-				this.computedStatus = 'El mes pasado gane el ' + data.total + '% de mi hidratacion optima.';
+				this.computedStatus = 'El ultimo mes logre ' + data.total + '% de mi hidratacion alcalina. #alcalinizate';
 				this.computedLabel = require('templates/stats_month')({data: data});
 				break;
 			}
@@ -153,11 +153,7 @@ define(function(require){
 				return;
 			}
 
-			window.plugins.socialsharing.share(
-				this.currentStatus,
-				null,
-				null,
-				'http://zoewater.com.mx');
+			Backbone.trigger('share', this.currentStatus);
 		},
 		setLabel: function(label, status){
 			this.currentStatus = status;

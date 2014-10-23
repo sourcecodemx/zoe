@@ -1,4 +1,4 @@
-/* globals define, _, forge, Backbone, topBarTint, buttonTint, User, aspect  */
+/* globals define, _, forge, Backbone, topBarTint, buttonTint, User, aspect, Parse  */
 define(function(require){
 	'use strict';
 
@@ -12,6 +12,7 @@ define(function(require){
 	var Journal = require('models/Journal');
 	var Stats = require('Stats');
 	var Settings = require('Settings');
+	var SettingsWeight = require('SettingsWeight');
 	
 	var Index = Controller.extend({
 		id: 'home-page',
@@ -33,18 +34,8 @@ define(function(require){
 		initialize: function(){
 			//Initialize main class
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
-
-			this.model = User.current();
-
-			console.log(this.model, User.current());
-
-			//Listen for model changes
-			if(this.model){
-				this.listenTo(this.model, 'change:weight', this.onWeightChange, this);
-				this.listenTo(this.model, 'change:username', this.onUsernameChange, this);
-				this.listenTo(this.model, 'change:lastConsumption', this.onConsumptionChange, this);
-			}
-
+			//Add model listeners
+			this.addListeners();
 			//get goal
 			this.data.goal =  this.model.getGoal() + ' litros';
 			this.data.username = this.model.get('firstName') ? this.model.get('firstName') : this.model.get('username');
@@ -62,24 +53,38 @@ define(function(require){
 
 			return this.render();
 		},
-		reload: function(){
+		addListeners: function(){
+			this.model = User.current();
+			
+			//Listen for model changes
+			if(this.model){
+				this.listenTo(this.model, 'change:weight', this.onWeightChange, this);
+				this.listenTo(this.model, 'change:username', this.onUsernameChange, this);
+				this.listenTo(this.model, 'change:lastConsumption', this.onConsumptionChange, this);
+			}
+		},
+		empty: function(){
 			this.$el.empty();
+			this.stopListening(this.model);
+			this.model = null;
+			this._clearWatchers();
+			this.data = {};
+			this.consumption = null;
+		},
+		reload: function(){
+			this.empty();
+			this.addListeners();
 			//get goal
 			this.data.goal =  this.model.getGoal() + ' litros';
 			this.data.username = this.model.get('firstName') ? this.model.get('firstName') : this.model.get('username');
-			//Reset consumption
 			this.consumption = 0;
-			//Clear watchers
-			this._clearWatchers();
 			//Setup drink and midnight watchers
 			this._setupWatchers();
 			//Re-render
 			this.render().show();
-			//Update current journal
-			this.updateJournal();
 		},
 		updateJournal: function(){
-			forge.notification.showLoading('Actualizando Consumo');
+			forge.notification.showLoading('Actualizando tu Consumo');
 			//Get Journal data
 			this.model.getJournal()
 				.then(this.onJournal.bind(this))
@@ -104,19 +109,31 @@ define(function(require){
 			}else{
 				this._updateConsumptionUI(0);
 			}
+
+			forge.launchimage.hide();
 		},
 		onShow: function(){
-			Controller.prototype.onShow.call(this);
 			//Configure home buttons and title
 			this.setupButtons();
+
+			if(this.shareModal){
+				this.shareModal.hide();
+			}
+		},
+		onHide: function(){
+			Controller.prototype.onHide.call(this);
+			
+			if(this.shareModal){
+				this.shareModal.hide();
+			}
 		},
 		onRightButton: function(){
 			if(!this.online){
-				this.onError(null, {message: 'Es necesario contar con una conexion a internet para poder usar el panel de configuracion.'});
+				this.onError(null, {message: 'Necesitas de con una conexion a internet para poder usar el panel de configuracion.'});
 				return;
 			}
 
-			this.hideMenu();
+			Backbone.trigger('header:hide');
 			this.bounceOutLeft();
 
 			if(this.views.settings){
@@ -128,6 +145,15 @@ define(function(require){
 			this.listenToOnce(this.views.settings, 'hide', this.bounceInLeft.bind(this));
 		},
 		setupButtons: function(){
+			forge.topbar.setTint(topBarTint);
+			forge.topbar.setTitle(this.title);
+			forge.topbar.removeButtons();
+			forge.topbar.addButton({
+				icon: 'images/menu@2x.png',
+				position: 'left',
+				prerendered: true
+			}, this.toggleMenu.bind(this));
+			
 			forge.topbar.setTitleImage('images/logo@2x.png');
 			forge.topbar.addButton({
 				icon: 'images/settings@2x.png',
@@ -144,8 +170,8 @@ define(function(require){
 
 			if(!this.model.get('weight')){
 				forge.notification.confirm(
-					'Hey!',	
-					'Necesitas definir tu peso para poder capturar consumo',
+					'¡Hey!',	
+					'Necesitas escribir tu peso para poder generar consumo',
 					'Hacerlo',
 					'Despues',
 					this.onWeightConfirmation.bind(this)
@@ -158,7 +184,7 @@ define(function(require){
 				if(this.consumption && this.consumption >= 100){
 					setTimeout(function(){
 						forge.notification.confirm(
-							'Hey',
+							'¡Hey!',
 							'Ya has logrado tu meta diaria, la sobrehidrtacion no es buena.',
 							'Leer mas',
 							'OK',
@@ -180,19 +206,27 @@ define(function(require){
 				}else {
 					this.modal.show();
 				}
+
+				this.listenToOnce(this.modal, 'hide', this.onShow.bind(this));
 			}
 		},
-		share: function(){
+		share: function(message){
 			if(!this.online){
 				this.offlineError();
 				return;
 			}
-			//Ask to share message
-			window.plugins.socialsharing.share(
-				'Mi meta del dia son ' + this.model.getGoal() + ' litros, hoy he completado el ' + this.consumption + '% de mi hidratacion diaria.',
-				null,
-				null,
-				'http://zoewater.com.mx');
+
+			var goal = this.model.getGoal();
+			var consumption = this.consumption;
+			var user = User.current();
+			var username = user.get('firstName') ? user.get('firstName') : encodeURIComponent(user.get('username'));
+			var m = 'Mi meta del día son ' + this.model.getGoal() + ' litros, hoy he completado el ' + this.consumption + '% de mi hidratación alcalina. #alcalinizate';
+			
+			if(_.isString(message)){
+				m = message;
+			}
+
+			Backbone.trigger('share', m, 'today', username, consumption, goal);
 		},
 		playAudio: function(url) {
 			if(!this.player){
@@ -244,7 +278,15 @@ define(function(require){
 		},
 		onWeightConfirmation: function(y){
 			if(y){
-				this.dom.weight.trigger('click');
+				this.bounceOutLeft();
+
+				if(this.views.weightView){
+					this.views.weightView.show();
+				}else{
+					this.views.weightView = new SettingsWeight().show();
+				}
+
+				this.listenToOnce(this.views.weightView, 'hide', this.bounceInLeft.bind(this));
 			}
 		},
 		onWeightChange: function(){
@@ -263,7 +305,7 @@ define(function(require){
 
 			if(this.consumption >= 100){
 				setTimeout(function(){
-					forge.notification.alert('Felicidades', 'Lograste tu meta de hoy');
+					forge.notification.alert('¡Felicidades!', 'Lograste tu meta de hoy');
 				}, 1);
 			}
 
@@ -293,11 +335,11 @@ define(function(require){
 			this._clearWatchers();
 			this.consumption = null;
 			this.data = null;
-			this.views.stats.unload();
-			this.views.stats = null;
+
+			_.invoke(this.views, Backbone.View.prototype.destroy);
 			this.views = null;
 
-			window.removeEventListener('message', this.onMessage.bind(this));
+			aspect.remove(this, ['bounceInLeft', 'bounceInRight'], this.onShow.bind(this), 'after');
 		},
 		onOffline: function(){
 			Controller.prototype.onOffline.call(this);
@@ -319,6 +361,7 @@ define(function(require){
 			noonWatcher.setHours(12,0,0,0);
 
 			var afternoonWatcher = new Date();
+			//afternoonWatcher.setHours(18,0,0,0);
 			afternoonWatcher.setHours(18,0,0,0);
 
 			var midnightWatcher = new Date();
@@ -326,11 +369,12 @@ define(function(require){
 
 			var now = new Date();
 			var tillMidnight = midnightWatcher - now;
+			var pushData = {badge: 1, sound: 'audio/confirmation/wav'};
 
 			if(now < noonWatcher){
 				this.noonWatcher = setTimeout(function(){
 					if(this.consumption < 50){
-						forge.notification.alert('Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(');
+						forge.notification.alert('¡Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(');
 					}
 				}.bind(this), noonWatcher - now);
 			}
@@ -338,7 +382,7 @@ define(function(require){
 			if(now < afternoonWatcher){
 				this.afternoonWatcher = setTimeout(function(){
 					if(this.consumption < 75){
-						forge.notification.alert('Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(');
+						forge.notification.alert('¡Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(');
 					}
 				}.bind(this), afternoonWatcher - now);
 			}
@@ -346,8 +390,8 @@ define(function(require){
 			if(tillMidnight > 1000*60){
 				this.midnightWatcher = setTimeout(function(){
 					this.playAudio('audio/confirmation.wav');
-					forge.notification.alert('Hey!', 'El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.');
-					Backbone.history.navigate('#', {trigger: true});
+					forge.notification.alert('¡Hey!', 'El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.');
+					Backbone.history.navigate('#home', {trigger: true});
 				}.bind(this), tillMidnight);
 			}
 		},
@@ -372,7 +416,7 @@ define(function(require){
 			this.dom.percentage.text(totalLabel);
 		}
 	});
-
+	
 	var CheckModal = HTMLModal.extend({
 		events: (function () {
 			var events = _.extend({}, HTMLModal.prototype.events, {
@@ -394,7 +438,7 @@ define(function(require){
 				var type = parseInt(value, 10);
 				var consumption = new Journal({consumption: type});
 
-				forge.notification.showLoading('Guardando Consumo');
+				forge.notification.showLoading('Guardando tu Consumo');
 
 				//Save selected consumption
 				consumption.save()
@@ -447,12 +491,22 @@ define(function(require){
 			this.dom.deleteLast = this.$el.find('#deleteLast');
 		},
 		onShow: function(){
+			HTMLModal.prototype.onShow.call(this);
+
 			var user = User.current();
 			var lastConsumption = user.get('lastConsumption');
 
 			if(lastConsumption && lastConsumption.id){
 				this.dom.deleteLast.removeAttr('disabled');
 			}
+
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle('Capturar Consumo');
+			forge.topbar.addButton({
+				icon: 'images/close@2x.png',
+				position: 'left',
+				prerendered: true
+			}, this.hide.bind(this));
 		},
 		onSuccess: function(){
 			forge.notification.hideLoading();

@@ -1,4 +1,4 @@
-/* globals define, _, forge, Zoe, aspect */
+/* globals define, _, forge, Zoe, aspect, Backbone */
 define(function(require){
 	'use strict';
 
@@ -26,6 +26,8 @@ define(function(require){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
             aspect.add(this, ['bounceInLeft', 'bounceInRight'], this.setupButtons.bind(this), 'after');
+
+            Backbone.on('user:login', this.reset, this);
 
 			return this.render();
 		},

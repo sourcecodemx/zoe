@@ -25,6 +25,7 @@ define(function(require){
 			return events;
 		})(),
 		page: 0,
+		totalPages: 0,
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
@@ -47,34 +48,25 @@ define(function(require){
 			return this.render();
 		},
 		getImages: function(){
-			forge.notification.showLoading('Cargando');
 			//Paginate
 			if(this.page >= 0){
 				this.collection.query.skip(this.page*config.GALLERY.LIMIT);
 			}
 
-			this.collection.fetch({
-				success: function(){
-					this.page++;
-					//Remove scrolling class
-					if(this.$el.hasClass('scrolling')){
-						this.$el.removeClass('active scrolling');
-						this.dom.indicator.removeClass('active');
-					}
-					//Once we get to the end of the gallery, display the no-more-photos legend
-					if(this.images.length < config.GALLERY.LIMIT){
-						this.$el.addClass('end-reached');
-						this.dom.content.after('<div id="end" class="padding-large text-center">No hay mas fotografias.</div>');
-					}
-				}.bind(this),
-				error: function(collection, error){
-					if(this.dom.content.find('.pic').length){
-						this.onError(null, error);
-					}else{
-						this.onContentError(error);
-					}
-				}.bind(this)
-			});
+			this.collection.fetch();
+		},
+		countImages: function(){
+			var model = Parse.Object.extend('File');
+			var query = new Parse.Query(model);
+
+			forge.notification.showLoading('Cargando');
+			query.count().then(function(count){
+				var totalPages = Math.ceil(count/config.GALLERY.LIMIT);
+				if(totalPages){
+					this.totalPages = totalPages;
+					this.getImages();
+				}
+			}.bind(this)).fail(this.onError.bind(this));
 		},
 		onRender: function(){
 			Controller.prototype.onRender.call(this);
@@ -86,7 +78,7 @@ define(function(require){
 			this.dom.tabs = this.$el.find('#tabs');
 
 			if(this.online){
-				this.getImages();
+				this.countImages();
 			}else{
 				this.onContentError({message: 'No hay conexion a internet.'});
 			}
@@ -108,16 +100,28 @@ define(function(require){
 				this.removeAll();
 				//Reset pagination
 				this.page = 0;
-				$('#end').remove();
+				this.totalPages = 0;
+				$('#galleryEnd').remove();
 				this.$el.removeClass('end-reached');
-				this.getImages();
+				this.countImages();
 			}else{
 				this.offlineError();
 			}
 		},
 		addAll: function(){
+			this.page++;
 			if(!this.dom.pics.find('.pic').length){
 				this.dom.pics.empty();
+			}
+
+			if(this.$el.hasClass('scrolling')){
+				this.$el.removeClass('active scrolling');
+				this.dom.indicator.removeClass('active');
+			}
+
+			if(this.page === this.totalPages){
+				this.$el.addClass('end-reached');
+				this.dom.pics.after('<div id="galleryEnd" class="infinite-scroll-end">No hay mas imagenes en la galeria.</div>');
 			}
 
 			if(this.collection.length){
@@ -174,7 +178,7 @@ define(function(require){
 		},
 		onPicture: function(model){
 			this.dom.content.addClass('bounceOutLeft animated');
-			this.hideMenu();
+			Backbone.trigger('header:hide');
 			this.views.photo.update(model).show();
 			this.listenToOnce(this.views.photo, 'hide', this.bounceIn.bind(this));
 			this.dom.tabs.hide();
@@ -210,6 +214,13 @@ define(function(require){
 			if(this.$el.hasClass('scrolling')){
 				this.$el.addClass('active');
 				this.getImages();
+			}
+		},
+		checkPosition: function(e){
+			if((this.totalPages <= 1) || (this.page === this.totalPages) || this.$el.hasClass('end-reached')) {
+				return false;
+			}else{
+				Controller.prototype.checkPosition.call(this, e);
 			}
 		}
 	});
@@ -298,7 +309,21 @@ define(function(require){
 
 			this.img.onload = function(){
 				forge.notification.hideLoading();
-				this.dom.image.append($(this.img).addClass('rounded'));
+
+				var $img = $(this.img);
+				//Append image 
+				this.dom.image.append($img);
+
+				var w = $img.width();
+				var h = $img.height();
+				
+				if(w > h){
+					this.dom.image.addClass('horizontal');
+				}else if(h > w){
+					this.dom.image.addClass('vertical');
+				}
+
+				
 			}.bind(this);
 
 			this.base64Data = data;

@@ -92,7 +92,7 @@ define(function(require){
 		},
 		onSuccess: function(){
 			forge.notification.hideLoading();
-			forge.notification.alert('Listo!', 'Se ha enviado un mensaje de recuperacion de contraseña a la direccion de correo especificada.');
+			forge.notification.alert('¡Listo!', 'Se ha enviado un mensaje de recuperacion de contraseña a la direccion de correo especificada.');
 		}
 	});
 });

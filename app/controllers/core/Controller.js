@@ -15,15 +15,11 @@ define(function(require){
 		template: require('templates/page'),
 		errorTemplate: require('templates/page_error'),
 		compiledTemplate: '',
-		loadingLabel: 'Loading',
 		title: 'Default title',
 		description: 'Default Description',
 		showFx: 'fadeIn',
 		hideFx: 'fadeOut',
 		events: {
-			'click #leftButton': 'onLeftButton',
-			'click #title': 'onTitle',
-			'click #rightButton': 'onRightButton',
 			'submit form': 'submit'
 		},
 		mobile: true,
@@ -43,19 +39,15 @@ define(function(require){
 			aspect.add(this, 'show', this.onBeforeShow.bind(this));
 			aspect.add(this, 'hide', this.onBeforeHide.bind(this));
 			aspect.add(this, 'submit', this.onBeforeSubmit.bind(this), 'before');
-			aspect.add(this, 'back', this.reset.bind(this), 'after');
 			aspect.add(this, 'show', this._checkConnection.bind(this), 'before');
 			
 			return this;
 		},
 		submit: function(){},
 		reset: function(){
-			if(this.dom.form){
+			if(this.dom && this.dom.form && this.dom.form.length){
 				this.dom.form.trigger('reset');
 			}
-		},
-		messageListener: function(){
-			window.addEventListener('message', this.onMessage.bind(this));
 		},
 		//Override whenever it makes sense
 		render: function(){
@@ -77,9 +69,6 @@ define(function(require){
 			this.$el.hammer();
 
 			return this;
-		},
-		back: function(){
-			//setTimeout(function(){steroids.layers.pop();}, 1);
 		},
 		checkPosition: function(e){
 			if(this.$el.hasClass('scrolling')){
@@ -122,12 +111,10 @@ define(function(require){
 			this.back();
 		},
 		onRightButton: function(){},
-		onTitle: function(){},
-		onMessage: function(){},
 		onError: function(model, error){
 			forge.notification.hideLoading();
 			_.delay(function(){
-				forge.notification.alert('Ups!', this.message);
+				forge.notification.alert('¡Ups!', this.message);
 			}.bind(error), 1);
 		},
 		onContentError: function(error){
@@ -136,49 +123,7 @@ define(function(require){
 		},
 		onShow: function(){
 			//forge.ui.enhanceAllInputs();
-			this._checkConnection();
-		},
-		bounceOutLeft: function(){
-			this.dom.content.addClass('bounceOutLeft animated');
-			_.delay(function(){
-				this.dom.content.removeClass('bounceOutLeft animated').addClass('hide');
-				this.$el.hide();
-			}.bind(this), 1000);
-		},
-		bounceInLeft: function(){
-			this.$el.show();
-			this.dom.content.removeClass('hide').addClass('bounceInLeft animated');
-			_.delay(function(){
-				this.dom.content.removeClass('bounceInLeft animated');
-			}.bind(this), 1000);
-		},
-		bounceInRight: function(){
-			this.$el.show();
-			this.dom.content.removeClass('hide').addClass('bounceInRight animated');
-			_.delay(function(){
-				this.dom.content.removeClass('bounceInRight animated');
-			}.bind(this), 1000);
-		},
-		bounceOutRight: function(){
-			this.dom.content.addClass('bounceOutRight animated');
-			_.delay(function(){
-				this.dom.content.removeClass('bounceOutRight animated').addClass('hide');
-				this.$el.hide();
-			}.bind(this), 1000);
-		},
-		bounceInUp: function(){
-			this.$el.show();
-			this.dom.content.removeClass('hide').addClass('bounceInUp animated');
-			_.delay(function(){
-				this.dom.content.removeClass('bounceInUp animated');
-			}.bind(this), 1000);
-		},
-		bounceOutDown: function(){
-			this.dom.content.addClass('bounceOutDown animated');
-			_.delay(function(){
-				this.dom.content.removeClass('bounceOutDown animated').addClass('hide');
-				this.$el.hide();
-			}.bind(this), 1000);
+			//this._checkConnection();
 		},
 		onOnline: function(){
 			this.online = true;

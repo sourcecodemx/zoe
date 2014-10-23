@@ -1,12 +1,11 @@
-/*global define, Backbone, aspect, _, User */
+/*global define, Backbone, aspect, _, User, forge */
 
 define([
   'Page',
-  'Redirect'
-], function (Page, Redirect) {
+  'Header',
+  'ShareModal'
+], function (Page, Header, ShareModal) {
   'use strict';
-
-  console.log('Redirect', Redirect);
 
   var AppRouter = Backbone.Router.extend({
     currentView: null,
@@ -21,9 +20,7 @@ define([
       'premier'  : 'premier',
       'pos'      : 'pos',
       'store'    : 'store',
-
-      //Default Route
-      '*path'    : 'index'
+      'share/:message'    : 'share'
     },
 
     /**
@@ -67,14 +64,13 @@ define([
       // but a modal
       var pages = _
         .chain(routes)
-        //.omit(function(v){return v === 'profile';})
+        .omit(function(v){return v === 'share';})
         .toArray()
         .value();
 
       //Will close current view if any
       var beforeAll = function(){
         if (this.currentView instanceof Backbone.View) {
-          console.log('close view', this.currentView.id);
           // For order page we will skip this handling
           this.currentView.hide();
           this.currentView = null;
@@ -85,48 +81,49 @@ define([
 
       //Execute "beforeAll" function before all pages
       aspect.add(this, pages, beforeAll);
-      /*
-      //Will be executed after all pages
-      var afterAll = function(){
-        console.log(this.currentView.id, 'show');
-        this.currentView.show();
-      }.bind(this);
-      //Execute after all pages
-      aspect.add(this, routes, afterAll, 'after');
-      */
-      //Following pages require user to be logged in
-      var authPages = ['home'];
-      var beforeAuth = function(){
-        if(User.current()){
-          return true;
-        }
 
-        throw new Redirect('login');
+      var rootPages = ['home', 'blog', 'gallery', 'about', 'pos', 'premier', 'store'];
+      var beforeRoot = function(){
+        this.header = this.constructor.getHeader();
+        this.header.hide();
       }.bind(this);
       //Execute before all auth-only controllers
-      aspect.add(this, authPages, beforeAuth);
-
-      //Pages that won't be show if user is authenticated
-      var nonAuth = ['index'];
-      var beforeNonAuth = function(){
-        if(User.current()){
-          throw new Redirect('home');
-        }
-
-        return true;
-      }.bind(this);
-      //Execute before all controllers excluded to auth users
-      aspect.add(this, nonAuth, beforeNonAuth);
+      aspect.add(this, rootPages, beforeRoot);
     },
 
     initialize: function(){
-      console.log('initialize router');
-    },
-
-    start: function(){
+      forge.parse.setBadgeNumber(0);
+      //Start history
       Backbone.history.start({
         root: '/'
       });
+
+      if(User.current()){
+        Backbone.history.navigate('#home', {trigger: true});
+      }else{
+        Backbone.history.navigate('#index', {trigger: true});
+      }
+
+      var onLogout = function(){
+        this.homeView.empty();
+        Backbone.history.navigate('#index/bounceInLeft', {trigger: true});
+      }.bind(this);
+
+      var onLogin = function(){
+        if(this.homeView){
+          this.homeView.reload();
+          Backbone.history.navigate('#home/bounceInLeft', {trigger: true});
+        }else{
+          Backbone.history.navigate('#home', {trigger: true});
+        }
+      }.bind(this);
+
+      Backbone.on('user:logout', onLogout);
+      Backbone.on('user:login', onLogin);
+      Backbone.on('share', this.share.bind(this));
+
+      //Hid esplash screen
+      forge.launchimage.hide();
     },
 
     index: function (bounce) {
@@ -174,15 +171,11 @@ define([
     },
 
     gallery: function () {
-      try{
-        if (!this.galleryView) {
-          this.galleryView = new Page.Gallery();
-        }
-
-        this.currentView = this.galleryView.show();
-      }catch(e){
-        console.log(e, e.stack, e.message);
+      if (!this.galleryView) {
+        this.galleryView = new Page.Gallery();
       }
+
+      this.currentView = this.galleryView.show();
     },
 
     premier: function () {
@@ -194,11 +187,13 @@ define([
     },
 
     pos: function () {
-      if (!this.posView) {
-        this.posView = new Page.Pos();
-      }
+      require(['Pos'], function(View){
+        if (!this.posView) {
+          this.posView = new View();
+        }
 
-      this.currentView = this.posView.show();
+        this.currentView = this.posView.show();
+      }.bind(this));
     },
 
     store: function () {
@@ -207,6 +202,29 @@ define([
       }
 
       this.currentView = this.storeView.show();
+    },
+    share: function(m, period, username, consumption, goal){
+      if(!m && !_.isString(m)){
+        return;
+      }
+
+      this.currentView.shareModal = this.constructor.share(m, period, username, consumption, goal);
+    }
+  }, {
+    getHeader: function(){
+      if(!this._header){
+        this._header = new Header();
+        $('body').prepend(this._header.$el);
+      }
+
+      return this._header;
+    },
+    share: function(m, period, username, consumption, goal){
+      if(!this._shareModal){
+        this._shareModal = new ShareModal();
+      }
+
+      return this._shareModal.show(m, period, username, consumption, goal);
     }
   });
 

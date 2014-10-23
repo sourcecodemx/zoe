@@ -76,7 +76,7 @@ define(function(require){
 			//Reset form
 			this.reset();
 			this.bounceOutRight();
-			Backbone.history.navigate('#home/bounceInLeft', {trigger: true});
+			Backbone.trigger('user:login');
 		},
 		setupButtons: function(){
 			forge.topbar.removeButtons();

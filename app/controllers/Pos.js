@@ -1,84 +1,97 @@
-/* globals define, _, google, forge, Backbone */
+/* globals define, _, google, forge, Parse */
 define(function(require){
 	'use strict';
 
+	//MVC
 	var Controller = require('Root');
+	var Detachable = require('Detachable');
 	var config = require('config');
-
-	var Place = Backbone.Model.extend({
-		idAttribute: 'objectId'
+	var Place = Parse.Object.extend('POS');
+	var Places = Parse.Collection.extend({
+		model: Place,
+		query: (new Parse.Query(Place))
 	});
 
-	var Places = Backbone.Collection.extend({
-		model: Place
-	});
+	require('gmaps');
 
-	return Controller.extend({
+	var POS = Controller.extend({
 		id: 'pos-page',
 		template: require('templates/pos'),
-		events: (function () {
-			var events = _.extend({}, Controller.prototype.events, {
-
-			});
-
-			return events;
-		})(),
 		title: 'Puntos de Venta',
 		markers: [],
 		loading: false,
+		infowindow: null,
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
 			this.collection = new Places();
+			this.views.place = new PlaceView().hide();
 
 			this.listenTo(this.collection, 'reset', this.addAll, this);
-
-			window.addEventListener('message', this.onMessage.bind(this));
-
-			if(this.online){
-				this._createInfoWindow();
-			}
+			this.listenTo(this.collection, 'error', this.onError, this);
 
 			return this.render();
 		},
 		addAll: function(){
+			if(!this.collection.models.length){
+				forge.notification.hideLoading();
+				forge.notification.alert('¡Ups!', 'Al parecer no hay ningun punto de venta cercano a ti, intenta con otra ubicación.');
+				return;
+			}
+
+			this.removeAll();
+
 			this.collection.each(this.addMarker.bind(this));
 
 			forge.notification.hideLoading();
 		},
 		addMarker: function(model){
-			var position = model.get('location');
-			var box = this.infowindow;
-			var map = this._getMap();
-			var image = {
-				url: '/images/map_pin.png',
-				scaledSize: new google.maps.Size(15, 40),
-				size: new google.maps.Size(15, 40),
-				origin: new google.maps.Point(0,0)
-			};
-			var marker = new google.maps.Marker({
-				position: new google.maps.LatLng(position.latitude, position.longitude),
-				map: map,
-				title: model.get('nombre'),
-				animation: google.maps.Animation.DROP,
-				icon: image
-			});
-			
-			var content = require('templates/pos_info_window')({data: model.toJSON()});
-			google.maps.event.addListener(marker, 'click', function() {
-				box.setContent(content);
-				box.open(map, this);
-			});
-			this.markers.push(marker);
+			try{
+				var data = model.toJSON();
+				var location = data.location;
+				var map = this._getMap();
+				var image = {
+					url: 'images/map_pin.png',
+					scaledSize: new google.maps.Size(15, 40),
+					size: new google.maps.Size(15, 40),
+					origin: new google.maps.Point(0,0)
+				};
+				var marker = new google.maps.Marker({
+					position: new google.maps.LatLng(location.latitude, location.longitude),
+					map: map,
+					title: model.get('nombre'),
+					animation: google.maps.Animation.DROP,
+					icon: image
+				});
+
+				google.maps.event.addListener(marker, 'click', function() {
+					this.views.place.model.set(data);
+				}.bind(this));
+				this.markers.push(marker);	
+			}catch(e){
+				console.log(e, e.message, e.stock);
+			}
 		},
 		removeAll: function(){
 			_.each(this.markers, this.removeMarker, this);
 			this.markers = [];
-			this.collection.reset(null);
 		},
 		removeMarker: function(marker){
 			marker.setMap(null);
 			marker = null;
+			google.maps.event.removeListener(marker, 'click');
+		},
+		getPlaces: function(position){
+			var location = new Parse.GeoPoint(position);
+			var query = this.collection.query;
+
+			forge.notification.showLoading('Buscando puntos de venta');
+			
+			query
+				.near('location', location)
+				.withinKilometers('location', location, 10);
+
+			this.collection.fetch();
 		},
 		onRender: function(){
 			//Call base method
@@ -108,29 +121,28 @@ define(function(require){
 				this.onContentError({message: 'No es posible cargar el mapa.'});
 			}
 		},
+		onHide: function(){
+			this.views.place.hide();
+		},
 		onCenterChange: function(){
-			if((this._getMap().getZoom() < 12) || this.loading){
-				return;
+			if(this._getMap().getZoom() >= 11){
+				var position = this._getMap().getCenter();
+				var currentCenter = this.currentCenter;
+
+				if(position && currentCenter){
+					var distanceFromLastPosition = Math.ceil(google.maps.geometry.spherical.computeDistanceBetween(position, currentCenter)/1000);
+
+					if(distanceFromLastPosition >= 10){
+						this.currentCenter = position;
+						this.getPlaces({latitude: position.lat(), longitude: position.lng()});
+					}
+				}
 			}
-
-			forge.notification.hideLoading();
-
-			var position = this._getMap().getCenter();
-			var distanceFromLastPosition = Math.ceil(google.maps.geometry.spherical.computeDistanceBetween(position, this.currentCenter)/1000);
-
-			//Fetch new data only if user has moved 10kms from their last position
-			if(distanceFromLastPosition >= 10){
-				forge.notification.showLoading('Cargando');
-				var latlng = {latitude: position.lat(), longitude: position.lng()};
-				this.loading = true;
-				window.postMessage({message: 'pos:fetch', position: latlng});
-			}
-
-			this.currentCenter = position;
 		},
 		onRightButton: function(){
 			if(this.online){
 				this.freestyle = false;
+				this.currentCenter = null;
 				forge.geolocation.getCurrentPosition(
 					this.onGeolocation.bind(this),
 					this.onGeolocationError.bind(this),
@@ -142,28 +154,31 @@ define(function(require){
 			
 		},
 		onGeolocation: function(position){
-			forge.notification.hideLoading();
+			try{
+				this.position = position.coords;
+				this.location = new google.maps.LatLng(this.position.latitude, this.position.longitude);
 
-			this.position = position;
-			this.location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+				if(!this.map){
+					this._getMap();	
+				}
 
-			if(this.map){
 				this.map.setOptions({
 					center: this.location,
 					zoom: 12
 				});
+
 				this.marker.setOptions({
-					center: this.location
+					position: this.location
 				});
-			}else{
-				this._getMap();
+
+				//Set center and zoom, we will use them to compare agains center changes
+				this.currentCenter = this.map.getCenter();
+				this.currentZoom = this.map.getZoom();
+
+				this.getPlaces(this.position);
+			}catch(e){
+				console.log(e, e.stack, e.message);
 			}
-
-			this.currentCenter = this.map.getCenter();
-			this.currentZoom = this.map.getZoom();
-			this.loading = true;
-
-			window.postMessage({message: 'pos:fetch', position: position.coords});
 		},
 		onGeolocationError: function(error){
 			forge.logging.info(error, 'geolocation error');
@@ -181,54 +196,31 @@ define(function(require){
 			//Render map in default position (Mexico)
 			this.onGeolocation({coords: {latitude: config.GEO.DEFAULT_CENTER.lat, longitude: config.GEO.DEFAULT_CENTER.lng}});
 		},
-		onFreestyle: function(index){
-			switch(index){
-			case 1:
-				this.freestyle = true;
-				break;
-			}
-		},
-		onMessage: function(event){
-			var data = event.data;
-			switch(data.message){
-			case 'pos:fetch:success':
-				this.loading = false;
-				forge.notification.hideLoading();
-				/*
-				if(data.places.length){
-					this.removeAll();
-					this.collection.reset(data.places);
-				}else{
-					forge.notification.hideLoading();
-					this.onError(null, {message: 'Al parecer no hay ningun punto de venta cercano a ti, intenta de nuevo.'});
-				}*/
-				break;
-			case 'pos:fetch:error':
-				this.onError(null, data.error);
-				break;
-			}
-		},
 		onOnline: function(){
 			Controller.prototype.onOnline.call(this);
 
-			this._createInfoWindow();
+			this._getMap();
 		},
 		_getMap: function(){
+
+			if(!this.online){
+				return;
+			}
 
 			if(this.map instanceof google.maps.Map){
 				return this.map;
 			}
 
 			if(!this.position){
-				this.position = config.GEO.DEFAULT_CENTER;
+				this.position = config.GEO.DEFAULT_CENTER.coords;
 			}
 
 			if(!this.location){
-				this.location = new google.maps.LatLng(this.position.lat, this.position.lng);
+				this.location = new google.maps.LatLng(this.position.latitude, this.position.longitude);
 			}
 
 			this.image = {
-				url: '/images/user_marker@2x.png',
+				url: 'images/user_marker@2x.png',
 				scaledSize: new google.maps.Size(30, 30),
 				anchor: new google.maps.Point(10, 10)
 			};
@@ -250,22 +242,52 @@ define(function(require){
 			google.maps.event.addListener(this.map, 'zoom_changed', this.onCenterChange.bind(this));
 
 			return this.map;
-		},
-		_createInfoWindow: function(){
-			require(['infobox'], function(InfoBox){
-				this.infowindow = new InfoBox({
-					content: '',
-					maxWidth: 280,
-					pixelOffset: new google.maps.Size(-140, 0),
-					zIndex: null,
-					boxStyle: {
-						background: 'url("http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif") no-repeat',
-						opacity: 0.75,
-						width: '280px'
-					},
-					closeBoxMargin: '12px 4px 2px 2px'
-				});	
-			}.bind(this));
 		}
 	});
+
+	var PlaceView = Detachable.extend({
+		className: 'infobox padding animated',
+		id: 'pos-infobox',
+		template: require('templates/pos_info_window'),
+		events: {
+			'swipe': 'hide',
+			'tap .close': 'hide'
+		},
+		initialize: function(){
+			this.model = new Place();
+			this.listenTo(this.model, 'change', this.update, this);
+
+			return this.render();
+		},
+		render: function(){
+			this.update();
+
+			this.$el.hammer();
+
+			return this;
+		},
+		update: function(){
+			this.$el.html(this.template({data:this.model.toJSON()}));
+			this.show();
+
+			return this;
+		},
+		show: function(){
+			if(!this.isAttached()){
+				this.$el.hide();
+				this._append();
+			}
+
+			this.$el.removeClass('fadeOutDown').addClass('fadeInUp').show();
+
+			return this;
+		},
+		hide: function(){
+			this.$el.removeClass('fadeInUp').addClass('fadeOutDown');
+
+			return this;
+		}
+	});
+
+	return POS;
 });

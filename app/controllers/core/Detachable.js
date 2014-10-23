@@ -84,6 +84,48 @@ define(['underscore', 'jquery', 'backbone', 'aspect'], function(_, $, Backbone, 
 		//Implement yours
 		onShow: function(){},
 		onHide: function(){},
-		onRender: function(){}
+		onRender: function(){},
+		bounceOutLeft: function(){
+			this.dom.content.addClass('bounceOutLeft animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceOutLeft animated').addClass('hide');
+				this.$el.hide();
+			}.bind(this), 1000);
+		},
+		bounceInLeft: function(){
+			this.$el.show();
+			this.dom.content.removeClass('hide').addClass('bounceInLeft animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInLeft animated');
+			}.bind(this), 1000);
+		},
+		bounceInRight: function(){
+			this.$el.show();
+			this.dom.content.removeClass('hide').addClass('bounceInRight animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInRight animated');
+			}.bind(this), 1000);
+		},
+		bounceOutRight: function(){
+			this.dom.content.addClass('bounceOutRight animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceOutRight animated').addClass('hide');
+				this.$el.hide();
+			}.bind(this), 1000);
+		},
+		bounceInUp: function(){
+			this.$el.show();
+			this.dom.content.removeClass('hide').addClass('bounceInUp animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceInUp animated');
+			}.bind(this), 1000);
+		},
+		bounceOutDown: function(){
+			this.dom.content.addClass('bounceOutDown animated');
+			_.delay(function(){
+				this.dom.content.removeClass('bounceOutDown animated').addClass('hide');
+				this.$el.hide();
+			}.bind(this), 1000);
+		}
 	});
 });

@@ -65,6 +65,12 @@ body {
 			}
 		}
 	}
+
+	.infinite-scroll-end {
+		padding: $padding-large-vertical $padding-large-horizontal;
+		text-align: center;
+		@extend .h4;
+	}
 }
 
 .modal {
@@ -74,17 +80,24 @@ body {
 	-webkit-filter: blur(2px);
 }
 
+.modal.option-sheet>div{
+	position: absolute;
+	bottom: $padding-large-vertical*2;
+	width: 100%;
+}
+
 #index-page,
 #login-page,
 #signup-page,
-#weight-config-page,
-#signup-password-page,
-#auth-forgot-password-page {
+#signup-weight-page,
+#signup-password-page {
+	background-image: url(../images/background-1.png);
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-attachment: fixed;
+	
 	.page-content {
-		background-image: url(../images/background-1.png);
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-attachment: fixed;
+		background-color: transparent;
 	}
 }
 

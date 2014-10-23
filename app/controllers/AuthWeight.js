@@ -43,11 +43,6 @@ define(function(require){
 			}catch(e){
 				this.onError(null, e);
 			}
-		},
-		back: function(){
-			this.reset();
-
-			forge.notification.hideLoading();
 		}
 	});
 });

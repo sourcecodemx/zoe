@@ -11,16 +11,16 @@ define('config', function(){
 			KEY: 'f0f806e6c0165a801fb1'
 		},
 		FB: {
-			DEFAULT_PERMISSION: ['email'],
+			DEFAULT_PERMISSION: ['email', 'public_profile', 'publish_actions'],
 			APP_NAME: 'Zoe Water Movil'
 		},
 		CAMERA: {
-			DEFAULT: {width: 500, height: 500, source: 'camera'},
-			GALLERY: {width: 500, height: 500, source: 'gallery'}
+			DEFAULT: {height: 500, source: 'camera'},
+			GALLERY: {height: 500, source: 'gallery'}
 		},
 		GEO: {
 			DEFAULT: { enableHighAccuracy: true },
-			DEFAULT_CENTER: {lat: 19.432608, lng: -99.133208},
+			DEFAULT_CENTER: {coords: {latitude: 19.432608, longitude: -99.133208}},
 			DEFAULT_ZOOM: 6
 		},
 		DATE: {

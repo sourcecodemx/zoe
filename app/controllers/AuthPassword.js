@@ -68,6 +68,7 @@ define(function(require){
 					user.set('username', prefilledData.username);
 					user.set('email', prefilledData.email);
 					user.set('password', prefilledData.password);
+					user.set('settings', {consumptionType: 'weight'});
 
 					user.signUp(null, {
 						success: this.onSuccess.bind(this),
@@ -115,8 +116,8 @@ define(function(require){
 			//Reset form
 			this.reset();
 			this.bounceOutRight();
+			Backbone.trigger('user:login');
 			Zoe.storage.removeItem('signup_prefill');
-			Backbone.history.navigate('#home/bounceInLeft', {trigger: true});
 		}
 	});
 });

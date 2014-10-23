@@ -43,9 +43,7 @@ define('user', ['parse'], function(Parse){
 			var aMonthAgo = new Date((today*1)-(day*30));
 			var userAge = (today - this.createdAt)/day;
 			var goal = this.getGoal()*1000;
-
-			console.log(userAge, aMonthAgo, aWeekAgo, this.createdAt);
-
+			
 			return journal.query()
 				.greaterThanOrEqualTo('createdAt', aMonthAgo)
 				.lessThanOrEqualTo('createdAt', todayEnd)

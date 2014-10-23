@@ -15,7 +15,7 @@ define(function(require){
 		Gallery    : require('Gallery'),
 		Home       : require('Home'),
 		Photo      : require('GalleryPhoto'),
-		Pos        : require('Pos'),
+		//Pos        : require('Pos'),
 		Premier    : require('Premier'),
 		PremierInformation : require('PremierInformation'),
 		Settings   : require('Settings'),
@@ -24,7 +24,7 @@ define(function(require){
 		SettingsPassword : require('SettingsPassword'),
 		SettingsWeight : require('SettingsWeight'),
 		Stats      : require('Stats'),
-		Store      : require('Store'),
+		//Store      : require('Store'),
 		TOS        : require('TOS')
 	};
 });

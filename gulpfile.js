@@ -92,7 +92,8 @@ gulp.task('copy', function(){
             'requirejs/require.js',
             'hammerjs/hammer.min.js',
             'jquery-hammerjs/jquery.hammer.js',
-            'animate.css/animate.min.css'
+            'animate.css/animate.min.css',
+            'requirejs-plugins/src/async.js'
         ], {cwd: 'components/**/**'})
         .pipe(gulp.dest('src/components'));
 });

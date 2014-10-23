@@ -1,4 +1,4 @@
-/* globals define, CryptoJS, _, Parse, forge, User, aspect */
+/* globals define, CryptoJS, _, Parse, forge, User, aspect, Backbone */
 define(function(require) {
     'use strict';
 
@@ -42,9 +42,10 @@ define(function(require) {
         onRender: function() {
             this.dom.weight = this.$el.find('#weight');
             this.dom.content = this.$el.find('.page-content');
+
+            forge.launchimage.hide();
         },
         onMe: function(response) {
-            console.log(response, 'on me');
             var data = {
                 email: response.email,
                 username: response.email.toLowerCase(),
@@ -53,7 +54,10 @@ define(function(require) {
                 lastName: response.last_name || '',
                 fullName: response.name || '',
                 gender: response.gender || '',
-                facebook: true
+                facebook: true,
+                settings: {
+                    consumptionType: 'weight'
+                }
             };
 
             //Atempt saving the user
@@ -74,7 +78,7 @@ define(function(require) {
 						);
 					}else{
 						var user = new User();
-						user.set(data.user)
+						user.set(data)
 							.signUp(null, {
 								success: this.onFBSignupSuccess.bind(this),
 								error: this.onError.bind(this)
@@ -85,15 +89,13 @@ define(function(require) {
 			});
         },
         onFBSignupSuccess: function() {
-            forge.notification.hideLoading();
 
-            var user = User.current();
-            if (!user.get('weight')) {
-                this.dom.weight.trigger('click');
-            }
+            forge.notification.hideLoading();
+            //Reset form
+            this.bounceOutRight();
+            Backbone.trigger('user:login');
         },
-        onFBError: function(response) {
-            console.log('on error', response);
+        onFBError: function() {
             forge.notification.hideLoading();
             this.onError(null, {message: 'No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.'});
         },
@@ -107,26 +109,25 @@ define(function(require) {
                 return;
             }
 
-            var me = function(response) {
+            var me = function() {
                 try{
-                   console.log(response, 'me');
                     forge.notification.showLoading('Autenticando');
                     forge.facebook.api(
-                        '/me',
-                        config.FB.DEFAULT_PERMISSION,
+                        'me',
+                        'GET',
+                        {}, 
                         this.onMe.bind(this),
                         this.onFBError.bind(this)
-                    ); 
+                    );
                 }catch(e){
                     console.log(e, e.message, e.stack);
                 }
                 
             }.bind(this);
-
-            forge.facebook.authorize(config.FB.DEFAULT_PERMISSION, 'friends', me, this.onFBError.bind(this));
+            //Ask for authorization
+            forge.facebook.authorize(config.FB.DEFAULT_PERMISSION, 'all', me, this.onFBError.bind(this));
         },
         login: function(){
-            console.log('login');
             this.bounceOutLeft();
 
             if(this.views.login){
@@ -138,7 +139,6 @@ define(function(require) {
             this.listenToOnce(this.views.login, 'hide', this.bounceInLeft.bind(this));
         },
         signup: function(){
-            console.log('signup');
             this.bounceOutLeft();
 
             if(this.views.signup){

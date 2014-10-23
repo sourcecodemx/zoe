@@ -17,8 +17,7 @@
 	}
 
 	& + #modal,
-	&.ionic-body #image,
-	#pics{
+	&.ionic-body #image{
 		img{
 			@include box-shadow(0 1 4px transparentize(black, 0.3));
 			@extend .rounded;
@@ -45,18 +44,36 @@
 			float: left;
 			width: 33.33%;
 			padding-bottom:0;
+			background-size: cover;
+			max-height: 97px;
+			overflow: hidden;
 
-			a {
-				display: block;
-				min-height: 91px;
+			.rounded {
+				height: 87px;
+				overflow: hidden;
 			}
 		}
 	}
 
-	&+ #modal #image img{
-		max-height: 300px;
-		width: auto;
+	&+ #modal #image{
+		width: 300px;
+		height: 300px;
 		margin: 0 auto;
+		@include box-shadow(0 1 4px transparentize(black, 0.3));
+		@extend .rounded;
+		overflow: hidden;
+
+		&.vertical {
+			img{
+				width: 100%;
+			}
+		}
+
+		&.horizontal {
+			img{
+				height: 100%;
+			} 
+		}
 	}
 }
 

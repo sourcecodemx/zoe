@@ -72,7 +72,7 @@ define(function(require){
 				var data = model.toJSON();
 
 				this.model = model;
-				this.image.src = data.image.url;
+				this.image.src = data.cropped ? data.cropped.url : data.image.url;
 				this.dom.likes.text(data.likes || 0);
 
 				if(isLiked){
