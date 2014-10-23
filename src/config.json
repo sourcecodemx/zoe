@@ -1,0 +1,139 @@
+{
+	"config_version": "4",
+	"name": "Zoe Water Movil",
+	"author": "Source Code",
+	"version": "1.0",
+	"platform_version": "v2.2.5",
+	"description": "Aplicacion de Zoe Water",
+	"core": {
+		"general": {
+			"logging": {
+				"level": "DEBUG"
+			},
+			"reload": true
+		},
+		"ios": {
+			"minimum_version": "6.0",
+			"device_family": "iphone",
+			"webview": "WKWebView",
+			"package_name": "mx.zoewater.app"
+		}
+	},
+	"modules": {
+		"parse": {
+			"version": "2.4",
+			"config": {
+				"clientKey": "Jy03KXgoxpTQcfkpxhburHLc5LSzMaGzlQIoKJk5",
+				"applicationId": "Li087ST1O7bYBGKxhFQhWwlKnPRy4jJ2575mz7C3"
+			}
+		},
+		"geolocation": {
+			"version": "2.1",
+			"config": {
+				"ios": {
+					"always": true
+				}
+			}
+		},
+		"platform": {
+			"version": "2.1"
+		},
+		"damn_you_form_assist": {
+			"version": "2.2"
+		},
+		"camera": {
+			"version": "2.0"
+		},
+		"display": {
+			"version": "2.4",
+			"config": {
+				"orientations": {
+					"ipad": "any",
+					"android": "portrait",
+					"iphone": "portrait"
+				}
+			}
+		},
+		"facebook": {
+			"version": "2.6",
+			"config": {
+				"appid": "748031698593102"
+			}
+		},
+		"file": {
+			"version": "2.5"
+		},
+		"icons": {
+			"version": "2.4",
+			"config": {
+				"ios": {
+					"57": "icons/57.png",
+					"72": "icons/72.png",
+					"76": "icons/76.png",
+					"114": "icons/114.png",
+					"120": "icons/120.png",
+					"144": "icons/144.png",
+					"152": "icons/152.png",
+					"180": "icons/180.png",
+					"prerendered": true
+				}
+			}
+		},
+		"notification": {
+			"version": "2.6"
+		},
+		"parameters": {
+			"version": "2.0",
+			"config": {}
+		},
+		"request": {
+			"version": "2.6",
+			"config": {
+				"permissions": []
+			}
+		},
+		"urlhandler": {
+			"version": "2.1",
+			"config": {
+				"scheme": "zoewater"
+			}
+		},
+		"tabs": {
+			"version": "2.8"
+		},
+		"ui": {
+			"version": "2.1"
+		},
+		"topbar": {
+			"version": "2.6"
+		},
+		"media": {
+			"version": "2.4",
+			"config": {}
+		},
+		"launchimage": {
+			"version": "2.8",
+			"config": {
+				"background-size": "auto",
+				"ios": {
+					"1536x2048": "icons/1536x2048.png",
+					"320x480": "icons/320x480.jpg",
+					"1242x2208": "icons/1242x2208.png",
+					"640x1136": "icons/640x1136.jpg",
+					"2048x1536": "icons/2048X1536.jpg",
+					"1536x2008": "icons/1536x2008.png",
+					"750x1334": "icons/750x1334.png",
+					"1024x768": "icons/1024x768.jpg",
+					"2048x1496": "icons/2048x1496.png",
+					"1024x748": "icons/1024x748.jpg",
+					"640x960": "icons/640x960.jpg",
+					"768x1004": "icons/768x1004.jpg",
+					"768x1024": "icons/768x1024.jpg"
+				},
+				"hide-manually": true,
+				"background-color": "#33465d"
+			}
+		}
+	},
+	"homepage": "http://zoewater.mx"
+}
