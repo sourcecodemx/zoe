@@ -14,6 +14,7 @@ define(function(require){
 		id: 'signup-password-page',
 		template: require('templates/signup_password'),
 		title: '2. Crear cuenta',
+		titleImage: 'images/titles/auth-password.png',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #authTos': 'tos'
@@ -95,7 +96,13 @@ define(function(require){
 		},
 		setupButtons: function(){
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle(this.title);
+			
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+			
 			forge.topbar.addButton({
 				position: 'left',
 				icon: 'images/back@2x.png',

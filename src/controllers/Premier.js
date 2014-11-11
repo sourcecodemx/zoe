@@ -9,6 +9,7 @@ define(function(require){
 		id: 'premier-page',
 		template: require('templates/premier'),
 		title: 'Zoé Water Premier',
+		titleImage: 'images/titles/premier.png',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #information': 'info'

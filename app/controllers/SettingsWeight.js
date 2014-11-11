@@ -8,6 +8,7 @@ define(function(require){
 		id: 'settings-weight-page',
 		template: require('templates/settings_weight'),
 		title: 'Configurar Consumo',
+		titleImage: 'images/titles/settings-consumption.png',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #settings-weight-items label': 'checkConsumptionType'
@@ -84,7 +85,13 @@ define(function(require){
 		},
 		setupButtons: function(){
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle(this.title);
+
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+
 			forge.topbar.addButton({
 				position: 'left',
 				icon: 'images/back@2x.png',
@@ -111,7 +118,7 @@ define(function(require){
 					if(!liters){
 						throw new Error('Por favor introduce una cantidad para poder actualizar tu consumo.');
 					}else if(liters < 1){
-						throw new Error('Por salud no podemos recomendarte consumir menos de 1 litro diario.')
+						throw new Error('Por salud no podemos recomendarte consumir menos de 1 litro diario.');
 					}else if(liters > 4){
 						throw new Error('Por salud no podemos recomandarte consumir mas de 4 litros diarios, la sobre hidratacion no es buena.');
 					}else if(liters === this.data.liters){

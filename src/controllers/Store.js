@@ -8,6 +8,7 @@ define(function(require){
 		id: 'store-page',
 		template: require('templates/store'),
 		title: 'Tienda',
+		titleImage: 'images/titles/store.png',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 

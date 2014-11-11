@@ -12,6 +12,7 @@ define(function(require){
 		id: 'blog-page',
 		template: require('templates/blog'),
 		title: 'Blog',
+		titleImage: 'images/titles/blog.png',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'drag #entries': 'checkPosition',

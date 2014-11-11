@@ -1,8 +1,4 @@
 #pos-page {
-    .scroll-content {
-        top: $padding-large-vertical*2;
-    }
-
 	#map{
 		position: absolute;
 		top: 0;
@@ -27,7 +23,8 @@
         top: -47px;
     }
 
-    background-image: linear-gradient(0deg, $stable, transparentize($stable, 0.6));
+    //background-image: linear-gradient(0deg, $stable, transparentize($stable, 0.6));
+    background-color: $stable;
     display: none;
     color:#fff;
     position: absolute;

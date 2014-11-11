@@ -9,6 +9,7 @@ define(function(require){
 		id: 'gallery-image-page',
 		template: require('templates/gallery_image'),
 		title: 'Foto',
+		titleImage: 'images/titles/gallery-picture.png',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #like.upvote': 'upvote',
@@ -48,11 +49,17 @@ define(function(require){
 			this.trigger('hide');
 			_.delay(this._detach.bind(this), 1000);
 
-			this.model.stopListening(this.model);
+			this.stopListening(this.model);
 		},
 		onShow: function(){
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle(this.title);
+
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+			
 			forge.topbar.addButton({
 				position: 'left',
 				icon: 'images/back@2x.png',

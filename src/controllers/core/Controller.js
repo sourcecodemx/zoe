@@ -79,7 +79,9 @@ define(function(require){
 				var wheight = $(window).height();
 				var height = $(e.currentTarget).height();
 
-				if(offset + wheight - 100 > height){
+				console.log(offset, wheight, height, 'offsets');
+
+				if(offset + wheight > height){
 					this.$el.addClass('scrolling');
 					this.dom.indicator.addClass('active');
 				}
@@ -122,8 +124,7 @@ define(function(require){
 			this.dom.content.html(this.errorTemplate({message: error.message}));
 		},
 		onShow: function(){
-			//forge.ui.enhanceAllInputs();
-			//this._checkConnection();
+			forge.ui.enhanceAllInputs();
 		},
 		onOnline: function(){
 			this.online = true;

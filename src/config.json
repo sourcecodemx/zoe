@@ -82,11 +82,11 @@
 					"prerendered": true
 				},
 				"android": {
-					"36": "icons/36.png",
-					"48": "icons/48.png",
-					"72": "icons/72.png",
-					"96": "icons/96.png",
-					"144": "icons/144.png"
+					"36": "icons/android-36.png",
+					"48": "icons/android-48.png",
+					"72": "icons/android-72.png",
+					"96": "icons/android-96.png",
+					"144": "icons/android-144.png"
 				}
 			}
 		},

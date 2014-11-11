@@ -1,4 +1,4 @@
-/* globals define, _, forge, Backbone, topBarTint, buttonTint, User, aspect, Parse  */
+/* globals define, _, forge, Backbone, topBarTint, buttonTint, User, aspect  */
 define(function(require){
 	'use strict';
 
@@ -309,7 +309,7 @@ define(function(require){
 				}, 1);
 			}
 
-			this.playAudio('audio/confirmation.wav');
+			this.playAudio('audio/confirmation.mp3');
 			
 		},
 		onJournal: function(milltrs){
@@ -369,7 +369,7 @@ define(function(require){
 
 			var now = new Date();
 			var tillMidnight = midnightWatcher - now;
-			var pushData = {badge: 1, sound: 'audio/confirmation/wav'};
+			//var pushData = {badge: 1, sound: 'audio/confirmation/wav'};
 
 			if(now < noonWatcher){
 				this.noonWatcher = setTimeout(function(){
@@ -389,7 +389,7 @@ define(function(require){
 			//Reload home page layout after midnight
 			if(tillMidnight > 1000*60){
 				this.midnightWatcher = setTimeout(function(){
-					this.playAudio('audio/confirmation.wav');
+					this.playAudio('audio/confirmation.mp3');
 					forge.notification.alert('¡Hey!', 'El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.');
 					Backbone.history.navigate('#home', {trigger: true});
 				}.bind(this), tillMidnight);
@@ -427,6 +427,8 @@ define(function(require){
 			return events;
 		})(),
 		template: require('templates/home_modal_check'),
+		title: 'Capturar Consumo',
+		titleImage: 'images/titles/track.png',
 		initialize: function(){
 			HTMLModal.prototype.initialize.apply(this, arguments);
 
@@ -501,7 +503,13 @@ define(function(require){
 			}
 
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle('Capturar Consumo');
+
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+
 			forge.topbar.addButton({
 				icon: 'images/close@2x.png',
 				position: 'left',

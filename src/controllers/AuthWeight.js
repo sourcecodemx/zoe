@@ -8,6 +8,7 @@ define(function(require){
 		id: 'signup-weight-page',
 		template: require('templates/signup_weight'),
 		title: 'Configuracion',
+		titleImage: 'images/titles/settings-consumption.png',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 

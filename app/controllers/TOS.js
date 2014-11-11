@@ -9,6 +9,7 @@ define(function(require){
 		template: template,
 		title: 'Terminos de uso',
 		currentLabel: '',
+		titleImage: 'images/titles/tos.png',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
@@ -24,7 +25,13 @@ define(function(require){
 		},
 		onShow: function(){
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle(this.title);
+
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+			
 			forge.topbar.addButton({
 				icon: 'images/close@2x.png',
 				position: 'left',

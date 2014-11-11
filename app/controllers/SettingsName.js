@@ -1,4 +1,4 @@
-/* globals define, User, forge  */
+/* globals define, User, forge, _ */
 define(function(require){
 	'use strict';
 
@@ -8,6 +8,7 @@ define(function(require){
 		id: 'settings-name-page',
 		template: require('templates/settings_name'),
 		title: 'Cambiar Nombre',
+		titleImage: 'images/titles/settings-name.png',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
@@ -32,7 +33,13 @@ define(function(require){
 		},
 		setupButtons: function(){
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle(this.title);
+
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+
 			forge.topbar.addButton({
 				position: 'left',
 				icon: 'images/back@2x.png',

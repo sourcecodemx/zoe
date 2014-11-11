@@ -18,6 +18,7 @@ define(function(require){
 		id: 'pos-page',
 		template: require('templates/pos'),
 		title: 'Puntos de Venta',
+		titleImage: 'images/titles/pos.png',
 		markers: [],
 		loading: false,
 		infowindow: null,

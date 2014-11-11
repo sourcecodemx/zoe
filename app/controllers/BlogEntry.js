@@ -9,6 +9,7 @@ define(function(require){
 		id: 'blog-entry-page',
 		template: require('templates/blog_entry'),
 		title: 'Blog',
+		titleImage: 'images/titles/blog.png',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 

@@ -14,6 +14,7 @@ define(function(require){
 		id: 'gallery-page',
 		template: require('templates/gallery'),
 		title: 'Galeria',
+		titleImage: 'images/titles/gallery.png',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #take': 'takePicture',

@@ -13,6 +13,7 @@ define(function(require){
 		id: 'settings-page',
 		template: require('templates/settings'),
 		title: 'Configuracion',
+		titleImage: 'images/titles/settings.png',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #signout': 'signout',
@@ -117,7 +118,13 @@ define(function(require){
 		},
 		setupButtons: function(){
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle(this.title);
+
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+
 			forge.topbar.addButton({
 				position: 'left',
 				icon: 'images/back@2x.png',

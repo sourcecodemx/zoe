@@ -108,10 +108,10 @@ require(
 		try{
 			window.App = new Router();
 
-			var onPush = function(data){
+			var onPush = function(){
 				forge.parse.setBadgeNumber(0);
 			};
-			var onPushError = function(error){
+			var onPushError = function(){
 			};
 			forge.event.messagePushed.addListener(onPush, onPushError);
 		}catch(e){

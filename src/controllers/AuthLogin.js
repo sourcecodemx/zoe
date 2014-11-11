@@ -14,6 +14,7 @@ define(function(require){
 		id: 'login-page',
 		template: require('templates/login'),
 		title: 'Ingresa a tu cuenta',
+		titleImage: 'images/titles/auth-login.png',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #forgot': 'forgot'
@@ -80,7 +81,13 @@ define(function(require){
 		},
 		setupButtons: function(){
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle(this.title);
+			
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+			
 			forge.topbar.addButton({
 				position: 'left',
 				icon: 'images/back@2x.png',

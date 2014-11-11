@@ -13698,6 +13698,8 @@ a.button {
   box-shadow: 0 3px 2px #2d3d52;
   top: -100%;
   margin-top: 20px;
+  margin: 0;
+  left: 0;
 }
 #menu ul li {
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
@@ -13927,9 +13929,6 @@ a.button {
   background: black;
 }
 
-#pos-page .scroll-content {
-  top: 20px;
-}
 #pos-page #map {
   position: absolute;
   top: 0;
@@ -13939,7 +13938,7 @@ a.button {
 }
 
 #pos-infobox {
-  background-image: linear-gradient(0deg, #33465d, rgba(51, 70, 93, 0.4));
+  background-color: #33465d;
   display: none;
   color: #fff;
   position: absolute;
@@ -13984,8 +13983,17 @@ a.button {
   height: 100%;
 }
 
+#tos-page {
+  position: absolute;
+  z-index: 1000;
+}
 #tos-page .page-content {
   background: #33465d;
+}
+
+#auth-forgot-password-page {
+  position: absolute;
+  z-index: 1000;
 }
 
 html,

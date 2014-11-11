@@ -9,6 +9,7 @@ define(function(require){
 		id: 'premier-information-page',
 		template: template,
 		title: 'Informacion',
+		titleImage: 'images/titles/premier-information.png',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
@@ -35,7 +36,13 @@ define(function(require){
 		},
 		onShow: function(){
 			forge.topbar.setTint([0,0,0,255]);
-			forge.topbar.setTitle(this.title);
+			
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+			
 			forge.topbar.removeButtons();
 			forge.topbar.addButton({
 				icon: 'images/close@2x.png',
