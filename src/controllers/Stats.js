@@ -16,7 +16,6 @@ define(function(require){
 		},
 		computedLabel: '',
 		computedStatus: '',
-		titleImage: 'images/titles/stats.png',
 		initialize: function(){
 			Detachable.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
 
@@ -76,6 +75,7 @@ define(function(require){
 		id: 'stats-page',
 		template: template,
 		title: 'Estadisticas',
+		titleImage: 'images/titles/stats.png',
 		currentLabel: '',
 		initialize: function(options){
 			Controller.prototype.initialize.apply(this, arguments);

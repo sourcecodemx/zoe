@@ -65,7 +65,7 @@ define(function(require){
 					throw new Error('Ese es tu nombre de usuario actual, no hay necesidad de guardarlo de nuevo.');
 				}
 
-				forge.notification.showLoading('Guardando');
+				window.showLoading('Guardando');
 				User.current()
 					.save('username', name)
 					.then(this.onSuccess.bind(this))
@@ -75,9 +75,9 @@ define(function(require){
 			}
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
-			forge.notification.showLoading('Tu nombre de usuario se ha actualizado.');
-			setTimeout(forge.notification.hideLoading.bind(window), 2000);
+			window.hideLoading();
+			window.showLoading('Tu nombre de usuario se ha actualizado.');
+			setTimeout(window.hideLoading.bind(window), 2000);
 		}
 	});
 });

@@ -42,7 +42,7 @@ define(function(require){
 			var model = Parse.Object.extend('Blog');
 			var query = new Parse.Query(model);
 
-			forge.notification.showLoading('Cargando');
+			window.showLoading('Cargando');
 			query.count().then(function(count){
 				var totalPages = Math.ceil(count/config.BLOG.LIMIT);
 				if(totalPages){
@@ -111,7 +111,7 @@ define(function(require){
 				this.onContentError({message: 'No hay publicaciones en el blog.'});
 			}
 
-			forge.notification.hideLoading();
+			window.hideLoading();
 		},
 		removeAll: function(){
 			_.invoke(this.entries, Entry.prototype.destroy);

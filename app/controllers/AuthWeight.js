@@ -1,4 +1,4 @@
-/* globals define, forge  */
+/* globals define */
 define(function(require){
 	'use strict';
 
@@ -39,7 +39,7 @@ define(function(require){
 					throw new Error('El peso debe ser un numero, por favor intente de nuevo.');
 				}
 
-				forge.notification.showLoading('Guardando');
+				window.showLoading('Guardando');
 				//window.postMessage({message: 'user:weight:save', weight: w});
 			}catch(e){
 				this.onError(null, e);

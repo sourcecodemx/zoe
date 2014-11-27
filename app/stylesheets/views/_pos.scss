@@ -11,7 +11,7 @@
 #pos-infobox {
 
     button.close {
-        background-color: transparentize($stable, 0.6);
+        background-color: $stable;
         background-image: url(../images/close@2x.png);
         background-repear: no-repeat;
         background-size: cover;

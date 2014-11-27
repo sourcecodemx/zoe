@@ -143,13 +143,13 @@ body {
 	position: fixed;
 	top: 50%;
 	bottom: 0;
-	height: 100px;
+	height: 80px;
 	background: rgba(0,0,0,0.7);
 	//line-height: 100px;
 	left:50%;
-	width:100px;
-	margin-left:-50px;
-	margin-top:-50px;
+	width:150px;
+	margin-left:-75px;
+	margin-top:-40px;
 	text-align: center;
 	font-weight: bold;
 	text-transform: capitalize;
@@ -157,9 +157,27 @@ body {
 	padding-top: 1em;
 	z-index: $z-index-backdrop + 1;
 	display: none;
+	font-weight: bold;
 
 	.icon {
-		font-size: 3em;
+		font-size: 2em;
+		display: inline-block
+	}
+
+	span {
+		display: block;
+		height: 1em;
+		line-height: 1em;
+		margin-bottom: 0px;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 0px;
+		overflow-x: hidden;
+		overflow-y: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		width: 90%;
+		word-wrap: break-word;
 	}
 }
 

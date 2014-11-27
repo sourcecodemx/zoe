@@ -60,7 +60,7 @@ define(function(require){
 			var model = Parse.Object.extend('File');
 			var query = new Parse.Query(model);
 
-			forge.notification.showLoading('Cargando');
+			window.showLoading('Cargando');
 			query.count().then(function(count){
 				var totalPages = Math.ceil(count/config.GALLERY.LIMIT);
 				if(totalPages){
@@ -134,7 +134,7 @@ define(function(require){
 				this.onContentError({message: 'No hay imagenes en la galeria.'});
 			}
 
-			forge.notification.hideLoading();
+			window.hideLoading();
 		},
 		addOne: function(model){
 			//Create image view
@@ -277,7 +277,7 @@ define(function(require){
 		},
 		save: function(){
 			if(this.base64Data.length > 0){
-				forge.notification.showLoading('Guardando');
+				window.showLoading('Guardando');
 
 				var img = new Parse.File('foto.jpg', { base64: this.base64Data });
 				var file = new File({image: img});
@@ -306,10 +306,10 @@ define(function(require){
 		update: function(data){
 			this.img = new Image();
 
-			forge.notification.showLoading('Cargando imagen');
+			window.showLoading('Cargando imagen');
 
 			this.img.onload = function(){
-				forge.notification.hideLoading();
+				window.hideLoading();
 
 				var $img = $(this.img);
 				//Append image 
@@ -346,14 +346,14 @@ define(function(require){
 		onShow: function(){
 			HTMLModal.prototype.onShow.call(this);
 
-			forge.notification.hideLoading();
+			window.hideLoading();
 		},
 		onSave: function(file){
 			try{
-				forge.notification.hideLoading();
-				forge.notification.showLoading('Imagen Guardada');
+				window.hideLoading();
+				window.showLoading('Imagen Guardada');
 
-				_.delay(forge.notification.hideLoading, 2000);
+				_.delay(window.hideLoading, 2000);
 
 				Backbone.trigger('gallery:image:prepend', file);
 				this.hide();

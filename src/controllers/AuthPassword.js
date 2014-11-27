@@ -60,7 +60,7 @@ define(function(require){
 				var confirmation = this.dom.passwordConfirmation.val();
 
 				if(!_.isEmpty(prefilledData) && !_.isEmpty(password) && !_.isEmpty(confirmation) && (password === confirmation)){
-					forge.notification.showLoading('Creando Cuenta');
+					window.showLoading('Creando Cuenta');
 
 					//Add password to the object
 					prefilledData.password = password;
@@ -119,7 +119,7 @@ define(function(require){
 			this.listenToOnce(this.views.tos, 'hide', this.setupButtons.bind(this));
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
+			window.hideLoading();
 			//Reset form
 			this.reset();
 			this.bounceOutRight();

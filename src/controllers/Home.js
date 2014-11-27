@@ -84,7 +84,7 @@ define(function(require){
 			this.render().show();
 		},
 		updateJournal: function(){
-			forge.notification.showLoading('Actualizando tu Consumo');
+			window.showLoading('Actualizando tu Consumo');
 			//Get Journal data
 			this.model.getJournal()
 				.then(this.onJournal.bind(this))
@@ -246,11 +246,11 @@ define(function(require){
 				return;
 			}
 
-			forge.notification.showLoading('Cargando Estadisticas');
+			window.showLoading('Cargando Estadisticas');
 
 			this.model.getStats()
 				.then(function(computed){
-					forge.notification.hideLoading();
+					window.hideLoading();
 					//Create and show stats modal
 					if(this.views.stats){
 						this.views.stats.update(computed).show();
@@ -263,7 +263,7 @@ define(function(require){
 					this.listenToOnce(this.views.stats, 'hide', this.onShow.bind(this));
 				}.bind(this))
 				.fail(function(error){
-					forge.notification.hideLoading();
+					window.hideLoading();
 					this.onError(null, error);
 				}.bind(this));
 		},
@@ -314,7 +314,7 @@ define(function(require){
 		},
 		onJournal: function(milltrs){
 			try{
-				forge.notification.hideLoading();
+				window.hideLoading();
 
 				var liters = parseFloat((milltrs/1000).toFixed(2), 10);
 				var goal = this.model.getGoal();
@@ -327,7 +327,7 @@ define(function(require){
 			
 		},
 		onJournalError: function(error){
-			forge.notification.hideLoading();
+			window.hideLoading();
 			this.onError(null, error);
 		},
 		onDestroy: function(){
@@ -440,7 +440,7 @@ define(function(require){
 				var type = parseInt(value, 10);
 				var consumption = new Journal({consumption: type});
 
-				forge.notification.showLoading('Guardando tu Consumo');
+				window.showLoading('Guardando tu Consumo');
 
 				//Save selected consumption
 				consumption.save()
@@ -517,16 +517,16 @@ define(function(require){
 			}, this.hide.bind(this));
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
-			forge.notification.showLoading('Consumo Guardado');
+			window.hideLoading();
+			window.showLoading('Consumo Guardado');
 			setTimeout(function(){
-				forge.notification.hideLoading();
+				window.hideLoading();
 				Backbone.trigger('user:consumption:successs');
 			}, 2000);
 			this.hide();
 		},
 		onError: function(model, error){
-			forge.notification.hideLoading();
+			window.hideLoading();
 			Controller.prototype.onError.call(this, null, error);
 		}
 	});

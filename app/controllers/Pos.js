@@ -35,7 +35,7 @@ define(function(require){
 		},
 		addAll: function(){
 			if(!this.collection.models.length){
-				forge.notification.hideLoading();
+				window.hideLoading();
 				forge.notification.alert('¡Ups!', 'Al parecer no hay ningun punto de venta cercano a ti, intenta con otra ubicación.');
 				return;
 			}
@@ -44,7 +44,7 @@ define(function(require){
 
 			this.collection.each(this.addMarker.bind(this));
 
-			forge.notification.hideLoading();
+			window.hideLoading();
 		},
 		addMarker: function(model){
 			try{
@@ -86,7 +86,7 @@ define(function(require){
 			var location = new Parse.GeoPoint(position);
 			var query = this.collection.query;
 
-			forge.notification.showLoading('Buscando puntos de venta');
+			window.showLoading('Buscando puntos de venta');
 			
 			query
 				.near('location', location)
@@ -112,7 +112,7 @@ define(function(require){
 			}, this.onRightButton.bind(this));
 
 			if(this.online){
-				forge.notification.showLoading('Cargando');
+				window.showLoading('Cargando');
 				forge.geolocation.getCurrentPosition(
 					this.onGeolocation.bind(this),
 					this.onGeolocationError.bind(this),

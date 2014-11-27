@@ -13747,7 +13747,7 @@ a.button {
   box-shadow: 0 20px 20px rgba(0, 0, 0, 0.3);
 }
 #home-page + #modal #bottles {
-  margin-bottom: 60px;
+  margin-bottom: 30px;
 }
 
 #settings-page #settingsBottle {
@@ -13949,7 +13949,7 @@ a.button {
   text-shadow: #33465d 1px 0px 1px;
 }
 #pos-infobox button.close {
-  background-color: rgba(51, 70, 93, 0.4);
+  background-color: #33465d;
   background-image: url(../images/close@2x.png);
   background-repear: no-repeat;
   background-size: cover;
@@ -14111,12 +14111,12 @@ body {
   position: fixed;
   top: 50%;
   bottom: 0;
-  height: 100px;
+  height: 80px;
   background: rgba(0, 0, 0, 0.7);
   left: 50%;
-  width: 100px;
-  margin-left: -50px;
-  margin-top: -50px;
+  width: 150px;
+  margin-left: -75px;
+  margin-top: -40px;
   text-align: center;
   font-weight: bold;
   text-transform: capitalize;
@@ -14124,9 +14124,26 @@ body {
   padding-top: 1em;
   z-index: 12;
   display: none;
+  font-weight: bold;
 }
 #spinner .icon {
-  font-size: 3em;
+  font-size: 2em;
+  display: inline-block;
+}
+#spinner span {
+  display: block;
+  height: 1em;
+  line-height: 1em;
+  margin-bottom: 0px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 90%;
+  word-wrap: break-word;
 }
 
 .ion-infinite-scroll {

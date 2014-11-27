@@ -114,13 +114,13 @@ define(function(require){
 		},
 		onRightButton: function(){},
 		onError: function(model, error){
-			forge.notification.hideLoading();
+			window.hideLoading();
 			_.delay(function(){
 				forge.notification.alert('¡Ups!', this.message);
 			}.bind(error), 1);
 		},
 		onContentError: function(error){
-			forge.notification.hideLoading();
+			window.hideLoading();
 			this.dom.content.html(this.errorTemplate({message: error.message}));
 		},
 		onShow: function(){

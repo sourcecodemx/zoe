@@ -30,7 +30,7 @@ define(function(require){
 			};
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
+			window.hideLoading();
 			this.dom.form.trigger('reset');
 			forge.notification.alert('¡Gracias!', 'Nos podremos en contacto contigo');
 		},
@@ -54,7 +54,7 @@ define(function(require){
 		},
 		submit: function(e){
 			try{
-				forge.notification.showLoading('Enviando');
+				window.showLoading('Enviando');
 
 				if(e && e.preventDefault){
 					e.preventDefault();

@@ -141,7 +141,7 @@ define(function(require){
 					break;
 				}
 				
-				forge.notification.showLoading('Guardando');
+				window.showLoading('Guardando');
 
 				User.current()
 					.save(data)
@@ -152,9 +152,9 @@ define(function(require){
 			}
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
-			forge.notification.showLoading('Tu consumo ha sido actualizado.');
-			setTimeout(forge.notification.hideLoading.bind(window), 2000);
+			window.hideLoading();
+			window.showLoading('Tu consumo ha sido actualizado.');
+			setTimeout(window.hideLoading.bind(window), 2000);
 		}
 	});
 });

@@ -64,7 +64,7 @@ define(function(require){
 					throw new Error('La contraseña no parece conincidir con la confirmacion.');
 				}
 
-				forge.notification.showLoading('Guardando');
+				window.showLoading('Guardando');
 				User.current()
 					.save('password', password)
 					.then(this.onSuccess.bind(this))
@@ -74,9 +74,9 @@ define(function(require){
 			}
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
-			forge.notification.showLoading('Tu contraseña ha sido actualizada.');
-			setTimeout(forge.notification.hideLoading.bind(window), 2000);
+			window.hideLoading();
+			window.showLoading('Tu contraseña ha sido actualizada.');
+			setTimeout(window.hideLoading.bind(window), 2000);
 		}
 	});
 });

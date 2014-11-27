@@ -61,7 +61,7 @@ define(function(require){
 					throw new Error('Por favor ingresa tus credenciales.');
 				}
 
-				forge.notification.showLoading('Autenticando');
+				window.showLoading('Autenticando');
 				User.logIn(u.toLowerCase(), p)
 					.then(this.onSuccess.bind(this))
 					.fail(this.onError.bind(this));
@@ -70,10 +70,16 @@ define(function(require){
 			}
 		},
 		onError: function(error){
+			switch(error.code){
+			case 101:
+				error.message = "Nombre de usuario o contraseña incorrectos";
+				break;
+			}
+			
 			Controller.prototype.onError.call(this, null, error);
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
+			window.hideLoading();
 			//Reset form
 			this.reset();
 			this.bounceOutRight();

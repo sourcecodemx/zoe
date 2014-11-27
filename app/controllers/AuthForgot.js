@@ -62,7 +62,7 @@ define(function(require){
 					throw new Error('Por favor ingresa tu correo electronico.');
 				}
 
-				forge.notification.showLoading('Enviando');
+				window.showLoading('Enviando');
 
 				//Send forgot password email
 				var forgotModel = Parse.Object.extend({className: '_User'});
@@ -98,7 +98,7 @@ define(function(require){
 			}
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
+			window.hideLoading();
 			forge.notification.alert('¡Listo!', 'Se ha enviado un mensaje de recuperacion de contraseña a la direccion de correo especificada.');
 		}
 	});

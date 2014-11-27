@@ -65,7 +65,7 @@ define(function(require){
 					throw new Error('Ese es tu correo actual, no hay necesidad de guardarlo de nuevo.');
 				}
 
-				forge.notification.showLoading('Guardando');
+				window.showLoading('Guardando');
 				User.current()
 					.save('email', email)
 					.then(this.onSuccess.bind(this))
@@ -75,9 +75,9 @@ define(function(require){
 			}
 		},
 		onSuccess: function(){
-			forge.notification.hideLoading();
-			forge.notification.showLoading('Tu correo ha sido actualizado.');
-			setTimeout(forge.notification.hideLoading.bind(window), 2000);
+			window.hideLoading();
+			window.showLoading('Tu correo ha sido actualizado.');
+			setTimeout(window.hideLoading.bind(window), 2000);
 		}
 	});
 });

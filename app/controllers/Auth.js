@@ -90,17 +90,17 @@ define(function(require) {
         },
         onFBSignupSuccess: function() {
 
-            forge.notification.hideLoading();
+            window.hideLoading();
             //Reset form
             this.bounceOutRight();
             Backbone.trigger('user:login');
         },
         onFBError: function() {
-            forge.notification.hideLoading();
+            window.hideLoading();
             this.onError(null, {message: 'No hemos podido iniciar sesion con Facebook, por favor intenta de nuevo.'});
         },
         onError: function() {
-            forge.notification.hideLoading();
+            window.hideLoading();
             Controller.prototype.onError.apply(this, Array.prototype.slice.call(arguments));
         },
         facebook: function() {
@@ -111,7 +111,7 @@ define(function(require) {
 
             var me = function() {
                 try{
-                    forge.notification.showLoading('Autenticando');
+                    window.showLoading('Autenticando');
                     forge.facebook.api(
                         'me',
                         'GET',
