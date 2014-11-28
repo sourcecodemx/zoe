@@ -72,7 +72,7 @@ define(function(require) {
 							data.username,
 							data.password,
 							{
-								success: this.onFBSignupSuccess.bind(this),
+								 success: this.onFBLoginSuccess.bind(this),
 								error: this.onError.bind(this)
 							}
 						);
@@ -88,12 +88,18 @@ define(function(require) {
 				error: this.onError.bind(this)
 			});
         },
+        onFBLoginSuccess: function(){
+            forge.notification.hideLoading();
+            //Reset form
+            this.bounceOutRight();
+            Backbone.trigger('user:login');
+        },
         onFBSignupSuccess: function() {
 
             window.hideLoading();
             //Reset form
             this.bounceOutRight();
-            Backbone.trigger('user:login');
+            Backbone.trigger('user:login', true);
         },
         onFBError: function() {
             window.hideLoading();

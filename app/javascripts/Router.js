@@ -109,12 +109,20 @@ define([
         Backbone.history.navigate('#index/bounceInLeft', {trigger: true});
       }.bind(this);
 
-      var onLogin = function(){
+      var onLogin = function(signup){
         if(this.homeView){
           this.homeView.reload();
           Backbone.history.navigate('#home/bounceInLeft', {trigger: true});
         }else{
           Backbone.history.navigate('#home', {trigger: true});
+        }
+
+        if(signup){
+          if(this.weightView){
+            this.weightView.show();
+          }else{
+            this.weightView = new Page.Weight().show();
+          }
         }
       }.bind(this);
 

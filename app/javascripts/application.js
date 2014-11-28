@@ -49,11 +49,11 @@ require.config({
 		Pos:          '../controllers/Pos',
 		Premier:      '../controllers/Premier',
 		PremierInformation: '../controllers/PremierInformation',
-		Settings:     '../controllers/Settings',
-		SettingsEmail: '../controllers/SettingsEmail',
-		SettingsName: '../controllers/SettingsName',
-		SettingsPassword: '../controllers/SettingsPassword',
-		SettingsWeight: '../controllers/SettingsWeight',
+		Settings:            '../controllers/Settings',
+		SettingsEmail:       '../controllers/SettingsEmail',
+		SettingsName:        '../controllers/SettingsName',
+		SettingsPassword:    '../controllers/SettingsPassword',
+		SettingsConsumption: '../controllers/SettingsConsumption',
 		Stats:        '../controllers/Stats',
 		Store:        '../controllers/Store',
 		TOS:          '../controllers/TOS',
@@ -105,6 +105,7 @@ require(
 	['setup', 'Router'],
 	function(setup, Router){
 		'use strict';
+		
 		try{
 			window.App = new Router();
 
