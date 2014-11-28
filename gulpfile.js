@@ -86,11 +86,13 @@ gulp.task('copy', function(){
             'backbone/backbone.js',
             'cryptojslib/rollups/sha3.js',
             'jquery/dist/jquery.min.js',
+            'jquery/dist/jquery.min.map',
             'lodash/dist/lodash.min.js',
             'parse-1.2.19.min/index.js',
             'pusher/dist/pusher.min.js',
             'requirejs/require.js',
             'hammerjs/hammer.min.js',
+            'hammerjs/hammer.min.map',
             'jquery-hammerjs/jquery.hammer.js',
             'animate.css/animate.min.css',
             'requirejs-plugins/src/async.js'

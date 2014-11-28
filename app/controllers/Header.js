@@ -6,6 +6,7 @@ define(function(require){
 		events: {
 			'tap button[root]': 'showRootView',
 			'tap #menuStoreItem': 'store',
+			'tap #menuOverlay': 'toggle',
 			'swipeup': 'toggle'
 		},
 		template: require('templates/menu'),
@@ -28,10 +29,13 @@ define(function(require){
 				}
 
 				var $target = $(e.currentTarget);
-				var page = $target.attr('data-view');
+				var page = $target.attr('data-view').replace('#', '');
+				var currentFragment = Backbone.history.getFragment();
 				
-				Backbone.history.navigate(page, {trigger: true});
-
+				if(page !== currentFragment){
+					Backbone.history.navigate(page, {trigger: true});
+				}
+				
 				this.toggle();
 			}catch(e){
 				console.log(e, e.stack);
@@ -48,12 +52,15 @@ define(function(require){
 		},
 		toggle: function(){
 			var $el = this.$el;
+			var $overlay = $el.find('#menuOverlay');
 	        var pos = $el.position().top;
 
 	        if(pos < 0){
 	          $el.animate({top: 0});
+	          $overlay.show();
 	        }else{
 	          $el.animate({top: '-100%'});
+	          $overlay.hide();
 	        }
 		},
 		hide: function(){

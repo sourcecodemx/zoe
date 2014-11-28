@@ -1,4 +1,4 @@
-/* globals define, _, forge, Backbone, topBarTint, buttonTint, User, aspect, Parse  */
+/* globals define, _, forge, Backbone, topBarTint, buttonTint, User, aspect  */
 define(function(require){
 	'use strict';
 
@@ -12,7 +12,7 @@ define(function(require){
 	var Journal = require('models/Journal');
 	var Stats = require('Stats');
 	var Settings = require('Settings');
-	var SettingsWeight = require('SettingsWeight');
+	var ConsumptionSettings = require('SettingsConsumption');
 	
 	var Index = Controller.extend({
 		id: 'home-page',
@@ -174,7 +174,7 @@ define(function(require){
 					'Necesitas escribir tu peso para poder generar consumo',
 					'Hacerlo',
 					'Despues',
-					this.onWeightConfirmation.bind(this)
+					this.onChangeConsumptionType.bind(this)
 				);
 			}else{
 				if(!this.modal){
@@ -276,14 +276,14 @@ define(function(require){
 		onUsernameChange: function(){
 			this.dom.username.text(this.model.get('username'));
 		},
-		onWeightConfirmation: function(y){
+		onChangeConsumptionType: function(y){
 			if(y){
 				this.bounceOutLeft();
 
 				if(this.views.weightView){
 					this.views.weightView.show();
 				}else{
-					this.views.weightView = new SettingsWeight().show();
+					this.views.weightView = new ConsumptionSettings().show();
 				}
 
 				this.listenToOnce(this.views.weightView, 'hide', this.bounceInLeft.bind(this));
@@ -298,7 +298,7 @@ define(function(require){
 			var goal = this.model.getGoal();
 			var percentage = Math.floor((consumption/goal)*100);
 			var currentText = this.dom.percentage.text();
-			var current = (currentText === '~') || _.isEmpty(currentText) ? 0 : parseInt(currentText, 10);
+			var current = (currentText === '0') || _.isEmpty(currentText) ? 0 : parseInt(currentText, 10);
 			var total = current + percentage;
 
 			this._updateConsumptionUI(total);
@@ -369,7 +369,7 @@ define(function(require){
 
 			var now = new Date();
 			var tillMidnight = midnightWatcher - now;
-			var pushData = {badge: 1, sound: 'audio/confirmation/wav'};
+			//var pushData = {badge: 1, sound: 'audio/confirmation/wav'};
 
 			if(now < noonWatcher){
 				this.noonWatcher = setTimeout(function(){
@@ -397,7 +397,7 @@ define(function(require){
 		},
 		_updateConsumptionUI: function(total){
 			total = total || 0;
-			var totalLabel = total ? total : '~';
+			var totalLabel = total ? total : '0';
 
 			this.consumption = total;
 

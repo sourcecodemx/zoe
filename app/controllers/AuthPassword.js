@@ -116,7 +116,7 @@ define(function(require){
 			//Reset form
 			this.reset();
 			this.bounceOutRight();
-			Backbone.trigger('user:login');
+			Backbone.trigger('user:login', true);
 			Zoe.storage.removeItem('signup_prefill');
 		}
 	});

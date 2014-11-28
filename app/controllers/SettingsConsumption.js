@@ -111,7 +111,7 @@ define(function(require){
 					if(!liters){
 						throw new Error('Por favor introduce una cantidad para poder actualizar tu consumo.');
 					}else if(liters < 1){
-						throw new Error('Por salud no podemos recomendarte consumir menos de 1 litro diario.')
+						throw new Error('Por salud no podemos recomendarte consumir menos de 1 litro diario.');
 					}else if(liters > 4){
 						throw new Error('Por salud no podemos recomandarte consumir mas de 4 litros diarios, la sobre hidratacion no es buena.');
 					}else if(liters === this.data.liters){

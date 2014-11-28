@@ -40,6 +40,7 @@ define(function(require){
 			aspect.add(this, 'hide', this.onBeforeHide.bind(this));
 			aspect.add(this, 'submit', this.onBeforeSubmit.bind(this), 'before');
 			aspect.add(this, 'show', this._checkConnection.bind(this), 'before');
+			aspect.add(this, ['onLeftButton', 'onRightButton', 'hide'], this.blur.bind(this), 'before');
 			
 			return this;
 		},
@@ -70,6 +71,13 @@ define(function(require){
 
 			return this;
 		},
+		blur: function(){
+			var $focus = this.$el.find('input:focus');
+
+			if($focus.length){
+				$focus.trigger('blur');
+			}
+		},
 		checkPosition: function(e){
 			if(this.$el.hasClass('scrolling')){
 				e.preventDefault();
@@ -91,11 +99,7 @@ define(function(require){
 		},
 		onBeforeHide: function(){},
 		onBeforeSubmit: function(){
-			var $focus = this.$el.find(':focus');
-
-			if($focus.length){
-				$focus.trigger('blur');
-			}
+			this.blur();
 		},
 		onLayerChange: function(){},
 		onLayerWillChange: function(){},
@@ -108,6 +112,7 @@ define(function(require){
 			this.stopListening();
 		},
 		onLeftButton: function(){
+			console.log('on left button');
 			this.back();
 		},
 		onRightButton: function(){},

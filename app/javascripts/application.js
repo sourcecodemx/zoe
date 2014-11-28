@@ -49,11 +49,11 @@ require.config({
 		Pos:          '../controllers/Pos',
 		Premier:      '../controllers/Premier',
 		PremierInformation: '../controllers/PremierInformation',
-		Settings:     '../controllers/Settings',
-		SettingsEmail: '../controllers/SettingsEmail',
-		SettingsName: '../controllers/SettingsName',
-		SettingsPassword: '../controllers/SettingsPassword',
-		SettingsWeight: '../controllers/SettingsWeight',
+		Settings:            '../controllers/Settings',
+		SettingsEmail:       '../controllers/SettingsEmail',
+		SettingsName:        '../controllers/SettingsName',
+		SettingsPassword:    '../controllers/SettingsPassword',
+		SettingsConsumption: '../controllers/SettingsConsumption',
 		Stats:        '../controllers/Stats',
 		Store:        '../controllers/Store',
 		TOS:          '../controllers/TOS',
@@ -105,13 +105,14 @@ require(
 	['setup', 'Router'],
 	function(setup, Router){
 		'use strict';
+		
 		try{
 			window.App = new Router();
 
-			var onPush = function(data){
+			var onPush = function(){
 				forge.parse.setBadgeNumber(0);
 			};
-			var onPushError = function(error){
+			var onPushError = function(){
 			};
 			forge.event.messagePushed.addListener(onPush, onPushError);
 		}catch(e){

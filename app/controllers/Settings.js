@@ -7,7 +7,7 @@ define(function(require){
 	var SettingsName = require('SettingsName');
 	var SettingsEmail = require('SettingsEmail');
 	var SettingsPassword = require('SettingsPassword');
-	var SettingsWeight = require('SettingsWeight');
+	var SettingsWeight = require('SettingsConsumption');
 
 	return Controller.extend({
 		id: 'settings-page',
