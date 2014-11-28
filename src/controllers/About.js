@@ -8,7 +8,7 @@ define(function(require){
 	return Controller.extend({
 		id: 'about-page',
 		template: template,
-		title: '¿Que es Zoé Water?',
+		title: '¿Qué es Zoé Water?',
 		titleImage: 'images/titles/about.png',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));

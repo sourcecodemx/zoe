@@ -13713,6 +13713,10 @@ a.button {
   margin: 0 auto;
   font-weight: bold;
 }
+#menu #menuOverlay {
+  z-index: 0;
+  background-color: transparent;
+}
 
 #home-page #stats {
   background: url("../images/stats.png") no-repeat center;

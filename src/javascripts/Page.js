@@ -22,7 +22,7 @@ define(function(require){
 		SettingsEmail : require('SettingsEmail'),
 		SettingsName  : require('SettingsName'),
 		SettingsPassword : require('SettingsPassword'),
-		SettingsWeight : require('SettingsWeight'),
+		SettingsWeight : require('SettingsConsumption'),
 		Stats      : require('Stats'),
 		//Store      : require('Store'),
 		TOS        : require('TOS')

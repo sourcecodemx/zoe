@@ -36,6 +36,10 @@ define(function(require){
 
 			data.total = parseInt(Math.floor(total), 10);
 
+			if(_.isNaN(data.total)){
+				data.total = 0;
+			}
+
 			switch(this.model.get('type')){
 			case 'today':
 				this.computedStatus = 'Hoy he logrado el ' + data.total + '% de mi hidratación alcalina. #alcalinizate';

@@ -36,8 +36,8 @@ gulp.task('styles', function() {
 });
 
 gulp.task('images', function(){
-    return gulp.src(['app/images/*.png', 'app/images/*.jpg'])
-        .pipe(cache(imagemin({ optimizationLevel: 5, progressive: true, interlaced: true })))
+    return gulp.src(['*.png', '*.jpg'], {cwd: 'app/images/**'})
+        .pipe(imagemin({ optimizationLevel: 5, progressive: true, interlaced: true }))
         .pipe(gulp.dest('src/images'));
 });
 
