@@ -71,7 +71,7 @@ define(function(require){
 		onError: function(error){
 			switch(error.code){
 			case 101:
-				error.message = "Nombre de usuario o contraseña incorrectos";
+				error.message = 'Nombre de usuario o contraseña incorrectos';
 				break;
 			}
 			

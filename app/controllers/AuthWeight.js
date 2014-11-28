@@ -1,4 +1,4 @@
-/* globals define, User, forge, _ */
+/* globals define, User, forge */
 define(function(require){
 	'use strict';
 
