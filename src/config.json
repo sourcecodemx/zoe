@@ -59,7 +59,7 @@
 			}
 		},
 		"facebook": {
-			"version": "2.7",
+			"version": "2.8",
 			"config": {
 				"appid": "748031698593102"
 			}
@@ -110,13 +110,13 @@
 			}
 		},
 		"tabs": {
-			"version": "2.8"
+			"version": "2.9"
 		},
 		"ui": {
 			"version": "2.1"
 		},
 		"topbar": {
-			"version": "2.6"
+			"version": "2.7"
 		},
 		"media": {
 			"version": "2.4",

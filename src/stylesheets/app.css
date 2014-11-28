@@ -14062,7 +14062,6 @@ body {
 #index-page,
 #login-page,
 #signup-page,
-#signup-weight-page,
 #signup-password-page {
   background-image: url(../images/background-1.png);
   background-repeat: no-repeat;
@@ -14072,7 +14071,6 @@ body {
 #index-page .page-content,
 #login-page .page-content,
 #signup-page .page-content,
-#signup-weight-page .page-content,
 #signup-password-page .page-content {
   background-color: transparent;
 }

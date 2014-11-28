@@ -5,7 +5,7 @@ define(function(require){
 	var Controller      = require('Controller');
 
 	return Controller.extend({
-		id: 'signup-weight-page',
+		id: 'auth-weight-page',
 		template: require('templates/signup_weight'),
 		title: 'Configuracion',
 		titleImage: 'images/titles/settings-consumption.png',
@@ -30,6 +30,12 @@ define(function(require){
 			};
 		},
 		onShow: function(){
+			if(this.titleImage){
+				forge.topbar.setTitleImage(this.titleImage, _.noop, _.noop);
+			}else{
+				forge.topbar.setTitle(this.title);
+			}
+
 			this.setupButtons();
 			this.bounceInUp();
 		},

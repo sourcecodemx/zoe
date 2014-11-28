@@ -123,6 +123,8 @@ define([
           }else{
             this.weightView = new Page.Weight().show();
           }
+
+          this.listenToOnce(this.weightView, 'hide', this.currentView.setupButtons.bind(this.currentView));
         }
       }.bind(this);
 
