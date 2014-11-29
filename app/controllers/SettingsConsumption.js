@@ -24,7 +24,7 @@ define(function(require){
 
 			var settings = User.current().get('settings');
 			if(settings && settings.consumptionType === 'custom'){
-				this.data.liters = this.data.weight * 0.03;
+				this.data.liters = this.data.weight * 0.036;
 				this.data.weight = 0;
 			}
 			this.render();
@@ -125,7 +125,7 @@ define(function(require){
 						throw new Error('Ese es tu consumo personalizado actual, no hay necesidad de guardarlo de nuevo.');
 					}
 					//Set weight based on how many liters user wants to drink
-					data = {weight: liters/0.03, settings: {consumptionType: 'custom'}};
+					data = {weight: liters/0.036, settings: {consumptionType: 'custom'}};
 					break;
 				default:
 					var weight = parseInt(this.dom.weight.val(), 10);

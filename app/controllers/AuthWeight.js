@@ -17,7 +17,7 @@ define(function(require){
 
 			var settings = User.current().get('settings');
 			if(settings && settings.consumptionType === 'custom'){
-				this.data.liters = this.data.weight * 0.03;
+				this.data.liters = this.data.weight * 0.036;
 				this.data.weight = 0;
 			}
 			this.render();

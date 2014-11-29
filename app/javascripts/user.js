@@ -7,7 +7,7 @@ define('user', ['parse'], function(Parse){
 	return Parse.User.extend({
 		getGoal: function(){
 			var weight = this.get('weight') || 0;
-			return (weight * 0.03).toFixed(2);
+			return (weight * 0.036).toFixed(2);
 		},
 		getJournal: function(){
 			var journal = this.relation('journal');
