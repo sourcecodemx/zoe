@@ -2,7 +2,7 @@
 	"config_version": "4",
 	"name": "Zoe Water Movil",
 	"author": "Source Code",
-	"version": "1.0",
+	"version": "1.1",
 	"platform_version": "v2.2.7",
 	"description": "Aplicacion de Zoe Water",
 	"core": {
@@ -10,7 +10,8 @@
 			"logging": {
 				"level": "DEBUG"
 			},
-			"reload": true
+			"reload": true,
+			"trusted_urls": []
 		},
 		"ios": {
 			"minimum_version": "6.0",
