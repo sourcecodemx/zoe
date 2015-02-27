@@ -1,4 +1,4 @@
-/* globals define, _, forge, Backbone, topBarTint, buttonTint, User, aspect  */
+/* globals define, _, forge, Backbone, topBarTint, User, aspect, Parse  */
 define(function(require){
 	'use strict';
 
@@ -11,6 +11,7 @@ define(function(require){
 	var template = require('templates/home');
 	var Journal = require('models/Journal');
 	var Stats = require('Stats');
+	var Tips = require('Tips');
 	var Settings = require('Settings');
 	var ConsumptionSettings = require('SettingsConsumption');
 	
@@ -23,7 +24,8 @@ define(function(require){
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #track': 'track',
 				'tap #share': 'share',
-				'tap #stats': 'stats'
+				'tap #stats': 'stats',
+				'tap #tips':  'tips'
 			});
 
 			return events;
@@ -118,7 +120,7 @@ define(function(require){
 
 			if(this.shareModal){
 				this.shareModal.hide();
-			}
+			}	
 		},
 		onHide: function(){
 			Controller.prototype.onHide.call(this);
@@ -181,6 +183,7 @@ define(function(require){
 					this.modal = new CheckModal();
 				}
 				//Callback hell!
+				/*
 				if(this.consumption && this.consumption >= 100){
 					setTimeout(function(){
 						forge.notification.confirm(
@@ -203,9 +206,9 @@ define(function(require){
 								}
 							}.bind(this));
 					}.bind(this), 1);
-				}else {
-					this.modal.show();
-				}
+				}else {*/
+				this.modal.show();
+				//}
 
 				this.listenToOnce(this.modal, 'hide', this.onShow.bind(this));
 			}
@@ -261,6 +264,38 @@ define(function(require){
 					}
 					//Reconfigure navigation bar
 					this.listenToOnce(this.views.stats, 'hide', this.onShow.bind(this));
+				}.bind(this))
+				.fail(function(error){
+					forge.notification.hideLoading();
+					this.onError(null, error);
+				}.bind(this));
+		},
+		tips: function(){
+			if(!this.online){
+				this.offlineError();
+				return;
+			}
+
+			forge.notification.showLoading('Cargando Tips');
+
+			var tipsQuery = new Parse.Query('Tip');
+
+			tipsQuery.descending('createdAt');
+			tipsQuery
+				.find()
+				.then(function(tips){
+					tips = tips.map(function(t){return t.toJSON();});
+
+					forge.notification.hideLoading();
+					if(this.views.tips){
+						this.views.tips.update(tips).show();
+					}else{
+						this.views.tips = new Tips({
+							tips: tips
+						}).show();
+					}
+
+					this.listenToOnce(this.views.tips, 'hide', this.onShow.bind(this));
 				}.bind(this))
 				.fail(function(error){
 					forge.notification.hideLoading();

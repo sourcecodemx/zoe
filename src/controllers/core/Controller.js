@@ -72,7 +72,7 @@ define(function(require){
 			return this;
 		},
 		blur: function(){
-			var $focus = this.$el.find('input:focus');
+			var $focus = this.$el.find(':focus');
 
 			if($focus.length){
 				$focus.trigger('blur');

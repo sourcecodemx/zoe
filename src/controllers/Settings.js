@@ -8,6 +8,7 @@ define(function(require){
 	var SettingsEmail = require('SettingsEmail');
 	var SettingsPassword = require('SettingsPassword');
 	var SettingsWeight = require('SettingsConsumption');
+	var SettingsBirthdate = require('SettingsBirthdate');
 
 	return Controller.extend({
 		id: 'settings-page',
@@ -20,7 +21,8 @@ define(function(require){
 				'tap #updateName': 'onName',
 				'tap #updateEmail': 'onEmail',
 				'tap #updateWeight': 'onWeight',
-				'tap #updatePassword': 'onPassword'
+				'tap #updatePassword': 'onPassword',
+				'tap #updateBirthdate': 'onBirthdate'
 			});
 
 			return events;
@@ -75,6 +77,17 @@ define(function(require){
 			}
 
 			this.listenToOnce(this.views.passwordView, 'hide', this.bounceInLeft.bind(this));
+		},
+		onBirthdate: function(){
+			this.bounceOutLeft();
+
+			if(this.views.birthdateView){
+				this.views.birthdateView.show();
+			}else{
+				this.views.birthdateView = new SettingsBirthdate().show();
+			}
+
+			this.listenToOnce(this.views.birthdateView, 'hide', this.bounceInLeft.bind(this));
 		},
 		onRender: function(){
 			this.dom.name = this.$el.find('#updateName');

@@ -13717,13 +13717,9 @@ a.button {
   display: none;
 }
 
-#home-page #stats {
-  background: url("../images/stats.png") no-repeat center;
-  background-size: contain;
-  width: 28px;
-  height: 28px;
-  padding: 5px;
-  margin: 5px 0;
+#home-page #stats, #home-page #tips {
+  width: 80px;
+  margin: 0 8px;
 }
 #home-page #goalArea {
   position: relative;
@@ -13802,6 +13798,38 @@ a.button {
 #gallery-image-page #likes {
   margin: 0;
 }
+#gallery-page #owner,
+#gallery-image-page #owner {
+  display: block;
+  position: absolute;
+  border-radius: 4px;
+  right: 16px;
+  bottom: 10px;
+  color: #485e90;
+}
+#gallery-page #owner:before,
+#gallery-image-page #owner:before {
+  content: '@';
+  display: inline-block;
+}
+#gallery-page #owner.hide:before,
+#gallery-image-page #owner.hide:before {
+  display: none;
+}
+#gallery-page #caption-wrapper,
+#gallery-image-page #caption-wrapper {
+  display: block;
+  display: -webkit-box;
+  max-height: 60px;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 6px 0;
+}
 #gallery-page + #modal img, #gallery-page.ionic-body #image img,
 #gallery-image-page + #modal img,
 #gallery-image-page.ionic-body #image img {
@@ -13876,14 +13904,36 @@ a.button {
 #gallery-image-page + #modal #image.horizontal img {
   height: 100%;
 }
+#gallery-page + #modal #caption,
+#gallery-image-page + #modal #caption {
+  height: 70px;
+  padding: 6px 12px;
+}
+#gallery-page + #modal button,
+#gallery-image-page + #modal button {
+  margin: 0;
+}
 
 #gallery-image-page .downvote {
   text-shadow: white 1px 0px 0px, white -1px 0px 0px, white 0px -1px 0px, white 0px 1px 0px;
+}
+#gallery-image-page #like-area {
+  width: 100px;
+  margin: 0 auto;
 }
 #gallery-image-page #image img {
   max-height: 300px;
   margin: 0 auto;
   width: auto;
+}
+#gallery-image-page #tabs-gallery-photo-edit.hide,
+#gallery-image-page #tabs-gallery-photo.hide {
+  display: none;
+}
+#gallery-image-page #caption-wrapper-text {
+  height: 70px;
+  padding: 6px 12px;
+  margin: 10px 0;
 }
 
 #blog-page .item-image {
@@ -13991,6 +14041,21 @@ a.button {
 
 #tos-page .page-content {
   background: #33465d;
+}
+
+#tips h2 {
+  font-weight: bold;
+}
+#tips p {
+  color: white;
+}
+#tips .item.toggled {
+  background-color: #57be29;
+}
+#tips .item.toggled p {
+  text-overflow: visible;
+  overflow: visible;
+  white-space: normal;
 }
 
 html,

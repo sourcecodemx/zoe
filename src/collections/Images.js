@@ -4,7 +4,7 @@ define(['models/File', 'config'], function(Model, config){
 	
 	return Parse.Collection.extend({
 		model: Model,
-		query: (new Parse.Query(Model)).descending('createdAt').limit(config.GALLERY.LIMIT),
+		query: (new Parse.Query(Model)).descending('createdAt').include('owner').limit(config.GALLERY.LIMIT),
 		prepend: function(model){
 			this.add(model, {silent: true});
 			this.trigger('prepend', model);

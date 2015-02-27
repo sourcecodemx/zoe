@@ -35,7 +35,7 @@ define(function(require){
 			this.views.photo = new Photo();
 
 			//Create upload modal
-			this.uploadModal = new UploadModal({collection: this.collection});
+			this.views.uploadModal = new UploadModal({collection: this.collection});
 
 			//Listen for images collection
 			this.listenTo(this.collection, 'reset', this.addAll.bind(this));
@@ -44,6 +44,7 @@ define(function(require){
 
 			Backbone.on('gallery:image:show', this.onPicture, this);
 			Backbone.on('gallery:image:prepend', this.onImageSaved, this);
+			Backbone.on('gallery:image:destroy', this.onDestroyOne, this);
 
 			return this.render();
 		},
@@ -65,6 +66,8 @@ define(function(require){
 				if(totalPages){
 					this.totalPages = totalPages;
 					this.getImages();
+				}else{
+					this.addAll();
 				}
 			}.bind(this)).fail(this.onError.bind(this));
 		},
@@ -142,7 +145,12 @@ define(function(require){
 				appendTo: this.dom.pics
 			});
 			//Cache image reference
-			this.images[view.cid] = view;
+			var id = view.cid;
+			var images = this.images;
+
+			images[id] = view;
+
+			this.listenToOnce(view, 'remove', function(){delete images[id]; console.log('close', id);});
 		},
 		prependOne: function(model){
 			var view = new PicItem({
@@ -150,8 +158,27 @@ define(function(require){
 				appendTo: this.dom.pics,
 				prepend: true
 			}).show();
+			var id = view.cid;
+			var images = this.images;
 
-			this.images[view.cid] = view;
+			images[id] = view;
+
+			this.listenToOnce(view, 'remove', function(){delete images[id]; console.log('close', id);});
+		},
+		onDestroyOne: function(id){
+			var model = this.collection.get(id);
+			var onDestroy = function(){
+				forge.notification.showLoading('Tu foto ha sido borrada.');
+				_.delay(forge.notification.hideLoading, 2000);
+			};
+			var onDestroyError = function(){
+				forge.notification.alert('¡Ups!', 'No hemos podido eliminar to foto, por favor intenta de nuevo.');
+			};
+
+			if(model){
+				forge.notification.showLoading('Eliminando foto...');
+				model.destroy({wait: true, success: onDestroy, error: onDestroyError});
+			}
 		},
 		removeAll: function(){
 			_.invoke(this.images, PicItem.prototype.destroy);
@@ -174,6 +201,7 @@ define(function(require){
 			return this;
 		},
 		onImageSaved: function(file){
+			file.set('owner', User.current());
 			this.collection.prepend(file);
 		},
 		onPicture: function(model){
@@ -205,7 +233,9 @@ define(function(require){
 			}.bind(this));
 		},
 		onSuccess: function(imageData) {
-			this.uploadModal.update(imageData).show();
+			this.views.uploadModal.update(imageData).show();
+
+			this.listenToOnce(this.views.uploadModal, 'hide', this.onShow.bind(this));
 		},
 		onPictureError: function(message) {
 			this.onError(null, {message: message});
@@ -240,6 +270,8 @@ define(function(require){
 				throw new Error('Gallery.PickItem requires a Backbone Model');
 			}
 
+			this.listenTo(this.model, 'destroy', this.destroy, this);
+
 			return this.render();
 		},
 		render: function(){
@@ -267,19 +299,29 @@ define(function(require){
 
 	var UploadModal = HTMLModal.extend({
 		template: require('templates/gallery_modal_upload'),
+		title: 'Fotografia',
 		events: {
 			'tap #save': 'save',
 			'tap button[data-dismiss]': 'hide'
 		},
 		onRender: function(){
 			this.dom.image = this.$el.find('#image');
+			this.dom.caption = this.$el.find('#caption');
 		},
 		save: function(){
 			if(this.base64Data.length > 0){
 				forge.notification.showLoading('Guardando');
 
 				var img = new Parse.File('foto.jpg', { base64: this.base64Data });
-				var file = new File({image: img});
+				var file = new File({image: img, caption: this.dom.caption.val(), owner: User.current()});
+				var ACL = new Parse.ACL();
+
+				ACL.setPublicReadAccess(true);
+				ACL.setPublicWriteAccess(false);
+				ACL.setWriteAccess(User.current().id, true);
+
+				file.setACL(ACL);
+
 				var onSave = function(){
 					var user = User.current();
 					var images = user.relation('images');
@@ -298,8 +340,12 @@ define(function(require){
 						}.bind(this));
 				}.bind(this);
 
+				var onError = function(){
+					console.log('on error', arguments);
+				}.bind(this);
+
 				//Save file
-				file.save().then(onSave).fail(this.onError.bind(this));
+				file.save().then(onSave).fail(onError);
 			}
 		},
 		update: function(data){
@@ -346,6 +392,13 @@ define(function(require){
 			HTMLModal.prototype.onShow.call(this);
 
 			forge.notification.hideLoading();
+			forge.topbar.removeButtons();
+			forge.topbar.setTitle(this.title);
+			forge.topbar.addButton({
+				position: 'left',
+				icon: 'images/close@2x.png',
+				prerendered: true
+			}, this.hide.bind(this));
 		},
 		onSave: function(file){
 			try{

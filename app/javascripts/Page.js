@@ -10,6 +10,7 @@ define(function(require){
 		Password   : require('AuthPassword'),
 		Signup     : require('AuthSignup'),
 		Weight     : require('AuthWeight'),
+		Birthdate  : require('AuthBirthdate'),
 		Blog       : require('Blog'),
 		Entry      : require('BlogEntry'),
 		Gallery    : require('Gallery'),

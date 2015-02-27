@@ -13,6 +13,8 @@ require.config({
 		hammerjs:    '../components/hammerjs/hammer.min',
 		jqueryhammer:'../components/jquery-hammerjs/jquery.hammer',
 		async:       '../components/requirejs-plugins/src/async',
+		moment:      '../components/moment/min/moment.min',
+		'moment.locale': '../components/moment/locale/es',
 
 		templates:   '../javascripts/templates',
 		models:      '../models',
@@ -41,6 +43,7 @@ require.config({
 		AuthLogin:    '../controllers/AuthLogin',
 		AuthSignup:   '../controllers/AuthSignup',
 		AuthWeight:   '../controllers/AuthWeight',
+		AuthBirthdate:'../controllers/AuthBirthdate',
 		Blog:         '../controllers/Blog',
 		BlogEntry:    '../controllers/BlogEntry',
 		Gallery:      '../controllers/Gallery',
@@ -54,8 +57,10 @@ require.config({
 		SettingsName:        '../controllers/SettingsName',
 		SettingsPassword:    '../controllers/SettingsPassword',
 		SettingsConsumption: '../controllers/SettingsConsumption',
+		SettingsBirthdate:   '../controllers/SettingsBirthdate',
 		Stats:        '../controllers/Stats',
 		Store:        '../controllers/Store',
+		Tips:         '../controllers/Tips',
 		TOS:          '../controllers/TOS',
 		Header:       '../controllers/Header'
 	},
@@ -108,13 +113,6 @@ require(
 		
 		try{
 			window.App = new Router();
-
-			var onPush = function(){
-				forge.parse.setBadgeNumber(0);
-			};
-			var onPushError = function(){
-			};
-			forge.event.messagePushed.addListener(onPush, onPushError);
 		}catch(e){
 			forge.logging.critical(e, e.stack, e.message);
 		}

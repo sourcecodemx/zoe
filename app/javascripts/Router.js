@@ -16,11 +16,14 @@ define([
       'index/:b' : 'index',
       'about'    : 'about',
       'blog'     : 'blog',
+      'blog/:id' : 'blog',
       'gallery'  : 'gallery',
       'premier'  : 'premier',
       'pos'      : 'pos',
       'store'    : 'store',
-      'share/:message'    : 'share'
+      'share/:message'    : 'share',
+      'tips'     : 'tips',
+      'tips/:id' : 'tips'
     },
 
     /**
@@ -89,6 +92,14 @@ define([
       }.bind(this);
       //Execute before all auth-only controllers
       aspect.add(this, rootPages, beforeRoot);
+
+      //Add one after all routes
+      var afterRoot = function(){
+        if(User.current() && !User.current().get('birthdate')){
+          _.delay(function(){Backbone.trigger('user:set:birthdate');}, 1000);
+        }
+      };
+      aspect.add(this, rootPages, afterRoot, 'after');
     },
 
     initialize: function(){
@@ -128,9 +139,34 @@ define([
         }
       }.bind(this);
 
+      var onBirthdate = function(){
+        if(this.birthdateView){
+          this.birthdateView.show();
+        }else{
+          this.birthdateView = new Page.Birthdate().show();
+        }
+
+        this.listenToOnce(this.birthdateView, 'hide', this.currentView.setupButtons.bind(this.currentView));
+      }.bind(this);
+
       Backbone.on('user:logout', onLogout);
       Backbone.on('user:login', onLogin);
       Backbone.on('share', this.share.bind(this));
+      Backbone.on('user:set:birthdate', onBirthdate);
+
+      var onPush = function(p){
+        forge.parse.setBadgeNumber(0);
+
+        switch(p.type){
+        case 'blog': Backbone.history.navigate('blog/' + p.id, {trigger: true}); break;
+        case 'tip': Backbone.history.navigate('tips/' + p.id, {trigger: true}); break;
+        case 'store': Backbone.history.navigate('store', {trigger: true});
+        }
+      };
+      var onPushError = function(){
+        //Handle error, not way to do for now
+      };
+      forge.event.messagePushed.addListener(onPush, onPushError);
 
       //Hid esplash screen
       forge.launchimage.hide();

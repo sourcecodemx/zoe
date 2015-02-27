@@ -5,7 +5,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<div class=\"modal-backdrop active\"></div><div class=\"modal\"><div class=\"h2 text-center\">Fotografia</div><div class=\"text-center padding\"><div id=\"image\"></div></div><div class=\"padding row\"><div class=\"col\"><button id=\"save\" class=\"button button-energized button-block\">Compartir</button></div><div class=\"col\"><button data-dismiss=\"data-dismiss\" class=\"button button-dark button-block\">Cancelar</button></div></div></div>");;return buf.join("");
+buf.push("<div class=\"modal-backdrop active\"></div><div class=\"modal\"><div class=\"text-center padding\"><div id=\"image\"></div></div><div class=\"text-center padding\"><textarea id=\"caption\" placeholder=\"Agrega una descripcion a tu foto\"></textarea></div><div class=\"padding row\"><div class=\"col\"><button id=\"save\" class=\"button button-energized button-block\">Compartir</button></div><div class=\"col\"><button data-dismiss=\"data-dismiss\" class=\"button button-dark button-block\">Cancelar</button></div></div></div>");;return buf.join("");
 };
 
 });

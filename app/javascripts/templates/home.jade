@@ -8,8 +8,13 @@ include ./offline.jade
 			.h4.text-center Tu meta del dia son 
 				span#goal #{data.goal}
 
-		.text-center
-			button.button.button-clear#stats(type='button')
+		.text-center.grid
+			.row
+				.col.text-right
+					button.button.button-dark.button-small#stats(type='button') Estadisticas
+				.col.text-left
+					button.button.button-dark.button-small#tips(type='button') Tips
+			
 
 		.text-center#goalArea
 			#circle

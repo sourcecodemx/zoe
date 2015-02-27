@@ -1,14 +1,9 @@
 #home-page {
 
-	#stats {
-		background: url('../images/stats.png') no-repeat center;
-		background-size: contain;
-		width: $font-size-base * 2;
-		height: $font-size-base * 2;
-		padding: $padding-small-vertical;
-		margin: $padding-small-vertical 0;
+	#stats, #tips {
+		width: 80px;
+		margin: 0 $padding-large-horizontal/2;
 	}
-
 	#goalArea {
 		position: relative;
 		margin: $padding-large-vertical 0;

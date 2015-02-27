@@ -95,7 +95,9 @@ gulp.task('copy', function(){
             'hammerjs/hammer.min.map',
             'jquery-hammerjs/jquery.hammer.js',
             'animate.css/animate.min.css',
-            'requirejs-plugins/src/async.js'
+            'requirejs-plugins/src/async.js',
+            'moment/min/moment.min.js',
+            'moment/locale/es.js',
         ], {cwd: 'components/**/**'})
         .pipe(gulp.dest('src/components'));
 });

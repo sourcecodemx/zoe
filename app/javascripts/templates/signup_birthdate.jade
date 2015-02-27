@@ -1,0 +1,17 @@
+include ./offline.jade
+include ./button_submit_outline.jade
+
+.scroll-content
+	.page-content
+		form
+			.row
+				.col
+					.padding
+						h5.text-center Por favor, agrega tu fecha de nacimiento para continuar.
+						.list
+							label.item.item-input
+								input#birthdate(type="date", placeholder="2014-01-01", min="01-01-1900", max="2014-01-01", value=data.birthdate)
+
+			.row
+				.col
+					+submitButton('Actualizar')

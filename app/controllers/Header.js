@@ -1,4 +1,4 @@
-/* global define, Backbone, forge */
+/* global define, Backbone, forge, buttonTint, topBarTint */
 define(function(require){
 	'use strict';
 
@@ -44,8 +44,11 @@ define(function(require){
 		store: function(){
 			forge.tabs.openWithOptions({
 				url: 'http://zoewater.mx/movil',
-				buttonText: 'Cerrar',
-				title: 'Tienda'
+				title: 'Tienda',
+				titleTint: buttonTint,
+				tint: topBarTint,
+				buttonTint: buttonTint,
+				buttonText: 'Cerrar'
 			});
 			
 			this.toggle();

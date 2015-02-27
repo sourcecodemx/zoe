@@ -5,6 +5,7 @@ define(function(require){
 	var Controller  = require('Controller');
 	var Password    = require('AuthPassword');
 	var TOS = require('TOS');
+	var moment = require('moment');
 
 	/**
 	* Login Controller
@@ -35,6 +36,7 @@ define(function(require){
 			this.dom = {
 				username: this.$el.find('#username'),
 				email: this.$el.find('#email'),
+				date: this.$el.find('#birthdate'),
 				form: this.$el.find('form'),
 				content: this.$el.find('.page-content')
 			};
@@ -57,11 +59,23 @@ define(function(require){
 					return;
 				}
 
-				if(_.isEmpty(this.dom.username) || _.isEmpty(this.dom.email)){
+				if(_.isEmpty(this.dom.username.val()) || _.isEmpty(this.dom.email.val())){
 					throw new Error('Por favor ingresa tus credenciales.');
 				}
 
-				var data = {username: this.dom.username.val().toLowerCase(), email: this.dom.email.val().toLowerCase()};
+				if(_.isEmpty(this.dom.date.val())){
+					throw new Error('Por favor ingresa tus fecha de nacimiento.');
+				}
+
+				if(!moment(this.dom.date.val()).isValid()){
+					throw new Error('Esa fecha de nacimiento parece invalida, por favor verificala.');
+				}
+
+				var data = {
+					username: this.dom.username.val().toLowerCase(), 
+					email: this.dom.email.val().toLowerCase(),
+					birthdate: new Date(this.dom.date.val())
+				};
 
 				//Save items for the next step, will last for 10 minutes
 				Zoe.storage.setItem('signup_prefill', data, ((new Date())*1) + 10*60*1000);
@@ -80,7 +94,6 @@ define(function(require){
 		},
 		setupButtons: function(){
 			forge.topbar.removeButtons();
-			forge.topbar.setTitle(this.title);
 			forge.topbar.addButton({
 				position: 'left',
 				icon: 'images/back@2x.png',
@@ -89,6 +102,8 @@ define(function(require){
 			forge.topbar.show();
 		},
 		tos: function(){
+			this.blur();
+
 			if(this.views.tos){
 				this.views.tos.show();
 			}else{

@@ -3,17 +3,25 @@ include ./button_submit_outline.jade
 
 .scroll-content
 	.page-content
-		form.row
-			.col
-				.padding
-					.list
-						label.item.item-input
-							input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off")
-							
-					.list
-						label.item.item-input
-							input#email(type='email', placeholder="Correo electronico")
-					
+		form
+			.row
+				.col
+					.padding
+						.list
+							label.item.item-input
+								input#username(type='text', placeholder="Nombre de usuario", autocomplete="off", autocapitalize="off")
+								
+						.list
+							label.item.item-input
+								input#email(type='email', placeholder="Correo electronico")
+
+						h5 Fecha de nacimiento
+						.list
+							label.item.item-input
+								input#birthdate(type="date", placeholder="01-01-1996", min="01-01-1900", max="01-01-2014")
+
+			.row
+				.col
 					+submitButton('Siguiente')
 
 					br

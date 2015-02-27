@@ -3,7 +3,7 @@
 	"name": "Zoe Water Movil",
 	"author": "Source Code",
 	"version": "1.0",
-	"platform_version": "v2.2.6",
+	"platform_version": "v2.2.7",
 	"description": "Aplicacion de Zoe Water",
 	"core": {
 		"general": {
@@ -61,7 +61,7 @@
 			}
 		},
 		"file": {
-			"version": "2.5"
+			"version": "2.6"
 		},
 		"icons": {
 			"version": "2.4",
@@ -80,7 +80,7 @@
 			}
 		},
 		"notification": {
-			"version": "2.6"
+			"version": "2.7"
 		},
 		"parameters": {
 			"version": "2.0",
@@ -117,18 +117,18 @@
 				"background-size": "auto",
 				"ios": {
 					"1536x2048": "icons/1536x2048.png",
-					"320x480": "icons/320x480.jpg",
+					"320x480": "icons/320x480.png",
 					"1242x2208": "icons/1242x2208.png",
-					"640x1136": "icons/640x1136.jpg",
-					"2048x1536": "icons/2048X1536.jpg",
+					"640x1136": "icons/640x1136.png",
+					"2048x1536": "icons/2048X1536.png",
 					"1536x2008": "icons/1536x2008.png",
 					"750x1334": "icons/750x1334.png",
-					"1024x768": "icons/1024x768.jpg",
+					"1024x768": "icons/1024x768.png",
 					"2048x1496": "icons/2048x1496.png",
-					"1024x748": "icons/1024x748.jpg",
-					"640x960": "icons/640x960.jpg",
-					"768x1004": "icons/768x1004.jpg",
-					"768x1024": "icons/768x1024.jpg"
+					"1024x748": "icons/1024x748.png",
+					"640x960": "icons/640x960.png",
+					"768x1004": "icons/768x1004.png",
+					"768x1024": "icons/768x1024.png"
 				},
 				"hide-manually": true,
 				"background-color": "#33465d"

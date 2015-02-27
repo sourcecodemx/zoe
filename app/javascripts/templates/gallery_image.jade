@@ -1,10 +1,31 @@
-.content.page-content
-	.padding
-		#image-wrapper
-			#image.text-center
-				include ./block_refresher.jade
+.scroll-content
+	.page-content
+		.padding
+			#image-wrapper
+				#image.text-center
+					#owner.hide.badge.badge-light
+					include ./block_refresher.jade
 
-		.text-center
-			#like.upvote
-				i.icon.ion-ios7-heart-outline
-			h3#likes
+			#caption-wrapper.hidden.text-center
+			textarea#caption-wrapper-text.hide
+			.text-center#like-area
+				#like.upvote
+					i.icon.ion-ios7-heart-outline
+				h3#likes
+
+#tabs-gallery-photo.tabs.tabs-dark.tabs-icon-top.hide
+	a.tab-item#delete
+		i.icon.ion-ios7-close-outline
+		| Eliminar
+	a.tab-item#edit
+		i.icon.ion-ios7-compose-outline
+		| Editar
+
+#tabs-gallery-photo-edit.tabs.tabs-dark.tabs-icon-top.hide
+	a.tab-item#cancel
+		i.icon.ion-ios7-close-empty
+		| Cancelar
+
+	a.tab-item.disabled#save(disabled)
+		i.icon.ion-ios7-checkmark-empty
+		| Guardar

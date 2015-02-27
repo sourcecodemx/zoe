@@ -1,4 +1,4 @@
-/* globals define, _, forge, User, Zoe, Backbone, aspect */
+/* globals define, _, forge, User, Zoe, Backbone, aspect, Parse */
 define(function(require){
 	'use strict';
 
@@ -69,7 +69,13 @@ define(function(require){
 					user.set('email', prefilledData.email);
 					user.set('password', prefilledData.password);
 					user.set('settings', {consumptionType: 'weight'});
+					user.set('birthdate', new Date(prefilledData.birthdate));
 
+					var ACL = new Parse.ACL();
+					ACL.setPublicReadAccess(false);
+					ACL.setPublicWriteAccess(false);
+
+					user.setACL(ACL);
 					user.signUp(null, {
 						success: this.onSuccess.bind(this),
 						error: this.onError.bind(this)
