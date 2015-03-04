@@ -13807,13 +13807,8 @@ a.button {
   bottom: 10px;
   color: #485e90;
 }
-#gallery-page #owner:before,
-#gallery-image-page #owner:before {
-  content: '@';
-  display: inline-block;
-}
-#gallery-page #owner.hide:before,
-#gallery-image-page #owner.hide:before {
+#gallery-page #owner.hide,
+#gallery-image-page #owner.hide {
   display: none;
 }
 #gallery-page #caption-wrapper,

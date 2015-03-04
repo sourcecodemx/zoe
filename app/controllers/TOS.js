@@ -7,7 +7,7 @@ define(function(require){
 	return Controller.extend({
 		id: 'tos-page',
 		template: template,
-		title: 'Terminos de uso',
+		title: 'Términos de uso',
 		currentLabel: '',
 		initialize: function(){
 			Controller.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));

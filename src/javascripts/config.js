@@ -32,7 +32,7 @@ define('config', function(){
 				'Domingo',
 				'Lunes',
 				'Martes',
-				'Miercoles',
+				'Miércoles',
 				'Jueves',
 				'Viernes',
 				'Sabado'

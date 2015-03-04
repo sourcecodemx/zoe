@@ -24,12 +24,7 @@
 		bottom: $padding-large-vertical;
 		color: $positive;
 
-		&:before {
-			content: '@';
-			display: inline-block;
-		}
-
-		&.hide:before {
+		&.hide {
 			display: none;
 		}
 	}

@@ -86,7 +86,7 @@ define('user', ['parse'], function(Parse){
 					if(userAge > 29){
 						computed.push({
 							total: results.filter(function(r){return (r.createdAt > aMonthAgo && r.createdAt <= todayEnd);}).reduce(sum, 0),
-							label: 'Ultimo mes',
+							label: 'Último mes',
 							type: 'month',
 							goal: goal
 						});

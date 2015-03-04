@@ -64,7 +64,7 @@ define(function(require){
 
 				var d = new Date(this.dom.date.val());
 				if(!d){
-					throw new Error('Por favor introduce tu fecha de nacimeinto.');
+					throw new Error('Por favor introduce tu fecha de nacimiento.');
 				}else if(!moment(d).isValid()){
 					throw new Error('Por favor introduce una fecha de nacimiento valida');
 				}

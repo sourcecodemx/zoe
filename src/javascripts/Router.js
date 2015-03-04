@@ -157,16 +157,20 @@ define([
       var onPush = function(p){
         forge.parse.setBadgeNumber(0);
 
-        switch(p.type){
-        case 'blog': Backbone.history.navigate('blog/' + p.id, {trigger: true}); break;
-        case 'tip': Backbone.history.navigate('tips/' + p.id, {trigger: true}); break;
-        case 'store': Backbone.history.navigate('store', {trigger: true});
+        var data = JSON.parse(p);
+
+        switch(data.type){
+        case 'blog': Backbone.trigger('tips:open', data.id); break;
+        case 'tip': Backbone.history.navigate('tips/' + data.id, {trigger: true}); break;
+        case 'store': Backbone.trigger('store:open'); break;
         }
       };
       var onPushError = function(){
         //Handle error, not way to do for now
       };
       forge.event.messagePushed.addListener(onPush, onPushError);
+
+      window.onPush = onPush;
 
       //Hid esplash screen
       forge.launchimage.hide();

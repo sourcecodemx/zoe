@@ -13,7 +13,7 @@ define(function(require){
 	var Gallery = Controller.extend({
 		id: 'gallery-page',
 		template: require('templates/gallery'),
-		title: 'Galeria',
+		title: 'Galería',
 		events: (function () {
 			var events = _.extend({}, Controller.prototype.events, {
 				'tap #take': 'takePicture',
@@ -124,7 +124,7 @@ define(function(require){
 
 			if(this.page === this.totalPages){
 				this.$el.addClass('end-reached');
-				this.dom.pics.after('<div id="galleryEnd" class="infinite-scroll-end">No hay mas imagenes en la galeria.</div>');
+				this.dom.pics.after('<div id="galleryEnd" class="infinite-scroll-end">No hay mas imagenes en la galería.</div>');
 			}
 
 			if(this.collection.length){
@@ -133,7 +133,7 @@ define(function(require){
 				//Call show on all images
 				_.invoke(this.images, PicItem.prototype.show);
 			}else{
-				this.onContentError({message: 'No hay imagenes en la galeria.'});
+				this.onContentError({message: 'No hay imagenes en la galería.'});
 			}
 
 			forge.notification.hideLoading();
@@ -148,9 +148,9 @@ define(function(require){
 			var id = view.cid;
 			var images = this.images;
 
-			images[id] = view;
+			model.vid = id;
 
-			this.listenToOnce(view, 'remove', function(){delete images[id]; console.log('close', id);});
+			images[id] = view;
 		},
 		prependOne: function(model){
 			var view = new PicItem({
@@ -161,13 +161,21 @@ define(function(require){
 			var id = view.cid;
 			var images = this.images;
 
-			images[id] = view;
+			model.vid = id;
 
-			this.listenToOnce(view, 'remove', function(){delete images[id]; console.log('close', id);});
+			images[id] = view;
 		},
 		onDestroyOne: function(id){
 			var model = this.collection.get(id);
+			var vid = model.vid;
+			var images = this.images;
+
 			var onDestroy = function(){
+				if(vid && images[vid]){
+					images[vid] = null;
+					delete images[vid];
+				}
+
 				forge.notification.showLoading('Tu foto ha sido borrada.');
 				_.delay(forge.notification.hideLoading, 2000);
 			};
@@ -384,6 +392,7 @@ define(function(require){
 			HTMLModal.prototype.onHide.call(this);
 
 			this.dom.image.empty();
+			this.dom.caption.val('');
 			this.base64Data = null;
 			this.img = null;
 			this.file = null;

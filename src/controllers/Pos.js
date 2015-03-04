@@ -6,7 +6,7 @@ define(function(require){
 	var Controller = require('Root');
 	var Detachable = require('Detachable');
 	var config = require('config');
-	var Place = Parse.Object.extend('POS');
+	var Place = Parse.Object.extend('POS2');
 	var Places = Parse.Collection.extend({
 		model: Place,
 		query: (new Parse.Query(Place))

@@ -47,6 +47,7 @@ define(function(require){
 			Backbone.on('journal:update', this.updateJournal, this);
 			Backbone.on('home:reload', this.reload, this);
 			Backbone.on('user:consumption:successs', this.checkStatus, this);
+			Backbone.on('tips:show', this.tips, this);
 
 			//Setup drink and midnight watchers
 			this._setupWatchers();
@@ -223,7 +224,7 @@ define(function(require){
 			var consumption = this.consumption;
 			var user = User.current();
 			var username = user.get('firstName') ? user.get('firstName') : encodeURIComponent(user.get('username'));
-			var m = 'Mi meta del día son ' + this.model.getGoal() + ' litros, hoy he completado el ' + this.consumption + '% de mi hidratación alcalina. #alcalinizate';
+			var m = 'Mi meta del día son ' + this.model.getGoal() + ' litros, hoy he completado el ' + this.consumption + '% de mi hidratación alcalina. #Alcalinízate';
 			
 			if(_.isString(message)){
 				m = message;
@@ -249,7 +250,7 @@ define(function(require){
 				return;
 			}
 
-			forge.notification.showLoading('Cargando Estadisticas');
+			forge.notification.showLoading('Cargando Estadísticas');
 
 			this.model.getStats()
 				.then(function(computed){
@@ -409,7 +410,7 @@ define(function(require){
 			if(now < noonWatcher){
 				this.noonWatcher = setTimeout(function(){
 					if(this.consumption < 50){
-						forge.notification.alert('¡Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(');
+						forge.notification.alert('¡Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratación diaria :(');
 					}
 				}.bind(this), noonWatcher - now);
 			}
@@ -417,7 +418,7 @@ define(function(require){
 			if(now < afternoonWatcher){
 				this.afternoonWatcher = setTimeout(function(){
 					if(this.consumption < 75){
-						forge.notification.alert('¡Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratacion diaria :(');
+						forge.notification.alert('¡Hey!', 'Solo has consumido el ' + this.consumption + '% de tu hidratación diaria :(');
 					}
 				}.bind(this), afternoonWatcher - now);
 			}
@@ -425,7 +426,7 @@ define(function(require){
 			if(tillMidnight > 1000*60){
 				this.midnightWatcher = setTimeout(function(){
 					this.playAudio('audio/confirmation.wav');
-					forge.notification.alert('¡Hey!', 'El dia ha terminado y completaste el ' + this.consumption + '% de tu hidratacion.');
+					forge.notification.alert('¡Hey!', 'El día ha terminado y completaste el ' + this.consumption + '% de tu hidratación.');
 					Backbone.history.navigate('#home', {trigger: true});
 				}.bind(this), tillMidnight);
 			}
@@ -516,7 +517,7 @@ define(function(require){
 		onDeleteLastError: function(error){
 			switch(error.code){
 			case 101:
-				error.message = 'Solo puedes borrar el ultimo consumo capturado.';
+				error.message = 'Solo puedes borrar el último consumo capturado.';
 				break;
 			}
 

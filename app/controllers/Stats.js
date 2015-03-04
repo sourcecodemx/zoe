@@ -42,25 +42,25 @@ define(function(require){
 
 			switch(this.model.get('type')){
 			case 'today':
-				this.computedStatus = 'Hoy he logrado el ' + data.total + '% de mi hidratación alcalina. #alcalinizate';
+				this.computedStatus = 'Hoy he logrado el ' + data.total + '% de mi hidratación alcalina. #Alcalinízate';
 				this.computedLabel = require('templates/stats_today')({data: data});
 				break;
 			case 'yesterday':
-				this.computedStatus = 'Ayer logre el ' + data.total + '% de mi hidratacion alcalina. #alcalinizate';
+				this.computedStatus = 'Ayer logre el ' + data.total + '% de mi hidratación alcalina. #Alcalinízate';
 				this.computedLabel = require('templates/stats_yesterday')({data: data});
 				break;
 			case 'beforeyesterday':
-				this.computedStatus = 'Antier logre el ' + data.total + '% de mi hidratacion alcalina. #alcalinizate';
+				this.computedStatus = 'Antier logre el ' + data.total + '% de mi hidratación alcalina. #Alcalinízate';
 				this.computedLabel = require('templates/stats_beforeyesterday')({data: data});
 				break;
 			case 'week':
 				data.total = parseInt(Math.floor(data.total/7), 10);
-				this.computedStatus = 'La ultima semana logre el ' + data.total + '% de mi hidratacion alcalina. #alcalinizate';
+				this.computedStatus = 'La ultima semana logre el ' + data.total + '% de mi hidratación alcalina. #Alcalinízate';
 				this.computedLabel = require('templates/stats_week')({data: data});
 				break;
 			case 'month':
 				data.total = parseInt(Math.floor(data.total/30), 10);
-				this.computedStatus = 'El ultimo mes logre ' + data.total + '% de mi hidratacion alcalina. #alcalinizate';
+				this.computedStatus = 'El último mes logre ' + data.total + '% de mi hidratación alcalina. #Alcalinízate';
 				this.computedLabel = require('templates/stats_month')({data: data});
 				break;
 			}
@@ -78,7 +78,7 @@ define(function(require){
 	return Controller.extend({
 		id: 'stats-page',
 		template: template,
-		title: 'Estadisticas',
+		title: 'Estadísticas',
 		currentLabel: '',
 		initialize: function(options){
 			Controller.prototype.initialize.apply(this, arguments);

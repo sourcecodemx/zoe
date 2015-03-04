@@ -21,7 +21,7 @@ buf.push("</button></div>");
 };
 buf.push("<div class=\"scroll-content\"><div class=\"page-content\"><form><div class=\"row\"><div class=\"col\"><div class=\"padding\"><div class=\"list\"><label class=\"item item-input\"><input id=\"username\" type=\"text\" placeholder=\"Nombre de usuario\" autocomplete=\"off\" autocapitalize=\"off\"/></label></div><div class=\"list\"><label class=\"item item-input\"><input id=\"email\" type=\"email\" placeholder=\"Correo electronico\"/></label></div><h5>Fecha de nacimiento</h5><div class=\"list\"><label class=\"item item-input\"><input id=\"birthdate\" type=\"date\" placeholder=\"01-01-1996\" min=\"01-01-1900\" max=\"01-01-2014\"/></label></div></div></div></div><div class=\"row\"><div class=\"col\">");
 jade_mixins["submitButton"]('Siguiente');
-buf.push("<br/><div class=\"text-center\">Al crear tu cuenta confirmas que has leido y <button id=\"authTos\" type=\"button\" class=\"button-clear\"><strong>Aceptas los terminos de uso</strong></button></div></div></div></form></div></div>");;return buf.join("");
+buf.push("<br/><div class=\"text-center\">Al crear tu cuenta confirmas que has leido y <button id=\"authTos\" type=\"button\" class=\"button-clear\"><strong>Aceptas los términos de uso</strong></button></div></div></div></form></div></div>");;return buf.join("");
 };
 
 });

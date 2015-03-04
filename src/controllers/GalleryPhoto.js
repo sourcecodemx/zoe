@@ -93,11 +93,12 @@ define(function(require){
 				icon: 'images/back@2x.png',
 				prerendered: true
 			}, this.hide.bind(this));
+			/*
 			forge.topbar.addButton({
 				icon: 'images/share@2x.png',
 				position: 'right',
 				prerendered: true
-			}, this.onRightButton.bind(this));
+			}, this.onRightButton.bind(this));*/
 
 			this.dom.content.removeClass('bounceOutRight').addClass('bounceInRight');
 
@@ -129,7 +130,7 @@ define(function(require){
 				}
 
 				if(owner){
-					this.dom.user.text(owner.get('username')).removeClass('hide').show();
+					this.dom.user.text(owner.get('username').split('@')[0]).removeClass('hide').show();
 				}
 
 				if(owner && owner.id === User.current().id){
