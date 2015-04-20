@@ -1,0 +1,130 @@
+{
+    "com.phonegap.plugins.facebookconnect": {
+        "source": {
+            "type": "local",
+            "path": "../phonegap-facebook-plugin"
+        }
+    },
+    "cordova-plugin-camera": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/apache/cordova-plugin-camera.git",
+            "subdir": "."
+        }
+    },
+    "cordova-plugin-splashscreen": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/apache/cordova-plugin-splashscreen.git",
+            "subdir": "."
+        }
+    },
+    "nl.x-services.plugins.socialsharing": {
+        "source": {
+            "type": "local",
+            "path": "../SocialSharing-PhoneGap-Plugin"
+        }
+    },
+    "org.apache.cordova.device": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.device"
+        }
+    },
+    "cordova-plugin-statusbar": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/apache/cordova-plugin-statusbar.git",
+            "subdir": "."
+        }
+    },
+    "org.apache.cordova.inappbrowser": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.inappbrowser"
+        }
+    },
+    "cordova-plugin-geolocation": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/apache/cordova-plugin-geolocation.git",
+            "subdir": "."
+        }
+    },
+    "org.apache.cordova.plugin.ActivityIndicator": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Initsogar/cordova-activityindicator",
+            "subdir": "."
+        }
+    },
+    "org.apache.cordova.dialogs": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.dialogs"
+        }
+    },
+    "nl.x-services.plugins.actionsheet": {
+        "source": {
+            "type": "registry",
+            "id": "nl.x-services.plugins.actionsheet"
+        }
+    },
+    "com.darktalker.cordova.screenshot": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/gitawego/cordova-screenshot.git",
+            "subdir": "."
+        }
+    },
+    "cordova-plugin-device": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/apache/cordova-plugin-device",
+            "subdir": "."
+        }
+    },
+    "com.telerik.plugins.wkwebview": {
+        "source": {
+            "type": "registry",
+            "id": "com.telerik.plugins.wkwebview"
+        }
+    },
+    "org.apache.cordova.media": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.media"
+        }
+    },
+    "org.apache.cordova.file": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.file"
+        }
+    },
+    "com.phonegap.plugins.PushPlugin": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/phonegap-build/PushPlugin.git",
+            "subdir": "."
+        }
+    },
+    "org.apache.cordova.camera": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.camera"
+        }
+    },
+    "org.apache.cordova.splashscreen": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.splashscreen"
+        }
+    },
+    "org.apache.cordova.statusbar": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.statusbar"
+        }
+    }
+}
