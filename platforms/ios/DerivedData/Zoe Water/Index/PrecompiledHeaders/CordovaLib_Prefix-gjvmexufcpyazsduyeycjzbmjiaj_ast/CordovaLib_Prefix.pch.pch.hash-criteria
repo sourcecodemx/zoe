@@ -1,0 +1,27 @@
+-x
+objective-c
+-arch
+arm64
+-fretain-comments-from-system-headers
+-std=c99
+-fobjc-arc
+-fpascal-strings
+-O0
+-isysroot
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.1.sdk
+-g
+-miphoneos-version-min=6.0
+-iquote
+-iquote
+-I/Users/addy/Documents/projects/zoewater/platforms/ios/DerivedData/Zoe Water/Build/Products/Debug-iphoneos/include
+-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+-F/Users/addy/Documents/projects/zoewater/platforms/ios/DerivedData/Zoe Water/Build/Products/Debug-iphoneos
+-ferror-limit=10
+-working-directory=/Users/addy/Documents/projects/zoewater/platforms/ios/CordovaLib
+-Xclang
+-detailed-preprocessing-record
+-DDEBUG
+arm64-apple-darwin13.4.0
+"4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.56)"
+SDK_PRODUCT_BUILD_VERSION=12B411
+12B411
