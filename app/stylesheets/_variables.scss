@@ -47,3 +47,24 @@ $border-calm: 1px solid transparentize(white, 0.97);
 
 //Ionicons
 $ionicons-font-path: 'ionic/fonts' !default;
+
+// Charts
+$ct-text-color: white !default;
+$ct-grid-color: rgba(255,255,255, 0.2) !default;
+$ct-series-colors: (
+  $energized,
+  #f05b4f,
+  #f4c63d,
+  #d17905,
+  #453d3f,
+  #59922b,
+  #0544d3,
+  #6b0392,
+  #f05b4f,
+  #dda458,
+  #eacf7d,
+  #86797d,
+  #b2c326,
+  #6188e2,
+  #a748ca
+) !default;

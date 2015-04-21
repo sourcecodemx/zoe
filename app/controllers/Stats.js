@@ -1,33 +1,12 @@
-/* globals define, Backbone, _, User */
+/* globals define, Backbone, User, _ */
 define(function(require){
 	'use strict';
 
-	var Detachable = require('Detachable');
 	var Controller = require('Controller');
 	var Chartist = require('chartist');
 	var config = require('config');
 
 	var Day = Backbone.Model.extend();
-	var DayView = Detachable.extend({
-		className: 'item item-icon-left item-dark',
-		showFx: 'fadeIn',
-		hideFx: 'fadeOut',
-		template: require('templates/stats_item'),
-		initialize: function(){
-			Detachable.prototype.initialize.apply(this, Array.prototype.slice.call(arguments));
-
-			return this.render();
-		},
-		render: function(){
-			var m = this.model.toJSON();
-			var data = {date: m.date, total: m.total/1000, percentage: m.percentage};
-			
-			this.$el.append(this.template({data: data}));
-
-			return this;
-		}
-	});
-
 	var template = require('templates/stats');
 	var Days = Backbone.Collection.extend({
 		model: Day,
@@ -51,12 +30,14 @@ define(function(require){
 		getMonthlyStatus: function(){
 			var month = this.toArray();
 
-			var total = month.reduce(function(c, n){return c + n.total;}, 0);
-			var percentage = total/7;
+			var total = month.reduce(function(c, n){return c + n.get('total');}, 0);
+
+			var percentage = 0;
 			var goal = User.current().getGoal();
 
-			if(goal){
-				percentage = parseInt(((percentage/1000)*100)/goal, 10);
+			if(month.length && goal){
+				percentage = total/month.length;
+				percentage = parseInt((((total/month.length)/1000)*100)/goal, 10);
 			}else {
 				percentage = 'N/A';
 			}
@@ -66,7 +47,7 @@ define(function(require){
 		getChartData: function(){
 			return {
 				labels: this.map(function(c){return c.get('date');}),
-				serie: this.map(function(c){return c.get('total')/1000;})
+				serie: this.map(function(c){return parseFloat(c.get('total')/1000).toFixed(1);})
 			};
 		}
 	});
@@ -76,6 +57,14 @@ define(function(require){
 		template: template,
 		title: 'Estadísticas',
 		currentLabel: '',
+		events: (function() {
+            var events = _.extend({}, Controller.prototype.events, {
+                'tap #monthly': 'monthly',
+                'tap #weekly': 'weekly'
+            });
+
+            return events;
+        })(),
 		initialize: function(options){
 			Controller.prototype.initialize.apply(this, arguments);
 
@@ -84,8 +73,6 @@ define(function(require){
 			if(options.days){
 				this.collection.reset(options.days);
 			}
-
-			this.listenTo(this.collection, 'reset', this.addAll, this);
 
 			return this.render();
 		},
@@ -99,59 +86,55 @@ define(function(require){
 			this.trigger('hide');
 		},
 		onRender: function(){
-			this.dom.items = this.$el.find('#history');
-			this.dom.status = this.$el.find('#status');
-			this.addAll();
+			Controller.prototype.onRender.call(this);
+
+			this.dom.monthly = this.$el.find('#monthly');
+			this.dom.weekly = this.$el.find('#weekly');
+		},
+		onShow: function(){
+			this.bounceInUp();
+			this.weekly();
+		},
+		monthly: function(){
+			this.dom.monthly.addClass('active');
+			this.dom.weekly.removeClass('active');
+
+			var data = this.collection.getChartData();
+			this.drawChart(data.labels, data.serie);
+
+			this.status('month', this.collection.getMonthlyStatus().percentage);
+		},
+		weekly: function(){
+			this.dom.monthly.removeClass('active');
+			this.dom.weekly.addClass('active');
+
+			var data = this.collection.getChartData();
+			this.drawChart(data.labels.slice(0, 7), data.serie.slice(0, 7));
 
 			this.status('week', this.collection.getFirstWeekStatus().percentage);
 		},
-		onShow: function(){
-			var data = this.collection.getChartData();
+		drawChart: function(labels, serie){
+			var goal = User.current().getGoal();
+			var options = {
+				reverseData: true,
+				width: labels.length * 50,
+				axisY: {
+					offset: 30
+				},
+				axisX: {
+				},
+				high: goal,
+				height: this.dom.content.height() - 20
+			};
 
-			this.bounceInUp();
-
-			this.chart = new Chartist.Bar('.ct-chart', {
-			  labels: data.labels,
-			  series: [data.serie]
-			}, {
-			  seriesBarDistance: 10,
-			  reverseData: true,
-			  horizontalBars: true,
-			  height: data.labels.length * 40,
-			  axisY: {
-			    offset: 70,
-			    showGrid: false
-			  },
-			  axisX: {
-			  	showGrid: false,
-			  	scaleMinSpace: 50
-			  }
-			});
-
-			console.log('chartist', Chartist);
-		},
-		addAll: function(){
-			this.removeAll();
-
-			this.collection.each(this.addOne.bind(this));
-			_.invoke(this.views, DayView.prototype.show);
-		},
-		removeAll: function(){
-			_.each(this.views, function(v){
-				v.destroy();
-				v = null;
-			});
-			this.views = {};
-			this.dom.status.empty();
-
-			return this;
-		},
-		addOne: function(model){
-			var view = new DayView({
-				model: model,
-				appendTo: this.dom.items
-			});
-			this.views[view.cid] = view;
+			if(!this.chart){
+				this.chart = new Chartist.Bar('.ct-chart', {
+					labels: labels,
+					series: [serie]
+				}, options);
+			}else{
+				this.chart.update({labels: labels, series: [serie]}, options);
+			}
 		},
 		onRightButton: function(){
 			if(!this.currentStatus){
@@ -168,24 +151,17 @@ define(function(require){
 			});
 		},
 		status: function(type, percentage){
-			var s = '';
-			var html = '';
+			var s = '';			
 			switch(type){
 			case 'week':
 				s = 'La ultima semana logre el ' + (percentage || 0) + '% de mi hidratación alcalina.';
-				html = '<h2 class="dark">La</h2><h2 class="dark">ultima semana</h2><h2 class="dark">ganaste</h2><h2 class="dark">el <strong>' + percentage + '%</strong> de tu</h2><h2 class="dark">hidratación</h2>';
 				break;
 			default:
 				s = 'El último mes logre ' + (percentage || 0) + '% de mi hidratación alcalina.';
-				html = '<h2 class="dark">El</h2><h2 class="dark">último mes</h2><h2 class="dark">ganaste</h2><h2 class="dark">el <strong>' + percentage + '%</strong> de tu</h2><h2 class="dark">hidratación</h2>';
 				break;
 			}
 
 			this.currentStatus = s;
-			this.dom.status.html(html);
-		},
-		drawChart: function(){
-			console.log('drawChart', this);
 		}
 	});
 });

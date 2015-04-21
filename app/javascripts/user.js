@@ -52,7 +52,7 @@ define('user', ['parse', 'config', 'moment'], function(Parse, config, moment){
 
 					for(var d = today, e = todayEnd, i = 0; i<userAge; i++){
 						var total = results.filter(dayFilter.bind({d: d, e: e})).reduce(sum, 0);
-						var date = moment(d).format('DD/MM/YY');
+						var date = moment(d).format('DD');
 
 						monthlyResults.push({total: total, date: date, percentage: goal > 0 ? parseFloat(((total * 100)/goal).toFixed(2),10): 'N/A'});
 

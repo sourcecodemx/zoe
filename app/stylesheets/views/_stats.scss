@@ -1,22 +1,18 @@
 #stats-page {
-	#status {
-		background: url('../images/stats_back.jpg') no-repeat center top;
-		background-position-y: $padding-large-vertical * 5;
-		background-size: cover;
-		background-color: white;
+	.page-content {
+		overflow-x: scroll;
 	}
 
-	#history {
-		//position: fixed;
-		//bottom: 0;
-		//width: 100%;
-		//padding: 0;
+	.ct-chart .ct-label.ct-horizontal {
+		text-align: center;
+	}
+	.ct-chart .ct-bar {
+		stroke-width: 40px;
+	}
 
-		.icon {
-			background: url('../images/gota.png') no-repeat;
-			background-size: contain;
-			width: 20px;
-			background-position-y: 13px
-		}
+	.ct-chart .ct-grid {
+		stroke: rgba(255, 255, 255, 0.06);
+		stroke-width: 1px;
+		stroke-dasharray: 10px;
 	}
 }

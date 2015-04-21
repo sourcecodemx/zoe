@@ -13731,8 +13731,8 @@ a.button {
   display: block;
   width: 100%;
   height: 100%;
-  fill: rgba(0, 0, 0, 0.4);
-  color: rgba(0, 0, 0, 0.4);
+  fill: white;
+  color: white;
   font-size: 0.75rem;
   text-align: left;
 }
@@ -13740,8 +13740,8 @@ a.button {
   display: block;
   width: 100%;
   height: 100%;
-  fill: rgba(0, 0, 0, 0.4);
-  color: rgba(0, 0, 0, 0.4);
+  fill: white;
+  color: white;
   font-size: 0.75rem;
   text-align: left;
 }
@@ -13749,13 +13749,13 @@ a.button {
   display: block;
   width: 100%;
   height: 100%;
-  fill: rgba(0, 0, 0, 0.4);
-  color: rgba(0, 0, 0, 0.4);
+  fill: white;
+  color: white;
   font-size: 0.75rem;
   text-align: right;
 }
 .ct-chart .ct-grid {
-  stroke: rgba(0, 0, 0, 0.2);
+  stroke: rgba(255, 255, 255, 0.2);
   stroke-width: 1px;
   stroke-dasharray: 2px;
 }
@@ -13780,10 +13780,10 @@ a.button {
   stroke-width: 60px;
 }
 .ct-chart .ct-series.ct-series-a .ct-point, .ct-chart .ct-series.ct-series-a .ct-line, .ct-chart .ct-series.ct-series-a .ct-bar, .ct-chart .ct-series.ct-series-a .ct-slice.ct-donut {
-  stroke: #d70206;
+  stroke: #57be29;
 }
 .ct-chart .ct-series.ct-series-a .ct-slice:not(.ct-donut), .ct-chart .ct-series.ct-series-a .ct-area {
-  fill: #d70206;
+  fill: #57be29;
 }
 .ct-chart .ct-series.ct-series-b .ct-point, .ct-chart .ct-series.ct-series-b .ct-line, .ct-chart .ct-series.ct-series-b .ct-bar, .ct-chart .ct-series.ct-series-b .ct-slice.ct-donut {
   stroke: #f05b4f;
@@ -14324,17 +14324,19 @@ a.button {
   background: transparent;
 }
 
-#stats-page #status {
-  background: url("../images/stats_back.jpg") no-repeat center top;
-  background-position-y: 50px;
-  background-size: cover;
-  background-color: white;
+#stats-page .page-content {
+  overflow-x: scroll;
 }
-#stats-page #history .icon {
-  background: url("../images/gota.png") no-repeat;
-  background-size: contain;
-  width: 20px;
-  background-position-y: 13px;
+#stats-page .ct-chart .ct-label.ct-horizontal {
+  text-align: center;
+}
+#stats-page .ct-chart .ct-bar {
+  stroke-width: 40px;
+}
+#stats-page .ct-chart .ct-grid {
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1px;
+  stroke-dasharray: 10px;
 }
 
 #gallery-page .page-content,
