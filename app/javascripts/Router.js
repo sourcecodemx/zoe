@@ -143,13 +143,8 @@ define([
         }
       }.bind(this);
 
-      Backbone.on('user:logout', onLogout);
-      Backbone.on('user:login', onLogin);
-      Backbone.on('user:set:birthdate', onBirthdate);
-
       var onPush = function(p){
-        //forge.parse.setBadgeNumber(0);
-
+        console.log(arguements);
         var data = JSON.parse(p);
 
         switch(data.type){
@@ -161,10 +156,20 @@ define([
       var onPushError = function(){
         //Handle error, not way to do for now
       };
-      //forge.event.messagePushed.addListener(onPush, onPushError);
 
-      //window.onPush = onPush;
+      Backbone.on('user:logout', onLogout);
+      Backbone.on('user:login', onLogin);
+      Backbone.on('user:set:birthdate', onBirthdate);
+      Backbone.on('onpushreceived', onPush);
 
+
+      window.plugins.parsePushNotifications.register({
+        appId: "Li087ST1O7bYBGKxhFQhWwlKnPRy4jJ2575mz7C3",
+        clientKey: "Jy03KXgoxpTQcfkpxhburHLc5LSzMaGzlQIoKJk5",
+        onNotification: 'onPushReceived'
+      });
+
+      
       //Hid esplash screen
       navigator.splashscreen.hide();
     },

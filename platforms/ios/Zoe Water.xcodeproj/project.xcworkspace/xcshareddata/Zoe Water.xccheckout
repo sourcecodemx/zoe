@@ -5,13 +5,13 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>16782ABD-8481-41B5-904A-FF4C4802DA1D</string>
+	<string>F69AE005-8285-4ACC-B6F7-BBA3C77018C2</string>
 	<key>IDESourceControlProjectName</key>
 	<string>Zoe Water</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>AC378D8C334CEAC22D632F7F60568A2B51676FDC</key>
-		<string>https://github.com/sourcecodemx/zoe.git</string>
+		<string>https://github.com/sourcecodemx/zoe</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>platforms/ios/Zoe Water.xcodeproj</string>
@@ -21,7 +21,7 @@
 		<string>../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/sourcecodemx/zoe.git</string>
+	<string>https://github.com/sourcecodemx/zoe</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
@@ -34,7 +34,7 @@
 			<key>IDESourceControlWCCIdentifierKey</key>
 			<string>AC378D8C334CEAC22D632F7F60568A2B51676FDC</string>
 			<key>IDESourceControlWCCName</key>
-			<string>zoewater</string>
+			<string>zoe</string>
 		</dict>
 	</array>
 </dict>

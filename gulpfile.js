@@ -89,7 +89,6 @@ gulp.task('copy', function(){
             'jquery/dist/jquery.min.map',
             'lodash/dist/lodash.min.js',
             'parse-1.2.19.min/index.js',
-            'pusher/dist/pusher.min.js',
             'requirejs/require.js',
             'hammerjs/hammer.min.js',
             'hammerjs/hammer.min.map',
