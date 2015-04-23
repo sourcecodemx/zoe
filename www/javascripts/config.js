@@ -6,7 +6,8 @@ define('config', function(){
 		PARSE: {
 			//Prod
 			ID: 'Li087ST1O7bYBGKxhFQhWwlKnPRy4jJ2575mz7C3',
-			JSKEY: 'ex5SBIHB9bNN9ELyx1ZRFoqiWVfrl5SIukRct2zt'
+			JSKEY: 'ex5SBIHB9bNN9ELyx1ZRFoqiWVfrl5SIukRct2zt',
+			CLIENTKEY: 'Jy03KXgoxpTQcfkpxhburHLc5LSzMaGzlQIoKJk5'
 			//Dev
 			//ID: 'WhG4gZOUXz16xV4uLfDV4qLAjh3fDTl0DDxAwY0p',
 			//JSKEY: '9q4nTLaRuPvEmdz4ztsXDabmjxmR0TuOxKkh3TeA'

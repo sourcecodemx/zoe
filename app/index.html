@@ -14,11 +14,6 @@
   <script src="cordova.js"></script>
   <script src="javascripts/zoe.js"></script>
   <script>
-
-    window.onPushReceived = function(){
-      Backbone.trigger('onpushreceived', arguments);
-    };
-    
     window.addEventListener('devicemotion', function (e) {
       e.preventDefault();
     });

@@ -1,4 +1,4 @@
-/*global define, Backbone, aspect, _, User, forge */
+/*global define, Backbone, aspect, _, User */
 
 define([
   'Page',
@@ -143,13 +143,8 @@ define([
         }
       }.bind(this);
 
-      Backbone.on('user:logout', onLogout);
-      Backbone.on('user:login', onLogin);
-      Backbone.on('user:set:birthdate', onBirthdate);
-
-      var onPush = function(p){
-        //forge.parse.setBadgeNumber(0);
-
+      var onPush = function(s, p){
+        console.log(s, p, 'state, json');
         var data = JSON.parse(p);
 
         switch(data.type){
@@ -158,13 +153,13 @@ define([
         case 'store': Backbone.trigger('store:open'); break;
         }
       };
-      var onPushError = function(){
-        //Handle error, not way to do for now
-      };
-      //forge.event.messagePushed.addListener(onPush, onPushError);
 
-      //window.onPush = onPush;
+      Backbone.on('user:logout', onLogout);
+      Backbone.on('user:login', onLogin);
+      Backbone.on('user:set:birthdate', onBirthdate);
+      Backbone.on('onpushreceived', onPush);
 
+      
       //Hid esplash screen
       navigator.splashscreen.hide();
     },

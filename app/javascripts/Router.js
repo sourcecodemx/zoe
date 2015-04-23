@@ -1,4 +1,4 @@
-/*global define, Backbone, aspect, _, User, forge */
+/*global define, Backbone, aspect, _, User */
 
 define([
   'Page',
@@ -143,8 +143,8 @@ define([
         }
       }.bind(this);
 
-      var onPush = function(p){
-        console.log(arguements);
+      var onPush = function(s, p){
+        console.log(s, p, 'state, json');
         var data = JSON.parse(p);
 
         switch(data.type){
@@ -153,21 +153,11 @@ define([
         case 'store': Backbone.trigger('store:open'); break;
         }
       };
-      var onPushError = function(){
-        //Handle error, not way to do for now
-      };
 
       Backbone.on('user:logout', onLogout);
       Backbone.on('user:login', onLogin);
       Backbone.on('user:set:birthdate', onBirthdate);
       Backbone.on('onpushreceived', onPush);
-
-
-      window.plugins.parsePushNotifications.register({
-        appId: "Li087ST1O7bYBGKxhFQhWwlKnPRy4jJ2575mz7C3",
-        clientKey: "Jy03KXgoxpTQcfkpxhburHLc5LSzMaGzlQIoKJk5",
-        onNotification: 'onPushReceived'
-      });
 
       
       //Hid esplash screen

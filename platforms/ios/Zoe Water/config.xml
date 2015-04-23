@@ -55,6 +55,10 @@
     <feature name="Notification">
         <param name="ios-package" value="CDVNotification" />
     </feature>
+    <feature name="SocialSharing">
+        <param name="ios-package" value="SocialSharing" />
+        <param name="onload" value="true" />
+    </feature>
     <icon height="180" src="res/icon/180.png" width="180" />
     <icon height="60" src="res/icon/60.png" width="60" />
     <icon height="120" src="res/icon/120.png" width="120" />
@@ -94,8 +98,4 @@
     <preference name="StatusBarStyle" value="lightcontent" />
     <preference name="ShowSplashScreenSpinner" value="false" />
     <preference name="AutoHideSplashScreen" value="false" />
-    <feature name="SocialSharing">
-        <param name="ios-package" value="SocialSharing" />
-        <param name="onload" value="true" />
-    </feature>
 </widget>

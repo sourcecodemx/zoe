@@ -125,6 +125,13 @@ module.exports = [
         "clobbers": [
             "window.plugins.socialsharing"
         ]
+    },
+    {
+        "file": "plugins/nl.x-services.plugins.launchmyapp/www/ios/LaunchMyApp.js",
+        "id": "nl.x-services.plugins.launchmyapp.LaunchMyApp",
+        "clobbers": [
+            "window.plugins.launchmyapp"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -142,7 +149,8 @@ module.exports.metadata =
     "org.apache.cordova.device": "0.3.0",
     "org.apache.cordova.camera": "0.3.6",
     "org.apache.cordova.dialogs": "0.3.0",
-    "nl.x-services.plugins.socialsharing": "4.3.17"
+    "nl.x-services.plugins.socialsharing": "4.3.17",
+    "nl.x-services.plugins.launchmyapp": "3.2.2"
 }
 // BOTTOM OF METADATA
 });
