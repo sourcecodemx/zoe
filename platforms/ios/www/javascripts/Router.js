@@ -144,7 +144,8 @@ define([
       }.bind(this);
 
       var onPush = function(s, p){
-        console.log(s, p, 'state, json');
+        console.log(s, p, arguments, 'state, json');
+        
         var data = JSON.parse(p);
 
         switch(data.type){
@@ -160,7 +161,7 @@ define([
       Backbone.on('onpushreceived', onPush);
 
       
-      //Hid esplash screen
+      //Hide esplash screen
       navigator.splashscreen.hide();
     },
 
