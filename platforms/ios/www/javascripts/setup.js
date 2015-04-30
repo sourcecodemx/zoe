@@ -30,8 +30,8 @@ define(
 			console.log('push not registered', arguments);
 		});
 
-		window.plugin.parse_push.ontrigger = function(state, json){
-			Backbone.trigger('onpushreceived', state, json);
+		window.plugin.parse_push.ontrigger = function(p){
+			Backbone.trigger('onpushreceived', p);
 		};
 	}
 );

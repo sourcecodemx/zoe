@@ -64,9 +64,11 @@
 		7E7966E71810823500FA85AD /* icon-small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7E7966DD1810823500FA85AD /* icon-small@2x.png */; };
 		805EC6423430434C847834E8 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7FF23DB3A2C461288F05AA9 /* QuartzCore.framework */; };
 		8EFA521FC61446FB98533DE3 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C461394978AA4CFDAA195952 /* OpenGLES.framework */; };
+		97BC9DD052F44FD987B0FCB5 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9617CCE49E554BCDBB9A049C /* MessageUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		9A715CCE3FA248719D1857D4 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F47EE66AACC4F15BDC8FCFC /* StoreKit.framework */; };
 		ACFBB5261F8C446AB9C1D125 /* CDVJpegHeaderWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = B51500A8148045A68218F4A9 /* CDVJpegHeaderWriter.m */; };
 		B03E4EBE8DA64243B8B936FD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6867758CCFCF4FF8BBE7D73E /* Security.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		B43A7FD41D424F3E9FF93269 /* SocialSharing.m in Sources */ = {isa = PBXBuildFile; fileRef = 66875C3320A64FE8AE8BD9CB /* SocialSharing.m */; };
 		B7601647C4C140D993CE7E51 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A082B6693C854F1881BD1C8B /* OpenAL.framework */; };
 		B8096D642AA54525AF626084 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD14C49988BC4B2C93839870 /* CoreLocation.framework */; };
 		C150B9EB054740CABA2C1D5F /* Release-iphonesimulator-libCocoonJS_force_load.a in Sources */ = {isa = PBXBuildFile; fileRef = 736B379582A942788374A30D /* Release-iphonesimulator-libCocoonJS_force_load.a */; settings = {COMPILER_FLAGS = "-force_load"; }; };
@@ -79,8 +81,6 @@
 		EDF3E3CD642046729A8C50F9 /* CDVNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B238B02A71741FC89DC5DB3 /* CDVNotification.m */; };
 		F73769A46E964F769C139570 /* cocoonjs.cf in Sources */ = {isa = PBXBuildFile; fileRef = C9DB04008DD44E908F9204F0 /* cocoonjs.cf */; };
 		F8FC798FBC89491DAEE8771E /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79A4E94631454176A4828E87 /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		B43A7FD41D424F3E9FF93269 /* SocialSharing.m in Sources */ = {isa = PBXBuildFile; fileRef = 66875C3320A64FE8AE8BD9CB /* SocialSharing.m */; };
-		97BC9DD052F44FD987B0FCB5 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9617CCE49E554BCDBB9A049C /* MessageUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +146,7 @@
 		4E2AAAEBB1CD4573B502FDB8 /* Release-iphoneos-libCocoonJS.a */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = archive.ar; name = "Release-iphoneos-libCocoonJS.a"; path = "com.ludei.ios.webview.plus/Release-iphoneos-libCocoonJS.a"; sourceTree = "<group>"; };
 		5B1594DC16A7569C00FEF299 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		5FBE5EC155FB48039E8FB829 /* Release-iphonesimulator-libCocoonJS.a */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = archive.ar; name = "Release-iphonesimulator-libCocoonJS.a"; path = "com.ludei.ios.webview.plus/Release-iphonesimulator-libCocoonJS.a"; sourceTree = "<group>"; };
+		66875C3320A64FE8AE8BD9CB /* SocialSharing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SocialSharing.m; path = "nl.x-services.plugins.socialsharing/SocialSharing.m"; sourceTree = "<group>"; };
 		67706037DB6C4D328C426F52 /* MapKit.framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		67920F5E1261474B9084F375 /* Release-iphoneos-libCocoonJS_force_load.a */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = archive.ar; name = "Release-iphoneos-libCocoonJS_force_load.a"; path = "com.ludei.ios.webview.plus/Release-iphoneos-libCocoonJS_force_load.a"; sourceTree = "<group>"; };
 		6867758CCFCF4FF8BBE7D73E /* Security.framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -174,6 +175,7 @@
 		8B7D6B35ACD647099A40D588 /* libsqlite3.dylib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* Zoe Water-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Zoe Water-Info.plist"; path = "../Zoe Water-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		9121BBCD88E142F3B82EC394 /* CDVStatusBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDVStatusBar.h; path = org.apache.cordova.statusbar/CDVStatusBar.h; sourceTree = "<group>"; };
+		9617CCE49E554BCDBB9A049C /* MessageUI.framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		966E0951B2114EB181FFDB98 /* CDVDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDVDevice.h; path = org.apache.cordova.device/CDVDevice.h; sourceTree = "<group>"; };
 		A082B6693C854F1881BD1C8B /* OpenAL.framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		A1A07FA7CC3D4119A1D8F331 /* ParsePushNotificationPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParsePushNotificationPlugin.h; path = com.stratogos.cordova.parsePushNotifications/ParsePushNotificationPlugin.h; sourceTree = "<group>"; };
@@ -195,13 +197,11 @@
 		EB87FDF21871DA7A0020F90C /* merges */ = {isa = PBXFileReference; lastKnownFileType = folder; name = merges; path = ../../merges; sourceTree = "<group>"; };
 		EB87FDF31871DA8E0020F90C /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../www; sourceTree = "<group>"; };
 		EB87FDF41871DAF40020F90C /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = ../../config.xml; sourceTree = "<group>"; };
+		F2BCC10496134124B281ABEB /* SocialSharing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SocialSharing.h; path = "nl.x-services.plugins.socialsharing/SocialSharing.h"; sourceTree = "<group>"; };
 		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = "Zoe Water/config.xml"; sourceTree = "<group>"; };
 		FAB4F06E69E64AB4AA1DFC49 /* CoreMotion.framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FE8F4498BCC647BC91B8B8C1 /* Accounts.framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 		FFA7FD7599634BBF8EC2A317 /* CFNetwork.framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		66875C3320A64FE8AE8BD9CB /* SocialSharing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "SocialSharing.m"; path = "nl.x-services.plugins.socialsharing/SocialSharing.m"; sourceTree = "<group>"; fileEncoding = 4; };
-		F2BCC10496134124B281ABEB /* SocialSharing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "SocialSharing.h"; path = "nl.x-services.plugins.socialsharing/SocialSharing.h"; sourceTree = "<group>"; fileEncoding = 4; };
-		9617CCE49E554BCDBB9A049C /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "MessageUI.framework"; path = "System/Library/Frameworks/MessageUI.framework"; sourceTree = SDKROOT; fileEncoding = 4; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

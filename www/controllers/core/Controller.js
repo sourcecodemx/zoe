@@ -35,8 +35,8 @@ define(function(require){
         	Backbone.on('app:offline', this.onOffline, this);
 
             //Aspect
-			aspect.add(this, 'show', this.onBeforeShow.bind(this));
-			aspect.add(this, 'hide', this.onBeforeHide.bind(this));
+			aspect.add(this, 'show', this.onBeforeShow.bind(this), 'before');
+			aspect.add(this, 'hide', this.onBeforeHide.bind(this), 'before');
 			aspect.add(this, 'submit', this.onBeforeSubmit.bind(this), 'before');
 			aspect.add(this, ['onLeftButton', 'onRightButton', 'hide'], this.blur.bind(this), 'before');
 

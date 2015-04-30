@@ -169,44 +169,24 @@
     {
         NSLog(@"didReceiveRemoteNotificationWithPayload received");
         
-        NSDictionary *aps = [payload objectForKey:@"aps"];
-        NSMutableDictionary *data = [[payload objectForKey:@"data"] mutableCopy];
+        NSMutableString *jsonStr = [NSMutableString stringWithString:@"{"];
+        [self parseDictionary:payload intoJSON:jsonStr];
         
-        if(data == nil){
-            data = [[NSMutableDictionary alloc] init];
-        }
-        
-        /*
-         
-         the aps.alert value is required in order for the ios notification center to have something to show
-         or else it wouls show the full JSON payload.
-         
-         however on the js side we want to access all the properties for this notification inside a single
-         object and care not for ios specific implemenataion such as the aps wrapper
-         
-         we could just duplicate the text and have it in both *aps.alert* and inside data.message but as the
-         payload size limit is only 256 bytes it is better to check if an explicit data.message value exists
-         and if not just copy aps.alert into it
-         
-         */
-        
-        if([aps objectForKey:@"alert"]){
-            if(![data objectForKey:@"message"]){
-                [data setObject:[aps objectForKey:@"alert"] forKey:@"message"];
-            }
-        }
         
         BOOL receivedInForeground = [[payload objectForKey:@"receivedInForeground"] boolValue];
-        NSString* stateName = receivedInForeground ? @"foreground" : @"background";
         
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data options:NSJSONWritingPrettyPrinted error:nil];
+        if (receivedInForeground)
+        {
+            [jsonStr appendFormat:@"foreground:\"%d\"", 1];
+        }
+        else
+            [jsonStr appendFormat:@"foreground:\"%d\"", 0];
         
-        NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        [jsonStr appendString:@"}"];
         
+        NSLog(@"Msg: %@", jsonStr);
         
-        NSLog(@"Msg: %@", json);
-        
-        NSString * jsCallBack = [NSString stringWithFormat:@"setTimeout(function(){window.plugin.parse_push.ontrigger('%@', %@)},0)", stateName, json];
+        NSString * jsCallBack = [NSString stringWithFormat:@"setTimeout(function(){window.plugin.parse_push.ontrigger(%@)},0)", jsonStr];
         
         if(receivedInForeground){
             [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
@@ -274,5 +254,30 @@
         
         [self.commandDelegate sendPluginResult:commandResult callbackId:self.callbackId];
     }
+
+// reentrant method to drill down and surface all sub-dictionaries' key/value pairs into the top level json
+-(void)parseDictionary:(NSDictionary *)inDictionary intoJSON:(NSMutableString *)jsonString
+{
+    NSArray         *keys = [inDictionary allKeys];
+    NSString        *key;
     
+    for (key in keys)
+    {
+        id thisObject = [inDictionary objectForKey:key];
+        
+        if ([thisObject isKindOfClass:[NSDictionary class]])
+            [self parseDictionary:thisObject intoJSON:jsonString];
+        else if ([thisObject isKindOfClass:[NSString class]])
+            [jsonString appendFormat:@"\"%@\":\"%@\",",
+             key,
+             [[[[inDictionary objectForKey:key]
+                stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"]
+               stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]
+              stringByReplacingOccurrencesOfString:@"\n" withString:@"\\n"]];
+        else {
+            [jsonString appendFormat:@"\"%@\":\"%@\",", key, [inDictionary objectForKey:key]];
+        }
+    }
+}
+
     @end

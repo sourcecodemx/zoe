@@ -48,7 +48,7 @@ define(function(require){
 			Backbone.on('journal:update', this.updateJournal, this);
 			Backbone.on('home:reload', this.reload, this);
 			Backbone.on('user:consumption:successs', this.checkStatus, this);
-			Backbone.on('tips:show', this.tips, this);
+			Backbone.on('tips:open', this.tips, this);
 
 			//Setup drink and midnight watchers
 			this._setupWatchers();
@@ -130,6 +130,28 @@ define(function(require){
 			}
 
 			this.listenToOnce(this.views.settings, 'hide', this.bounceInLeft.bind(this));
+		},
+		onBeforeHide: function(){
+			if(this.views){
+				
+				if(this.views.tips){
+					if(this.views.tips.$el.is(':visible')){
+						this.stopListening(this.views.tips);
+						this.views.tips.hide();	
+					}
+
+					Controller.prototype.hide.call(this.views.tips);
+				}
+				
+				if(this.views.stats){
+					if(this.views.stats.$el.is(':visible')){
+						this.stopListening(this.views.stats);
+						this.views.stats.hide();	
+					}
+
+					Controller.prototype.hide.call(this.views.stats);
+				}
+			}
 		},
 		track: function(){
 			if(!this.online){

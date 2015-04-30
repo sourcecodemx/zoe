@@ -65,7 +65,7 @@ define([
       // but a modal
       var pages = _
         .chain(routes)
-        .omit(function(v){return v === 'share';})
+        .omit(function(v){return v === 'share' ||  v === 'tips';})
         .toArray()
         .value();
 
@@ -143,15 +143,11 @@ define([
         }
       }.bind(this);
 
-      var onPush = function(s, p){
-        console.log(s, p, arguments, 'state, json');
-        
-        var data = JSON.parse(p);
-
-        switch(data.type){
-        case 'blog': Backbone.trigger('tips:open', data.id); break;
-        case 'tip': Backbone.history.navigate('tips/' + data.id, {trigger: true}); break;
-        case 'store': Backbone.trigger('store:open'); break;
+      var onPush = function(p){
+        switch(p.type){
+        case 'blog': Backbone.history.navigate('blog', {trigger: true}); break;
+        case 'tip': Backbone.history.navigate('tips', {trigger: true}); break;
+        case 'store': Backbone.history.navigate('store', {trigger: true}); break;
         }
       };
 
@@ -241,6 +237,14 @@ define([
       }
 
       this.currentView = this.storeView.show();
+    },
+
+    tips: function(){
+      if(this.currentView.id !== 'home-page'){
+        Backbone.history.navigate('home', {trigger: true});
+      }
+
+      _.delay(function(){Backbone.trigger('tips:open');}, 1000);
     }
   }, {
     getHeader: function(){

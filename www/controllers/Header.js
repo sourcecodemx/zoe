@@ -13,7 +13,6 @@ define(function(require){
 		initialize: function(){
 			Backbone.on('header:hide', this.hide, this);
 			Backbone.on('header:toggle', this.toggle, this);
-			Backbone.on('store:open', this.store, this);
 
 			return this.render();
 		},
