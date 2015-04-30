@@ -132,8 +132,7 @@ define(function(require){
 			this.listenToOnce(this.views.settings, 'hide', this.bounceInLeft.bind(this));
 		},
 		onBeforeHide: function(){
-			if(this.views){
-				
+			if(this.views){				
 				if(this.views.tips){
 					if(this.views.tips.$el.is(':visible')){
 						this.stopListening(this.views.tips);
@@ -142,7 +141,6 @@ define(function(require){
 
 					Controller.prototype.hide.call(this.views.tips);
 				}
-				
 				if(this.views.stats){
 					if(this.views.stats.$el.is(':visible')){
 						this.stopListening(this.views.stats);
